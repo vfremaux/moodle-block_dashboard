@@ -1,0 +1,38 @@
+<h2>Dashboard element</h2>
+<h3>Geolocated information</h3>
+
+<p>PLotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
+	or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
+	coordinate and will cache this information.</p>
+<p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Gecoding API of Google</a> for more information.</p>
+
+<h4>Geographic data settings</h4>
+
+<p>Geolocated information are plotted on map as graphical markers. Markers can be defined as :</p>
+<ul><li>A quadruplet: Title, Latitude, Longitude, Marker Class</li>
+	<li>A sextuplet: Title, Address, Post code, City, Region Code, MArker Class</li>
+</ul>
+<p>Information fields have following specification:</p>
+<ul><li><i>Title</i>: Textual label of the marker</li>
+	<li><i>Latitude</i>: floating point latitude</li>
+	<li><i>Longitude</i>: floating point longitude</li>
+	<li><i>Address</i>: road information</li>
+	<li><i>Post code</i>: Official post or zip code</li>
+	<li><i>City</i>: City name</li>
+	<li><i>Marker Class</i>: A classname, that will bind to a graphical icon</li>
+</ul>	
+
+<p>Setting fields let you bind required information to request output fields. Setting onputs will usually accept one or more field (or alias) names separated by semicolons (";").</p>
+<ul>
+	<li><i>Title input</i>: Query output fieldname providing the textual label</li>
+	<li><i>Location input</i>: 
+		<ul>
+			<li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point values : "lat,lng" (ex : 47.098456,1.4534456)</li>
+			<li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order : address, post code, city, and region code (*)</li>
+		</ul>
+	</li>
+	<li><i>Marker type input</i>: The query output fieldname that provides a class label</li>
+	
+<p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
+<pre>address;cp;city;'GB'</pre>
+<p>will always provide the value 'GB' as region code.</p> 	

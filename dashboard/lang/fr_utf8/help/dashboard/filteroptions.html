@@ -1,0 +1,27 @@
+<h2>Element de tableau de bord</h2>
+<h3>Options pour les filtres</h3>
+
+<p>Certaines options complémentaires peuvent être appliquées aux filtres, sous forme de marqueurs dans une chaîne d'options.</p>
+
+<h4>Valeurs</h4>
+
+<ul>
+	<li><b>m</b> : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".</li>
+	<li><b>s</b> : (single) Interdit l'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé sur "FIRST" si aucun défaut n'est défini. Un filtre en mode "s" exclut le précédent.</li>
+</ul>                                                           
+
+<h4>Cas de plusieurs filtres</h4>
+
+<p>Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent également faire aparaitre une liste
+de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".</p> 
+
+<h4>Exemple</h4>
+
+<p>Soit les filtres :</p>
+<pre>year;month;day</pre>
+
+<p>les options</p>
+
+<pre>s;m;</pre>
+
+<p>permettront la sélection d'une et une seule année d'extraction, une sélection de mois, et n'importe quel jour OU tous les jours.</p>
