@@ -74,7 +74,7 @@ Given a full query, the dashboard block mashes up :
 # Install additive for running timelines
 ========================================
 
-Timeline needs to be post page loading activaed. We got some issue to stack onload events
+Timeline needs to be post page loading activated. We got some issue to stack onload events
 on body element. The solution is till now to add a late call to initialisation in footer :
 
 Add this statement :
