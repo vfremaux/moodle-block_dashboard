@@ -1,5 +1,11 @@
+Versions
+========
+
+1.9 as branch MOODLE_19_STABLE
+2.2 as branch master
+
 Dashboard element block
-##############################
+=======================
 
 the dashboard element bloc is of use with flexible Moodle
 page formats allowing free setup of the page layout using blocks.
