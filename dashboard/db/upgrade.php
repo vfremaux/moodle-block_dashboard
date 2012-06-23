@@ -1,7 +1,7 @@
 <?php  //$Id: upgrade.php,v 1.2 2011-11-05 19:13:07 vf Exp $
 
 // This file keeps track of upgrades to 
-// the vmoodle block
+// the dashboard block
 //
 // Sometimes, changes between versions involve
 // alterations to database structures and other
@@ -19,32 +19,11 @@
 
 function xmldb_block_dashboard_upgrade($oldversion=0) {
 
-    global $CFG, $THEME, $db;
+    global $CFG, $THEME, $DB;
 
     $result = true;
 
-/// And upgrade begins here. For each one, you'll need one 
-/// block of code similar to the next one. Please, delete 
-/// this comment lines once this file start handling proper
-/// upgrade code.
-
-    if ($result && $oldversion < 2011101102) {
-
-    /// Define table dashboard_geo_cache to be created
-        $table = new XMLDBTable('dashboard_geo_cache');
-
-    /// Adding fields to table dashboard_geo_cache
-        $table->addFieldInfo('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
-        $table->addFieldInfo('address', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, null, null);
-        $table->addFieldInfo('regioncode', XMLDB_TYPE_CHAR, '16', null, null, null, null, null, null);
-        $table->addFieldInfo('latlng', XMLDB_TYPE_CHAR, '20', null, null, null, null, null, null);
-
-    /// Adding keys to table dashboard_geo_cache
-        $table->addKeyInfo('primary', XMLDB_KEY_PRIMARY, array('id'));
-
-    /// Launch create table for dashboard_geo_cache
-        $result = $result && create_table($table);
-    }
+	// Moodle 2.0 break line
     
     return $result;
 }

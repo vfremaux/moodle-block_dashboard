@@ -8,7 +8,7 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 1.9
+ * @version Moodle 2.0
  */
 
 /**
@@ -47,17 +47,18 @@ function extra_db_error($error, $return = false){
 	
 	// example : Moodle 1.9 environement : simplest way, non internationalised
 	if ($return) return '<span class="error">'.$error.'</span>';
-	error($error);
+	echo($error);
 }
 
 /*
 * wraps to environement non fatal error reporting function (debugging)
 */
 function extra_db_notify($error){
+	global $OUTPUT;
 	// TODO : implement environment dependant code here
 	
 	// example : Moodle 1.9 environement : simplest way, non internationalised
-	notify($error);
+	$OUTPUT->notification($error);
 }
 
 function extra_db_get_config($configkey){

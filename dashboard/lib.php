@@ -6,9 +6,13 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 1.9
+ * @version Moodle 2.x
  */
 
+/**
+* A low level utility to format data in a cell
+*
+*/
 function dashboard_format_data($format, $data, $cumulativeix = null){
 	global $DASHBOARD_ACCUMULATORS;
 
@@ -59,7 +63,7 @@ function print_cross_table(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $r
 
 	$str = '';
 
-	dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, $theBlock->config->horizsums);
+	dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, @$theBlock->config->horizsums);
 	
 	// print flipped array
 	$path = array();
@@ -104,6 +108,10 @@ function print_cross_table(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $r
 	echo $str;
 }
 
+/**
+* Recursive worker for printing bidimensional table
+*
+*/
 function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null){
 	static $level = 0;
 	static $r = 0;
@@ -171,14 +179,14 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
 					$str .= "<td class=\"data empty c{$c}\"></td>";
 				}
 				$sum += strip_tags(@$v[$col]);
-				if ($theBlock->config->vertsums){
+				if (@$theBlock->config->vertsums){
 					$subsums->subs[$col] = @$subsums->subs[$col] + strip_tags(@$v[$col]);
 					$subsums->all[$col] = @$subsums->all[$col] + strip_tags(@$v[$col]);
 				}
 				$c++;
 			}
 			
-			if ($theBlock->config->horizsums){
+			if (@$theBlock->config->horizsums){
 				$str .= "<td class=\"data rowtotal c{$c}\">$sum</td>";
 			}
 			
@@ -222,6 +230,154 @@ function dashboard_print_table_header(&$str, &$hcols, &$vkeys, $hlabel, $horizsu
 	$str .= '</tr>';
 }
 
+/**
+* An HTML raster for a matrix cross table
+* printing raster uses a recursive cell drilldown over dynamic matrix dimension
+*/
+function print_cross_table_csv(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $return = false){
+
+	$str = '';
+
+	dashboard_print_table_header_csv($str, $hcols, $vkeys, $hlabel, @$theBlock->config->horizsums);
+	
+	// print flipped array
+	$path = array();
+
+	$subsums = new StdClass;
+	$subsums->subs = array();
+	$subsums->all = array();
+
+	table_explore_rec_csv($theBlock, $str, $path, $hcols, $m, $vkeys, $hlabel, count($vkeys->formats), $subsums);
+	
+	if ($return) return $str;
+	echo $str;
+}
+
+/**
+* Recursive worker for CSV table writing
+*
+*/
+function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null){
+	static $level = 0;
+	static $r = 0;
+	
+	$vformats = array_values($vkeys->formats);
+	$vcolumns = array_keys($vkeys->formats);
+	
+	foreach($t as $k => $v){
+		$plittable = false;
+		array_push($pathstack, $k);
+		$level++;
+		if ($level < $keydeepness){
+			table_explore_rec_csv($theBlock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
+		} else {
+			$r = ($r + 1) % 2;
+			$c = 0;
+			$pre = '';
+			foreach($pathstack as $pathelm){
+				if (!empty($vformats[$c])){
+					$pathelm = dashboard_format_data($vformats[$c], $pathelm);
+				}
+				if (!empty($theBlock->config->cleandisplay)){
+					if ($pathelm != @$vkeys->mem[$c]){
+						$pre .= "<td class=\"vkey c{$c}\">$pathelm</td>";
+						if (isset($vkeys->mem[$c]) && @$theBlock->config->spliton == $vcolumns[$c]){
+							// first split do not play
+							
+							// if vertsums are enabled, print vertsubs
+							if ($theBlock->config->vertsums){
+								$str .= '<tr>';
+								$span = count($pathstack);
+								$subtotalstr = get_string('subtotal', 'block_dashboard');
+								$str .= "<td colspan=\"{$span}\" >$subtotalstr</td>";
+								foreach($hcols as $col){
+									$str.= "<td class=\"coltotal\">{$subsums->subs[$col]}</td>";
+									$subsums->subs[$col] = 0;
+								}
+								if ($theBlock->config->horizsums){
+									$str .= '<td></td>';
+								}
+								$str .= '</tr>';
+							}
+							
+							// then close previous table
+							$str .= '</table>';
+							dashboard_print_table_header_csv($str, $hcols, $vkeys, $hlabel, $theBlock->config->horizsums);
+						}
+						$vkeys->mem[$c] = $pathelm;
+					} else {
+						$pre .= "<td class=\"vkey c{$c}\"></td>";
+					}
+				} else {
+					$pre .= "<td class=\"vkey c{$c}\">$pathelm</td>";
+				}
+				$c++;
+			}
+			
+			$str .= $pre;
+			
+			$sum = 0;
+			foreach($hcols as $col){
+				if (array_key_exists($col, $v)){
+					$str .= "<td class=\"data c{$c}\">{$v[$col]}</td>";
+				} else {
+					$str .= "<td class=\"data empty c{$c}\"></td>";
+				}
+				$sum += strip_tags(@$v[$col]);
+				if (@$theBlock->config->vertsums){
+					$subsums->subs[$col] = @$subsums->subs[$col] + strip_tags(@$v[$col]);
+					$subsums->all[$col] = @$subsums->all[$col] + strip_tags(@$v[$col]);
+				}
+				$c++;
+			}
+			
+			if (@$theBlock->config->horizsums){
+				$str .= "<td class=\"data rowtotal c{$c}\">$sum</td>";
+			}
+			
+			$str .= "</tr>";
+		}
+		$level--;
+		array_pop($pathstack);
+	}
+}
+
+/**
+* prints the first line as column titles
+*
+*
+*/
+function dashboard_print_table_header_csv(&$str, &$hcols, &$vkeys, $hlabel, $horizsums = false){
+	global $CFG;
+		
+	$vlabels = array_values($vkeys->labels);
+
+	$row = array();
+	foreach($vkeys->labels as $vk => $vlabel){
+		$row[] = $vlabel;
+	}
+
+	foreach($hcols as $hc){
+		$row[] = $hc;
+	}
+	
+	if ($horizsums){
+		$row[] = get_string('total', 'block_dashboard');
+	}
+	
+	echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $row)); 
+	echo $CFG->dashboard_csv_line_separator;
+}
+
+/**
+* prints a smart tree with data
+* @param object $theBlock full block information
+* @param struct $tree the tree organized representation of records
+* @param array $treeoutput an array of pair column,format information for making the tree node name
+* @param array $outputfields an array of fields for tree node value information
+* @param array $outputformats formats for above
+* @param array $colourcoding an array of colour coding rules issued from table scope colourcoding settings
+*/
 function dashboard_print_tree_view(&$theBlock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding, $return = false){
 	static $level = 1;
 	
@@ -276,6 +432,7 @@ function dashboard_print_tree_view(&$theBlock, &$tree, &$treeoutput, &$outputfie
 
 /**
 * processes given colour coding to a datum
+* @param object $theBlock full block information
 *
 */
 function dashboard_colour_code(&$theBlock, $datum, &$colorcoding, $inline = false){

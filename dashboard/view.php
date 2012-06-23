@@ -1,59 +1,51 @@
 <?php
 
 	include '../../config.php';
-	
-	
+
 	$courseid = required_param('id', PARAM_INT);
 	$blockid = required_param('blockid', PARAM_INT);
-	
-	if (!$course = get_record('course', 'id', $courseid)){
-		error('Bad course ID');
+
+	if (!$course = $DB->get_record('course', array('id' => $courseid))){
+		print_error('invalidcourseid');
 	}
-	
+
 	require_login($course);
-	
+
     $pinned = optional_param('pinned', false, PARAM_INT);
-    $blocktable = ($pinned) ? 'block_pinned' : 'block_instance' ;
-    if (!$instance = get_record($blocktable, 'id', $blockid)){
-        error('Invalid block');
+    $blocktable = ($pinned) ? 'block_pinned' : 'block_instances' ;
+    if (!$instance = $DB->get_record($blocktable, array('id' => $blockid))){
+        print_error('invalidblockid');
     }
     $theBlock = block_instance('dashboard', $instance);
-	$context = get_context_instance(CONTEXT_BLOCK, $theBlock->instance->id);	
-	
-	$navlinks = array(
-			array('name' => $course->shortname,
-			      'type' => 'url',
-			      'link' => $CFG->wwwroot.'/cours/view.php?id='.$courseid),
-			array('name' => get_string('dashboards', 'block_dashboard'),
-			      'type' => 'title',
-			      'link' => ''),
-			array('name' => $theBlock->config->title,
-			      'type' => 'title',
-			      'link' => ''),
-		);
-	
-	print_header($SITE->shortname, $SITE->shortname, build_navigation($navlinks));
+	$context = context_block::instance($theBlock->instance->id);	
 
-	print_box_start();
-	echo $theBlock->print_dashboard();	
-	if (has_capability('block/dashboard:configure', $context)){
+	$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
+	$PAGE->navbar->add(@$theBlock->config->title, NULL);
+	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid.'&pinned='.$pinned);
+	$PAGE->set_title($SITE->shortname);
+	$PAGE->set_heading($SITE->shortname);
+	echo $OUTPUT->header();
+
+	echo $OUTPUT->box_start();
+
+	echo $theBlock->print_dashboard();
+
+	if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()){
 		$options = array();
 		$options['id'] = $courseid;
-		$options['instanceid'] = $blockid;
-		$options['blockaction'] = 'config';
+		$options['bui_editid'] = $blockid;
 		$options['sesskey'] = sesskey();
-		echo '<div style="float:right;width:100px;">';
-		print_single_button($CFG->wwwroot.'/course/view.php', $options, get_string('configure', 'block_dashboard'));
+		echo '<div class="configure">';
+		echo $OUTPUT->single_button(new moodle_url($CFG->wwwroot.'/course/view.php', $options), get_string('configure', 'block_dashboard'), 'get');
 		echo '</div>';
 		echo "<br/>";
-		echo "<br/>";
 	}
-	print_box_end();
-	
+	echo $OUTPUT->box_end();
+	echo "<br/>";
 	echo '<center>';
 	$options = array();
 	$options['id'] = $courseid;
-	print_single_button($CFG->wwwroot.'/course/view.php', $options, get_string('backtocourse', 'block_dashboard'));
+	echo $OUTPUT->single_button(new moodle_url($CFG->wwwroot.'/course/view.php', $options), get_string('backtocourse', 'block_dashboard'), 'get');
 	echo '</center>';
-	
-	print_footer($course);
+	echo "<br/>";
+	echo $OUTPUT->footer($course);

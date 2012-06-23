@@ -1,3 +1,8 @@
+div.configure{
+	float:right;
+	width:100px;
+}
+
 .dashboard-filters{
    margin:1px;
    border:solid 1px #9B5992;
@@ -112,4 +117,12 @@ div.dashboard-special{
    width:9px;
    height:9px;
    border-style:solid;
+}
+
+.jqplot-xaxis-tick{
+  margin-top:10px;
+}
+
+.jqplot-yaxis-label{
+   left:-40px !important;
 }

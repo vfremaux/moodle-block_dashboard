@@ -8,9 +8,7 @@
 
 
 function googlemaps_require_js($sensor = 'false'){
-	
 	echo "<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?sensor=$sensor\"></script>\n";
-	
 }
 
 function googlemaps_initialize(){
@@ -28,7 +26,6 @@ function googlemaps_initialize(){
 		function google_initialize_all(){
 			{$str}
 	    }
-	    
 	    document.body.onload = google_initialize_all;
 	    google_initialize_all();
 	</script>\n";
@@ -44,7 +41,6 @@ function googlemaps_initialize(){
 */
 function googlemaps_print_graph($htmlid, $lat, $lng, $width = 400, $height = 350, $options = array(), $data = null, $return = false){
 	global $GOOGLEMAPS;	
-	
 	if (!isset($GOOGLEMAPS)) $GOOGLEMAPS = array();
 
 	if (empty($lat)) $lat = '46.769968';
@@ -67,9 +63,7 @@ function googlemaps_print_graph($htmlid, $lat, $lng, $width = 400, $height = 350
 	";
 
 	$str .= "\n<div id=\"{$htmlid}\" style=\"width:{$width}px; height:{$height}px\"></div>";
-	
 	$GOOGLEMAPS[] = $htmlid;
-		
 	if ($return) return $str;
 	echo $str;
 }
@@ -80,7 +74,6 @@ function googlemaps_embed_graph($htmlid, $lat, $lng, $width = 400, $height = 350
 
 	if (empty($lat)) $lat = '46.769968';
 	if (empty($lng)) $lng = '1.757813';
-	
 	foreach($data as $d){
 		$markers[] = 'markers[]='.urlencode(json_encode($d));
 	}
@@ -93,7 +86,6 @@ function googlemaps_embed_graph($htmlid, $lat, $lng, $width = 400, $height = 350
 	$optionstr = preg_replace('/\"(google\.maps\.[^\s]*)\"/', "$1", $optionstr); // Remove quotes provided by php jsonisation
 	$optionstr = preg_replace('/\"([\d+.]+)\"/', "$1", $optionstr); // Remove quotes around numbers provided by php jsonisation
 	$optionstr = str_replace('"latlng"', 'latlng', $optionstr); // Remove quotes provided by php jsonisation
-	
 	$url = $CFG->wwwroot.'/blocks/dashboard/googlemap.php?id='.$COURSE->id.'&lat='.$lat.'&lng='.$lng.'&options='.urlencode($optionstr).'&mapid='.$htmlid.$markerstring;
 
 	$str = '<form name="framesend" method="POST" target="mapframe_'.$htmlid.'">';
@@ -106,9 +98,7 @@ function googlemaps_embed_graph($htmlid, $lat, $lng, $width = 400, $height = 350
 		$str .= '<input type="hidden" name="marker[]" value="'.json_encode($d).'" />';
 	}
 	$str .= '</form>';
-	
 	$str = "<iframe id=\"$htmlid\" name=\"mapframe_$htmlid\" src=\"\" width=\"$width\" height=\"$height\" onload=\"document.forms['framesend'].submit()\"></iframe>";
-	
 	if ($return) return $str;
 	echo $str;
 }
@@ -122,19 +112,14 @@ function googlemaps_embed_graph($htmlid, $lat, $lng, $width = 400, $height = 350
 */
 function googlemaps_get_geolocation($region, $address, $postalcode, $city, &$errors){
 	global $CFG;
-	
 	$locationUrlstring = 'region='.$region.'&address='.urlencode($address).','.urlencode($postalcode.' '.$city);
-	
-	if ($cached = get_record('dashboard_geo_cache', 'address', $locationUrlstring)){
+	if ($cached = $DB->get_record('dashboard_geo_cache', array('address' => $locationUrlstring))){
 		return $cached->latlng;
 	}
-	
 	$uri = 'http://maps.google.fr/maps/api/geocode/json';
 	$querystring = 'sensor=false&'.$locationUrlstring;
-	
     // Initialize with the target URL
     $ch = curl_init($uri.'?'.$querystring);
-	
     curl_setopt($ch, CURLOPT_TIMEOUT, 300);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, false);
@@ -147,30 +132,25 @@ function googlemaps_get_geolocation($region, $address, $postalcode, $city, &$err
     $timestamp_send    = time();
     $rawresponse = curl_exec($ch);
     $timestamp_receive = time();
-    
     if ($rawresponse === false) {
         $errors[] = curl_errno($ch) .':'. curl_error($ch);
         return false;
     }	
-    
     if (!$geostruct = json_decode($rawresponse)){
         $errors[] = "Google bad response format";
         return false;
     }
-    
     if ($geostruct->status != 'OK'){
         $errors[] = "Google denied service. Reason : ".$geostruct->status;
         return false;
     }
-    
     $location = $geostruct->results[0]->geometry->location->lat.','.$geostruct->results[0]->geometry->location->lng;
 
 	// caches result    
     $cacherec->address = $locationUrlstring;
     $cacherec->latlng = $location;
     $cacherec->regioncode = $region;
-    insert_record('dashboard_geo_cache', $cacherec);
-    
+    $DB->insert_record('dashboard_geo_cache', $cacherec);
     return $location;	
 }
 

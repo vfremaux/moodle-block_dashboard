@@ -30,14 +30,23 @@
 //
 // For the core capabilities, the variable is $moodle_capabilities.
 
-$block_dashboard_capabilities = array(
+$capabilities = array(
 
-    'block/dashboard:canaddto' => array(
+    'block/dashboard:systempathaccess' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array(
-            'admin' => CAP_ALLOW
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/dashboard:addtocourse' => array(
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'legacy' => array(
+            'manager' => CAP_ALLOW
         )
     ),
 
@@ -46,7 +55,7 @@ $block_dashboard_capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'legacy' => array(
-            'admin' => CAP_ALLOW
+            'manager' => CAP_ALLOW
         )
     ),
 
