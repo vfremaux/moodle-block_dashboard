@@ -8,7 +8,7 @@ Versions
 Dashboard element block
 =======================
 
-the dashboard element bloc is of use with flexible Moodle
+the dashboard element block is of use with flexible Moodle
 page formats allowing free setup of the page layout using blocks.
 
 It implements a "dashboard element" capable to plot and render in
