@@ -2,6 +2,7 @@ Versions
 ========
 
 1.9 as branch MOODLE_19_STABLE
+
 2.2 as branch master
 
 Dashboard element block
