@@ -38,6 +38,8 @@ $string['confighidetitle'] = 'Cacher le titre du bloc';
 $string['confighorizformat'] = 'Formatage des clefs  horizontales';
 $string['confighorizkey'] = 'Clef  horizontale';
 $string['confighorizlabel'] = 'Label de la série horizontale';
+$string['configimportexport'] = 'Import/Export de la configuration';
+$string['configlat'] = 'Latitude';
 $string['configlayout'] = 'Publier les données dans le bloc ';
 $string['configlocation'] = 'Emplacement';
 $string['configlowerbandunit'] = 'Echelle de la bande inférieure';
@@ -525,7 +527,7 @@ de vos indications.</p>
 
 $string['configfilelocation_help'] = '
 <p>Il est possible d\'obtenir une génération de données à partir d\'un raffraichissement programmé (rafraichissement différé). Ce paramètre permet de déterminer le chemin dans les fichiers du cours où le fichier sera généré.</p>
-<p><b>Attention :</b> Ce chemin doit exister dans les fichiers du cours. Le générateur ne créera pas le répertoire s'il n'existe pas.</p>
+<p><b>Attention :</b> Ce chemin doit exister dans les fichiers du cours. Le générateur ne créera pas le répertoire s\'il n\'existe pas.</p>
 ';
 
 $string['configfilelocationadmin_help'] = '

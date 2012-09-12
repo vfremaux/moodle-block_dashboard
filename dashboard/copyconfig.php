@@ -13,15 +13,15 @@
 
 /// setting contexts
 	
-	$id = required_param('id', PARAM_INT);
-	$instanceid = required_param('instance', PARAM_INT);
+	$id = required_param('id', PARAM_INT); // course id
+	$instanceid = required_param('instance', PARAM_INT); // block instance id
 	$action = optional_param('what', '', PARAM_TEXT);
 	
 	if (!$course = $DB->get_record('course', array('id' => "$id"))){
 		print_error('invalidcourseid');
 	}
 
-	if (!$instance = get_record('block_instance', 'id', "$instanceid")){
+	if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))){
 	    print_error('badblockinstance', 'block_dashboard');
 	}
 	
@@ -34,7 +34,7 @@
 	
 // get a copy of block configuration
 
-	if ($ation == 'get'){
+	if ($action == 'get'){
 		    ob_end_clean();
 			header("Content-Type:text/raw\n\n");
 			echo $instance->configdata;
@@ -44,8 +44,10 @@
 // process form 
 	
 	include_once 'copyconfig_form.php';
+
+	$url = $CFG->wwwroot.'/blocks/dashboard/copyconfig.php?id='.$course->id.'&instance='.$instanceid;
 	
-	$mform = new CopyConfig_Form();
+	$mform = new CopyConfig_Form($url);
 	
 	if ($mform->is_cancelled()){
 		redirect($CFG->wwwroot."/course/view.php?id={$id}&bui_edit={$instanceid}&sesskey=".sesskey());
@@ -56,7 +58,7 @@
 		redirect($CFG->wwwroot."/course/view.php?id={$id}&bui_edit={$instanceid}&sesskey=".sesskey());
 	}
 	
-	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/copyconfig.php?id='.$courseid.'&instance='.$instanceid.'&pinned='.$pinned);
+	$PAGE->set_url($url);
 	$PAGE->set_title($SITE->shortname);
 	$PAGE->set_heading($SITE->shortname);
 	$OUTPUT->header();

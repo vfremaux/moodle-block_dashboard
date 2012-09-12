@@ -4,26 +4,30 @@
 *
 *
 */
-function require_jqplot_libs(){
-	global $CFG;
+function require_jqplot_libs($libroot){
+	global $CFG, $PAGE;
+	static $jqplotloaded = false;
 	
-	require_js($CFG->wwwroot.'/lib/jqplot/jquery-1.4.4.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/jquery.jqplot.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/excanvas.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.dateAxisRenderer.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.barRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.highlighter.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasOverlay.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.cursor.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.categoryAxisRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.pointLabels.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.logAxisRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasTextRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.pieRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.donutRenderer.min.js');
+	if ($jqplotloaded) return;
+
+	$PAGE->requires->js($libroot.'/jqplot/jquery-1.4.4.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/jquery.jqplot.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/excanvas.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.dateAxisRenderer.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.barRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.highlighter.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.canvasOverlay.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.cursor.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.categoryAxisRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.pointLabels.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.logAxisRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.canvasTextRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.pieRenderer.min.js', true);
+	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.donutRenderer.min.js', true);
+	$jqplotloaded = true;
 }
 
 /**
@@ -72,7 +76,7 @@ function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle 
 * TODO : unfinished
 *
 */
-function jqplot_print_vert_bar_attemptsgraph(&$data, $title, $htmlid){
+function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
 	global $PLOTID;
 	static $instance = 0;
 	
@@ -87,7 +91,7 @@ function jqplot_print_vert_bar_attemptsgraph(&$data, $title, $htmlid){
 	
 	$title = addslashes($title);
 
-	$answeredarr = array($data->answered, $data->aanswered, $data->canswered);
+	$answeredarr = array($data->serie1, $data->aanswered, $data->canswered);
 	$matchedarr = array($data->matched, $data->amatched, $data->cmatched);
 	$hitratioarr = array($data->hitratio * 100, $data->ahitratio * 100, $data->chitratio * 100);
 
@@ -123,7 +127,7 @@ function jqplot_print_vert_bar_attemptsgraph(&$data, $title, $htmlid){
 * 
 *
 */
-function jqplot_print_labelled_graph(&$data, $title, $htmlid){
+function jqplot_print_labelled_graph(&$data, $title, $htmlid, $xlabel = '', $ylabel = ''){
 	global $PLOTID;
 	static $instance = 0;
 	
@@ -137,8 +141,6 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid){
 	";
 	
 	$title = addslashes($title);
-	$coveragestr = get_string('coverage', 'report_barchenamf3');
-	$hitratiostr = get_string('hitratio', 'report_barchenamf3');
 	
 	print_jqplot_labelled_rawline($data, 'data_'.$htmlid);
 
@@ -156,75 +158,10 @@ function jqplot_print_labelled_graph(&$data, $title, $htmlid){
 			  	markerOptions:{size:15, style:'circle'},
 			  	shadowDepth:2
 			}, 
-			axes:{ xaxis:{label:'{$coveragestr}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}, 
-				   yaxis:{label:'{$hitratiostr}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}
+			axes:{ xaxis:{label:'{$xlabel}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}, 
+				   yaxis:{label:'{$ylabel}', min:0, max:100, numberTicks:11, tickOptions:{formatString:'%d\%'}}
 			},
 			cursor:{zoom:true, showTooltip:false}
-		});
-	";
-
-	echo "</script>";
-	$PLOTID++;
-
-}
-
-/**
-* 
-*
-*/
-function jqplot_print_questionuse_graph(&$data, $title, $htmlid){
-	global $PLOTID;
-	static $instance = 0;
-	
-	$htmlid = $htmlid.'_'.$instance;
-	$instance++;
-	
-	echo "<center><div id=\"$htmlid\" style=\"margin-bottom:20px; margin-left:20px; width:700px; height:500px;\"></div></center>";
-	echo "<script type=\"text/javascript\" language=\"javascript\">";
-	echo "
-		$.jqplot.config.enablePlugins = true;
-	";
-	
-	$title = addslashes($title);
-	$usedstr = get_string('used', 'report_barchenamf3');
-	$matchedstr = get_string('matched', 'report_barchenamf3');
-	
-	$maxscale = max($data[0][1]) + 100;
-	
-	print_jqplot_labelled_rawline($data[0], 'quse_'.$htmlid);
-	print_jqplot_rawline($data[1], 'qmatched_'.$htmlid);
-	print_jqplot_rawline($data[2], 'qhitratio_'.$htmlid);
-
-	echo "
-		plot{$PLOTID} = $.jqplot(
-			'$htmlid', 
-			[quse_$htmlid, qmatched_$htmlid, qhitratio_$htmlid], 
-			{ 
-			title:'$title', 
-			seriesDefaults:{ 
-				renderer:$.jqplot.LineRenderer,
-			  	showLine:true,
-			  	showMarker:false, 
-			  	shadowAngle:135,
-			  	shadowDepth:2,
-			  	lineWidth:1
-			}, 
-			series:[
-				{label:'Used'},
-				{label:'Matched'},
-				{label:'ErrorRatio', yaxis:'y2axis', lineWidth:1, color:'#FF0000'}
-			],
-			axes:{ xaxis:{autoscale:true, min:0, tickOptions:{formatString:'%d'}}, 
-				   yaxis:{autoscale:true, min:0, max:{$maxscale}, tickOptions:{formatString:'%d'}},
-				   y2axis:{min:0, max:100, tickOptions:{formatString:'%d\%'}}
-			},
-			cursor:{
-      			showVerticalLine:true,
-      			showHorizontalLine:false,
-      			showCursorLegend:true,
-      			showTooltip: false,
-      			zoom:true
-      		}
 		});
 	";
 
@@ -251,8 +188,6 @@ function jqplot_print_simple_bargraph(&$data, $title, $htmlid){
 	";
 	
 	$title = addslashes($title);
-	$errorstr = addslashes(get_string('errorrate', 'report_barchenamf3'));
-	$numberstr = addslashes(get_string('quantity', 'report_barchenamf3'));
 	
 	print_jqplot_simplebarline('data_'.$htmlid, $data);
 
@@ -272,136 +207,8 @@ function jqplot_print_simple_bargraph(&$data, $title, $htmlid){
 			series:[
 				{color:'#FF0000'}
 			],
-			axes:{ xaxis:{renderer:$.jqplot.CategoryAxisRenderer, label:'{$errorstr} (%)', ticks:xticks}, 
-				   yaxis:{label:'{$numberstr}', autoscale:true}
-			},
-		});
-	";
-
-	echo "</script>";
-	$PLOTID++;
-
-}
-
-/**
-* 
-*
-*/
-function jqplot_print_assiduity_bargraph(&$data, $ticks, $title, $htmlid){
-	global $PLOTID;
-	static $instance = 0;
-	
-	$htmlid = $htmlid.'_'.$instance;
-	$instance++;
-	
-	$xticks = "'".implode("','", $ticks)."'";
-
-	echo "<center><div id=\"$htmlid\" style=\"margin-bottom:20px; margin-left:20px; width:880px; height:320px;\"></div></center>";
-	echo "<script type=\"text/javascript\" language=\"javascript\">";
-	echo "
-		$.jqplot.config.enablePlugins = true;
-	";
-	
-	$title = addslashes($title);
-	$qstr = addslashes(get_string('assiduity', 'report_barchenamf3'));
-	$numberstr = addslashes(get_string('attempts', 'report_barchenamf3'));
-	
-	print_jqplot_simplebarline('data_'.$htmlid, $data);
-	
-
-	echo "
-	
-		xticks = [$xticks];
-	
-		plot{$PLOTID} = $.jqplot(
-			'$htmlid', 
-			[data_$htmlid], 
-			{ 
-			title:'$title', 
-			seriesDefaults:{ 
-				renderer:$.jqplot.BarRenderer,
-        		rendererOptions:{barPadding: 6, barMargin:4}
-        	}, 
-			series:[
-				{color:'#FF0000'}
-			],
-			highlighter: {
-				show: false,
-			},
-			axes:{ 
-				xaxis:{
-					renderer:$.jqplot.CategoryAxisRenderer, 
-					tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-	            	tickOptions:{angle: -45, fontSize: '8pt'},
-					label:'{$qstr}',
-					ticks:xticks
-				}, 
-				yaxis:{
-					autoscale:true,
-					label:'{$numberstr}'
-				}
-			},
-		});
-	";
-
-	echo "</script>";
-	$PLOTID++;
-
-}
-
-/**
-* 
-*
-*/
-function jqplot_print_modules_bargraph(&$data, $title, $htmlid){
-	global $PLOTID;
-	static $instance = 0;
-	
-	$htmlid = $htmlid.'_'.$instance;
-	$instance++;
-	
-	// preformat data with empty values
-	for($i = 1; $i <= 10; $i++){
-		$data[$i*10] = 0 + @$data[$i*10];
-	}
-	ksort($data);
-
-	$xticks = implode(',', array_keys($data));
-
-	echo "<center><div id=\"$htmlid\" style=\"margin-bottom:20px; margin-left:20px; width:500px; height:320px;\"></div></center>";
-	echo "<script type=\"text/javascript\" language=\"javascript\">";
-	echo "
-		$.jqplot.config.enablePlugins = true;
-	";
-	
-	$title = addslashes($title);
-	$qstr = addslashes(get_string('questions', 'report_barchenamf3'));
-	$numberstr = addslashes(get_string('quantity', 'report_barchenamf3'));
-	
-	print_jqplot_simplebarline('data_'.$htmlid, $data);
-	
-
-	echo "
-	
-		xticks = [$xticks];
-	
-		plot{$PLOTID} = $.jqplot(
-			'$htmlid', 
-			[data_$htmlid], 
-			{ 
-			title:'$title', 
-			seriesDefaults:{ 
-				renderer:$.jqplot.BarRenderer,
-        		rendererOptions:{barPadding: 6, barMargin:4}
-        	}, 
-			series:[
-				{color:'#FF0000'}
-			],
-			highlighter: {
-				show: false,
-			},
-			axes:{ xaxis:{renderer:$.jqplot.CategoryAxisRenderer, label:'{$qstr}', ticks:xticks}, 
-				   yaxis:{label:'{$numberstr}', autoscale:true}
+			axes:{ xaxis:{renderer:$.jqplot.CategoryAxisRenderer, label:'{$xlabel} (%)', ticks:xticks}, 
+				   yaxis:{label:'{$ylabel}', autoscale:true}
 			},
 		});
 	";

@@ -5,16 +5,15 @@
 *
 */
 
-function timeline_require_js(){
-	global $CFG;
+function timeline_require_js($libroot){
+	global $CFG, $PAGE;
+	static $timelineloaded = false;
 
-	// echo "<script type=\"text/javascript\" src=\"/lib/timeline_api_2.3.0/timeline_js/timeline-api.js?bundle=true\"></script>\n";
-	echo '<script type="text/javascript">
-			Timeline_ajax_url = "'.$CFG->wwwroot.'/lib/timeline_api_2.3.0/timeline_ajax/simile-ajax-api.js";
- 			Timeline_urlPrefix = "'.$CFG->wwwroot.'/lib/timeline_api_2.3.0/timeline_js/";       
-      		Timeline_parameters = "bundle=true&defaultLocale=fr";
- 		 </script>';
-	echo "<script type=\"text/javascript\" src=\"{$CFG->wwwroot}/lib/timeline_api_2.3.0/timeline_js/timeline-api.js?bundle=true\"></script>\n";
+	if ($timelineloaded) return;
+	
+	$PAGE->requires->js($libroot.'/timeline_api_2.3.0/setup.php', true);
+	$PAGE->requires->js($libroot.'/timeline_api_2.3.0/timeline_js/timeline-api.js', true);
+	$timelineloaded = true;
 }
 
 function timeline_initialize($return = false){
@@ -121,7 +120,13 @@ function timeline_print_graph(&$theBlock, $htmlid, $width, $height, &$data, $ret
 function timeline_XML_generate(&$theBlock, $htmlid, &$data){
 	global $CFG, $COURSE, $USER;
 	
-	// print_object($data);
+	if (!is_dir($CFG->dataroot.'/'.$COURSE->id.'/blockdata')){
+		mkdir($CFG->dataroot.'/'.$COURSE->id.'/blockdata', 0777);
+	}	
+	
+	if (!is_dir($CFG->dataroot.'/'.$COURSE->id.'/blockdata/dashboard')){
+		mkdir($CFG->dataroot.'/'.$COURSE->id.'/blockdata/dashboard', 0777);
+	}	
 	
 	if (!is_dir($CFG->dataroot.'/'.$COURSE->id.'/blockdata/dashboard/timelineevents')){
 		mkdir($CFG->dataroot.'/'.$COURSE->id.'/blockdata/dashboard/timelineevents', 0777);
@@ -150,7 +155,7 @@ function timeline_XML_generate(&$theBlock, $htmlid, &$data){
 		if (!empty($theBlock->config->timelineeventstart) && !empty($d->{$theBlock->config->timelineeventstart})) $eventattrs[] = "start=\"".timeline_date_convert($d->{$theBlock->config->timelineeventstart}, $theBlock)."\"";
 		if (!empty($theBlock->config->timelineeventend) && !empty($d->{$theBlock->config->timelineeventend}) && $d->{$theBlock->config->timelineeventend} != "1 Jan 1970 01:00:00 GMT") $eventattrs[] = "end=\"".timeline_date_convert($d->{$theBlock->config->timelineeventend}, $theBlock)."\"";
 		if (!empty($theBlock->config->timelineeventend) && !empty($d->{$theBlock->config->timelineeventend}) && $d->{$theBlock->config->timelineeventend} != "1 Jan 1970 01:00:00 GMT") $eventattrs[] = "isDuration=\"true\"";
-		if (!empty($theBlock->config->timelineeventtitle) && !empty($d->{$theBlock->config->timelineeventtitle})) $eventattrs[] = "title=\"".$d->{$theBlock->config->timelineeventtitle}."\"";
+		if (!empty($theBlock->config->timelineeventtitle) && !empty($d->{$theBlock->config->timelineeventtitle})) $eventattrs[] = "title=\"".str_replace('&', '&amp;', $d->{$theBlock->config->timelineeventtitle})."\"";
 		if (!empty($theBlock->config->timelineeventlink) && !empty($d->{$theBlock->config->timelineeventlink})) $eventattrs[] = "link=\"".$d->{$theBlock->config->timelineeventlink}."\"";
 		if (!empty($theBlock->config->timelinecolorfield) && !empty($d->{$theBlock->config->timelinecolorfield})) {
 			if (array_key_exists($d->{$theBlock->config->timelinecolorfield}, $colouring)){
@@ -163,7 +168,7 @@ function timeline_XML_generate(&$theBlock, $htmlid, &$data){
 		}
 		if (!empty($theBlock->config->timelineeventdesc)) {
 			// $tmp .= '<event '.implode(' ', $eventattrs)." >".htmlentities(@$d->{$theBlock->config->timelineeventdesc}, ENT_QUOTE, 'UTF-8')."</event>\n";
-			$tmp .= '<event '.implode(' ', $eventattrs)." >".@$d->{$theBlock->config->timelineeventdesc}."</event>\n";
+			$tmp .= '<event '.implode(' ', $eventattrs)." >".str_replace('&', '&amp;', $d->{$theBlock->config->timelineeventtitle})."</event>\n";
 		}
 	}
 	$tmp .= "</data>\n";

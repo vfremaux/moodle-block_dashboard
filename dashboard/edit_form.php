@@ -32,6 +32,7 @@
 class block_dashboard_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
+    	global $CFG, $COURSE;
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
@@ -302,5 +303,15 @@ class block_dashboard_edit_form extends block_edit_form {
 			$mform->addElement('text', 'config_filepathadminoverride', get_string('configfilepathadminoverride', 'block_dashboard'), array('size' => 20));
 			$mform->addHelpButton('config_filepathadminoverride', 'configfilelocationadmin', 'block_dashboard');
 		}
+
+        $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
+		$importconfigstr = get_string('importconfig', 'block_dashboard');
+		$exportconfigstr = get_string('exportconfig', 'block_dashboard');
+		$import_export = "<a href=\"{$CFG->wwwroot}/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}&amp;what=upload\">$importconfigstr</a> - 
+      	<a href=\"{$CFG->wwwroot}/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}&amp;what=get\" target=\"_blank\">$exportconfigstr</a>";
+
+		$mform->addElement('static', '', '', $import_export);
+
+
 	}	
 }

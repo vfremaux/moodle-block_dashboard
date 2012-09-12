@@ -1,5 +1,8 @@
 <?php
 
+$yesnooptions[0] = get_string('no');
+$yesnooptions[1] = get_string('yes');
+
 if (!defined('MOODLE_INTERNAL')) die ("You cannot use this script this way");
 
 $settings->add(new admin_setting_heading('extradbparams', get_string('extradbparams', 'block_dashboard'), ''));
@@ -17,9 +20,8 @@ $settings->add(new admin_setting_configtext('dashboard_enable_isediting_security
 
 $settings->add(new admin_setting_heading('datarefresh', get_string('datarefresh', 'block_dashboard'), ''));
 
-$settings->add(new admin_setting_configcheckbox('block_dashboard_cron_enabled', get_string('dashboard_cron_enabled', 'block_dashboard'), get_string('dashboard_cron_enabled_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_enabled));
-$settings->add(new admin_setting_configtext('block_dashboard_cron_hour', get_string('dashboard_cron_hour', 'block_dashboard'), get_string('dashboard_cron_hour_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_hour));
-$settings->add(new admin_setting_configtext('block_dashboard_cron_min', get_string('dashboard_cron_min', 'block_dashboard'), get_string('dashboard_cron_min_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_min));
+$settings->add(new admin_setting_configselect('block_dashboard_cron_enabled', get_string('dashboard_cron_enabled', 'block_dashboard'), get_string('dashboard_cron_enabled_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_enabled, $yesnooptions));
+$settings->add(new admin_setting_configtime('block_dashboard_cron_hour', 'block_dashboard_cron_min', get_string('dashboard_cron_hour', 'block_dashboard'), '', array('h' => @$CFG->block_dashboard_cron_hour, 'm' => @$CFG->block_dashboard_cron_min)));
 
 $freq['daily'] = get_string('daily', 'block_dashboard');
 $freq['0'] = get_string('sunday', 'block_dashboard');
@@ -30,5 +32,5 @@ $freq['4'] = get_string('thursday', 'block_dashboard');
 $freq['5'] = get_string('friday', 'block_dashboard');
 $freq['6'] = get_string('saturday', 'block_dashboard');
 
-$settings->add(new admin_setting_configselect('block_dashboard_cron_freq', get_string('dashboard_cron_freq', 'block_dashboard'), get_string('dashboard_cron_freq_desc', 'block_dashboard'), $freq, @$CFG->block_dashboard_cron_freq));
+$settings->add(new admin_setting_configselect('block_dashboard_cron_freq', get_string('dashboard_cron_freq', 'block_dashboard'), get_string('dashboard_cron_freq_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_freq, $freq));
 

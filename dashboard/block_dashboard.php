@@ -12,12 +12,19 @@
 
 require_once $CFG->dirroot.'/blocks/dashboard/lib.php';
 require_once $CFG->dirroot.'/blocks/dashboard/extradblib.php';
-require_once $CFG->libdir.'/jqplotlib.php';
-require_once $CFG->libdir.'/googleplotlib.php';
-require_once $CFG->libdir.'/timelinelib.php';
+if (file_exists($CFG->libdir.'/jqplotlib.php')){
+	$graphlibs = $CFG->libdir;
+	$graphwww = '/lib';
+} else {
+	$graphlibs = '_goodies/lib';
+	$graphwww = '/blocks/dashbboard/_goodies/lib';
+}
+require_once $graphlibs.'/jqplotlib.php';
+require_once $graphlibs.'/googleplotlib.php';
+require_once $graphlibs.'/timelinelib.php';
 include_once $CFG->libdir.'/tablelib.php';
-require_jqplot_libs();
-timeline_require_js();
+require_jqplot_libs($graphwww);
+timeline_require_js($graphwww);
 
 class block_dashboard extends block_base {
 
@@ -1132,7 +1139,7 @@ class block_dashboard extends block_base {
     	global $extra_db_CNX, $CFG, $DB, $PAGE;
     	$sqlrad = preg_replace('/LIMIT.*/si', '', $sql);
     	$sqlkey = md5($sql);
-    	$cachefootprint = $DB->get_record('dashboard_cache', array('querykey' => $sqlkey));
+    	$cachefootprint = $DB->get_record('block_dashboard_cache', array('querykey' => $sqlkey));
     	$results = array();
     	/* 
     	* we can get real data : 
@@ -1141,8 +1148,8 @@ class block_dashboard extends block_base {
     	* If reload is forced
     	*/
     	if ((!$PAGE->user_is_editing() || !@$CFG->block_dashboard_enable_isediting_security) && (!@$this->config->uselocalcaching || !$cachefootprint || ($cachefootprint && $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) || $forcereload)){
-	        $DB->delete_records('dashboard_cache', array('querykey' => $sqlkey, 'access' => $this->config->target));
-	        $DB->delete_records('dashboard_cache_data', array('querykey' => $sqlkey, 'access' => $this->config->target));
+	        $DB->delete_records('block_dashboard_cache', array('querykey' => $sqlkey, 'access' => $this->config->target));
+	        $DB->delete_records('block_dashboard_cache_data', array('querykey' => $sqlkey, 'access' => $this->config->target));
 	        list($usec, $sec) = explode(" ", microtime());
     		$t1 = (float)$usec + (float)$sec;
 			if ($this->config->target == 'moodle'){
@@ -1159,7 +1166,7 @@ class block_dashboard extends block_base {
 						$cacherec->querykey = $sqlkey;
 			            $cacherec->recordid = $recarr[0]; // get first column in result as key
 			            $cacherec->record = base64_encode(serialize($rec));
-			            $DB->insert_record('dashboard_cache_data', $cacherec);
+			            $DB->insert_record('block_dashboard_cache_data', $cacherec);
 			        }
 		        }
 
@@ -1188,7 +1195,7 @@ class block_dashboard extends block_base {
 							$cacherec->querykey = $sqlkey;
 				            $cacherec->recordid = $reckey; // get first column in result as key
 				            $cacherec->record = base64_encode(serialize($rec));
-				            $DB->insert_record('dashboard_cache_data', str_replace("'", "''", $cacherec));
+				            $DB->insert_record('block_dashboard_cache_data', str_replace("'", "''", $cacherec));
 				        }
 				    }
 				}
@@ -1214,7 +1221,7 @@ class block_dashboard extends block_base {
 				$timerec->access = $this->config->target;
 				$timerec->querykey = $sqlkey;
 				$timerec->timereloaded = time();
-	            $DB->insert_record('dashboard_cache', $timerec);
+	            $DB->insert_record('block_dashboard_cache', $timerec);
 	        }
 	        list($usec, $sec) = explode(' ', microtime());
     		$t2 = (float)$usec + (float)$sec;
@@ -1227,7 +1234,7 @@ class block_dashboard extends block_base {
 	    		// we are caching and have a key
 		        list($usec, $sec) = explode(' ', microtime());
 	    		$t1 = (float)$usec + (float)$sec;
-	    		$rss = $DB->get_records('dashboard_cache_data', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
+	    		$rss = $DB->get_records('block_dashboard_cache_data', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
 		        foreach($rss as $rec){
 		            $results[$rec->recordid] = unserialize(base64_decode($rec->record));
 		        }
