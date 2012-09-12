@@ -17,7 +17,7 @@ if (file_exists($CFG->libdir.'/jqplotlib.php')){
 	$graphwww = '/lib';
 } else {
 	$graphlibs = '_goodies/lib';
-	$graphwww = '/blocks/dashbboard/_goodies/lib';
+	$graphwww = '/blocks/dashboard/_goodies/lib';
 }
 require_once $graphlibs.'/jqplotlib.php';
 require_once $graphlibs.'/googleplotlib.php';
