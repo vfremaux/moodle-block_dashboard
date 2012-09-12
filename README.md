@@ -1,14 +1,14 @@
 Versions
 ========
 
-1.9 as branch MOODLE_19_STABLE
+1.9 as branch MOODLE_19_STABLE (Status : RELEASE)
 
-2.2 as branch master
+2.2 as branch master (Status : BETA)
 
 Dashboard element block
 =======================
 
-the dashboard element bloc is of use with flexible Moodle
+the dashboard element block is of use with flexible Moodle
 page formats allowing free setup of the page layout using blocks.
 
 It implements a "dashboard element" capable to plot and render in
@@ -74,7 +74,7 @@ Given a full query, the dashboard block mashes up :
 # Install additive for running timelines
 ========================================
 
-Timeline needs to be post page loading activaed. We got some issue to stack onload events
+Timeline needs to be post page loading activated. We got some issue to stack onload events
 on body element. The solution is till now to add a late call to initialisation in footer :
 
 Add this statement :
