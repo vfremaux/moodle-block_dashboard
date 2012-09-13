@@ -49,20 +49,15 @@ Given a full query, the dashboard block mashes up :
 # Install
 #########
 
-1. Add all _goodies libraries to central libs of Moodle
-- jqplot + API wrapper
-- timeline + API wrapper
-- googmaps API wrapper
+1. Deploy the block in Moodle/blocks as usual
 
-2. Deploy the block in Moodle/blocks as usual
+2. Activate notifications to isntall the data model
 
-3. Activate notifications to isntall the data model
+3. Create a course, better a flexipage or paged format course if available
 
-4. Create a course, better a flexipage or paged format course if available
+4. Add a Dashboard block and write a query
 
-5. Add a Dashboard block and write a query
-
-6. Define output fields, output modes, output labels... and discover features....
+5. Define output fields, output modes, output labels... and discover features....
 
 # Install additive for running timelines
 ########################################
