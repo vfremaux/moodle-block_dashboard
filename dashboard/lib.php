@@ -59,7 +59,7 @@ function print_cross_table(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $r
 
 	$str = '';
 
-	dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, $theBlock->config->horizsums);
+	dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, @$theBlock->config->horizsums);
 	
 	// print flipped array
 	$path = array();
@@ -171,14 +171,14 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
 					$str .= "<td class=\"data empty c{$c}\"></td>";
 				}
 				$sum += strip_tags(@$v[$col]);
-				if ($theBlock->config->vertsums){
+				if (@$theBlock->config->vertsums){
 					$subsums->subs[$col] = @$subsums->subs[$col] + strip_tags(@$v[$col]);
 					$subsums->all[$col] = @$subsums->all[$col] + strip_tags(@$v[$col]);
 				}
 				$c++;
 			}
 			
-			if ($theBlock->config->horizsums){
+			if (@$theBlock->config->horizsums){
 				$str .= "<td class=\"data rowtotal c{$c}\">$sum</td>";
 			}
 			
@@ -220,6 +220,148 @@ function dashboard_print_table_header(&$str, &$hcols, &$vkeys, $hlabel, $horizsu
 	
 	// close title line
 	$str .= '</tr>';
+}
+
+/**
+* An HTML raster for a matrix cross table
+* printing raster uses a recursive cell drilldown over dynamic matrix dimension
+*/
+function print_cross_table_csv(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $return = false){
+
+	$str = '';
+
+	dashboard_print_table_header_csv($str, $hcols, $vkeys, $hlabel, @$theBlock->config->horizsums);
+	
+	// print flipped array
+	$path = array();
+
+	$subsums = new StdClass;
+	$subsums->subs = array();
+	$subsums->all = array();
+
+	table_explore_rec_csv($theBlock, $str, $path, $hcols, $m, $vkeys, $hlabel, count($vkeys->formats), $subsums);
+	
+	if ($return) return $str;
+	echo $str;
+}
+
+function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null){
+	global $CFG;
+
+	static $level = 0;
+	static $r = 0;
+	
+	$vformats = array_values($vkeys->formats);
+	$vcolumns = array_keys($vkeys->formats);
+	
+	foreach($t as $k => $v){
+		$plittable = false;
+		array_push($pathstack, $k);
+
+		$str = '';
+		$level++;
+		if ($level < $keydeepness){
+			table_explore_rec_csv($theBlock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
+		} else {
+			$r = ($r + 1) % 2;
+			$c = 0;
+			$pre = '';
+			foreach($pathstack as $pathelm){
+				if (!empty($vformats[$c])){
+					$pathelm = dashboard_format_data($vformats[$c], $pathelm);
+				}
+				if (!empty($theBlock->config->cleandisplay)){
+					if ($pathelm != @$vkeys->mem[$c]){
+						$pre .= "$pathelm".$CFG->dashboard_csv_field_separator;
+						if (isset($vkeys->mem[$c]) && @$theBlock->config->spliton == $vcolumns[$c]){
+							// first split do not play
+							
+							// if vertsums are enabled, print vertsubs
+							if ($theBlock->config->vertsums){
+								$span = count($pathstack);
+								$subtotalstr = get_string('subtotal', 'block_dashboard');
+								$str .= "$subtotalstr".$CFG->dashboard_csv_field_separator;
+								foreach($hcols as $col){
+									$str .= $subsums->subs[$col].$CFG->dashboard_csv_field_separator;
+									$subsums->subs[$col] = 0;
+								}
+								if ($theBlock->config->horizsums){
+									$str .= $CFG->dashboard_csv_field_separator;
+								}
+								$str .= $CFG->dashboard_csv_line_separator;
+							}
+							
+							// then close previous table
+							dashboard_print_table_header_csv($str, $hcols, $vkeys, $hlabel, $theBlock->config->horizsums);
+						}
+						$vkeys->mem[$c] = $pathelm;
+					} else {
+						$pre .= $CFG->dashboard_csv_field_separator;
+					}
+				} else {
+					$pre .= "$pathelm".$CFG->dashboard_csv_field_separator;
+				}
+				$c++;
+			}
+			
+			$str .= $pre;
+			
+			$sum = 0;
+			foreach($hcols as $col){
+				if (array_key_exists($col, $v)){
+					$str .= "{$v[$col]}".$CFG->dashboard_csv_field_separator;
+				} else {
+					$str .= ''.$CFG->dashboard_csv_field_separator;
+				}
+				$sum += strip_tags(@$v[$col]);
+				if (@$theBlock->config->vertsums){
+					$subsums->subs[$col] = @$subsums->subs[$col] + strip_tags(@$v[$col]);
+					$subsums->all[$col] = @$subsums->all[$col] + strip_tags(@$v[$col]);
+				}
+				$c++;
+			}
+			
+			if (@$theBlock->config->horizsums){
+				$str .= $sum.$CFG->dashboard_csv_field_separator;
+			}
+
+			// chop last value
+			
+			$str = preg_replace("/{$CFG->dashboard_csv_field_separator}$/", '', $str);
+			
+			echo $str; 
+			echo $CFG->dashboard_csv_line_separator;
+		}
+		$level--;
+		array_pop($pathstack);
+	}
+}
+
+/**
+* prints the first line as column titles
+*
+*
+*/
+function dashboard_print_table_header_csv(&$str, &$hcols, &$vkeys, $hlabel, $horizsums = false){
+	global $CFG;
+		
+	$vlabels = array_values($vkeys->labels);
+
+	$row = array();
+	foreach($vkeys->labels as $vk => $vlabel){
+		$row[] = $vlabel;
+	}
+
+	foreach($hcols as $hc){
+		$row[] = $hc;
+	}
+	
+	if ($horizsums){
+		$row[] = get_string('total', 'block_dashboard');
+	}
+	
+	echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $row)); 
+	echo $CFG->dashboard_csv_line_separator;
 }
 
 function dashboard_print_tree_view(&$theBlock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding, $return = false){

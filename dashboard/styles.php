@@ -113,3 +113,11 @@ div.dashboard-special{
    height:9px;
    border-style:solid;
 }
+
+.jqplot-xaxis-tick{
+  margin-top:10px;
+}
+
+.jqplot-yaxis-label{
+   left:-40px !important;
+}

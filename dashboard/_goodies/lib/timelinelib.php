@@ -8,13 +8,14 @@
 function timeline_require_js(){
 	global $CFG;
 
-	// echo "<script type=\"text/javascript\" src=\"/lib/timeline_api_2.3.0/timeline_js/timeline-api.js?bundle=true\"></script>\n";
-	echo '<script type="text/javascript">
-			Timeline_ajax_url = "'.$CFG->wwwroot.'/lib/timeline_api_2.3.0/timeline_ajax/simile-ajax-api.js";
- 			Timeline_urlPrefix = "'.$CFG->wwwroot.'/lib/timeline_api_2.3.0/timeline_js/";       
-      		Timeline_parameters = "bundle=true&defaultLocale=fr";
- 		 </script>';
-	echo "<script type=\"text/javascript\" src=\"{$CFG->wwwroot}/lib/timeline_api_2.3.0/timeline_js/timeline-api.js?bundle=true\"></script>\n";
+	global $CFG, $PAGE;
+	static $timelineloaded = false;
+
+	if ($timelineloaded) return;
+	
+	requires_js($libroot.'/timeline_api_2.3.0/setup.php', 1);
+	requires_js($libroot.'/timeline_api_2.3.0/timeline_js/timeline-api.js', 1);
+	$timelineloaded = true;
 }
 
 function timeline_initialize($return = false){

@@ -24,7 +24,6 @@
 	$output = optional_param('output', 'csv', PARAM_ALPHA); // output format (csv)
 	$limit = optional_param('limit', '', PARAM_INT);
 	$offset = optional_param('offset', '', PARAM_INT); 
-	$alldata = optional_param('alldata', '', PARAM_INT); 
 	
 	if (!$course = get_record('course', 'id', "$courseid")){
 		print_error('badcourseid');
@@ -59,6 +58,18 @@
 	$outputfilteroptions = explode(';', @$theBlock->config->filteroptions);
 	$theBlock->normalize($outputfilters, $outputfilteroptions); // normailzes options to keys
 	$theBlock->filterfields->options = array_combine($outputfilters, $outputfilteroptions);
+
+	// tabular params
+	$horizkey = @$theBlock->config->horizkey;
+	$hlabel = @$theBlock->config->horizlabel;
+	$vkeys = explode(";", @$theBlock->config->verticalkeys);
+	$vformats = explode(";", @$theBlock->config->verticalformats);
+	$vlabels = explode(";", @$theBlock->config->verticallabels);
+	$theBlock->normalize($vkeys, $vformats); // normalizes formats to keys
+	$theBlock->normalize($vkeys, $vlabels); // normalizes labels to keys
+	$vertkeys->formats = array_combine($vkeys, $vformats);
+	$vertkeys->labels = array_combine($vkeys, $vlabels);
+
 	// Detect translated
 	$translatedfilters = array();
 	$filterfields = array();
@@ -76,7 +87,7 @@
 
 	/// fetch data
 
-	if (!empty($theBlock->config->filters) && !$alldata){
+	if (!empty($theBlock->config->filters)){
 		$filterclause = '';
 		$filterkeys = preg_grep('/^filter'.$instanceid.'_/', array_keys($_GET));
 		$globalfilterkeys = preg_grep('/^filter0_/', array_keys($_GET));
@@ -101,9 +112,7 @@
 			foreach($theBlock->filterfields->defaults as $filter => $default){
 				$canonicalfilter = (array_key_exists($filter, $theBlock->filterfields->translations)) ? $theBlock->filterfields->translations[$filter] : $filter;
 				$default = (preg_match('/LAST|FIRST/i', $default)) ? $theBlock->filter_get_results(str_replace('<%%FILTERS%%>', '', $sql), $filter, $canonicalfilter, $default) : $default ;
-				if (!$theBlock->is_filter_global($filter)){
-					if (!array_key_exists('filter'.$instanceid.'_'.$canonicalfilter, $filterinputs)) $filterinputs['filter'.$instanceid.'_'.$canonicalfilter] = $default;
-				}
+				if (!array_key_exists('filter'.$instanceid.'_'.$canonicalfilter, $filterinputs)) $filterinputs['filter'.$instanceid.'_'.$canonicalfilter] = $default;
 			}
 		}
 		
@@ -117,17 +126,17 @@
 				$sqlfiltername = (isset($theBlock->filterfields->filtercanonicalfield[$radical])) ? $theBlock->filterfields->filtercanonicalfield[$radical] : $radical ;
 				if (!empty($value)){
 					if (!is_array($value)){
-						$filters[] = " $radical = '".str_replace("'", "''", $value)."' ";
+						$filters[] = " $sqlfiltername = '".$value."' ";
 					} else {
 						if (count($value) > 1 || $value[0] != 0){
-							$filters[] = " $radical IN ('".implode("','", str_replace("'", "''", $value))."') ";
+							$filters[] = " $sqlfiltername IN ('".implode("','", $value)."') ";
 						}
 					}
 					$filtervalues[$radical] = $value;
 				}
 			}
 		}
-		
+
 		if (!empty($filters)){
 			if (!preg_match('/\bWHERE\b/si', $sql)){
 				$filterclause = ' WHERE '.implode('AND', $filters);
@@ -165,19 +174,31 @@
 		header("Content-Type:text/raw\n\n");
 		header("Content-Disposition:filename={$exportname}.csv\n\n");
 
-		// print column names
-		foreach($output as $field => $label){
-			$headrow[] = $label;
-		}
-
-		if (!$debug) ob_end_clean();		
-		echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $headrow)); 
-		echo $CFG->dashboard_csv_line_separator;
-
+		$hcols = array();
 		// print data
 		foreach($results as $r){
-			$row = array();
-			foreach($output as $field => $label){
+			// this is a tabular table
+			/* in a tabular table, data can be placed :
+			* - in first columns in order of vertical keys
+			* - in first columns in order of vertical keys
+			* the results are grabbed sequentially and spread into the matrix 
+			*/
+			$keystack = array();
+			$matrix = array();
+			foreach(array_keys($vertkeys->formats) as $vkey){
+				if (empty($vkey)) continue;
+				$vkeyvalue = $r->$vkey;
+				$matrix[] = "['".addslashes($vkeyvalue)."']";
+			}
+			$hkey = $horizkey;
+			$hkeyvalue = (!empty($hkey)) ? $r->$hkey :  '' ;
+			$matrix[] = "['".addslashes($hkeyvalue)."']";
+			$matrixst = "\$m".implode($matrix);
+			if (!in_array($hkeyvalue, $hcols)) $hcols[] = $hkeyvalue;
+			
+			// now put the cell value in it
+			$outvalues = array();
+			foreach($outputfields as $field){
 
 				// did we ask for cumulative results ? 
 				$cumulativeix = null;
@@ -187,18 +208,29 @@
 				}
 
 				if (!empty($outputf[$field])){
-					$datum = dashboard_format_data($outputf[$field], @$r->$field, $cumulativeix);
+					$datum = dashboard_format_data($outputf[$field], $r->$field, $cumulativeix);
 				} else {
 					$datum = dashboard_format_data(null, @$r->$field, $cumulativeix);
 				}
-				$row[] = $datum;
+				/*
+				// no colour possible that way in excel
+				if (!empty($theBlock->config->colorfield) && $theBlock->config->colorfield == $field){
+					$datum = dashboard_colour_code($theBlock, $datum, $colorcoding);
+				}
+				*/
+				$outvalues[] = str_replace('"', '\\"', $datum);
 			}
-			echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $row)); 
-			echo $CFG->dashboard_csv_line_separator;
+			$matrixst .= ' = "'.implode(' ',$outvalues).'"';
+			
+			// make the matrix in memory
+			eval($matrixst.";");
+			
 		}
+
+		print_cross_table_csv($theBlock, $m, $hcols, $horizkey, $vertkeys, $hlabel, true);					
+		
+		echo $CFG->dashboard_csv_line_separator;
 	} else {
 		echo "No results. Empty file";
 	}
-
-
 ?>

@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="dashboard_cache" COMMENT="Default comment for dashboard, please edit me" NEXT="dashboard_cache_data">
+    <TABLE NAME="block_dashboard_cache" COMMENT="Default comment for dashboard, please edit me" NEXT="block_dashboard_cache_data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="querykey"/>
@@ -19,7 +19,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dashboard_cache_data" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="dashboard_cache" NEXT="dashboard_geo_cache">
+    <TABLE NAME="block_dashboard_cache_data" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboard_cache" NEXT="block_dashboard_geo_cache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="querykey"/>
@@ -35,7 +35,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="dashboard_geo_cache" COMMENT="Caches geo localisation data" PREVIOUS="dashboard_cache_data">
+    <TABLE NAME="block_dashboard_geo_cache" COMMENT="Caches geo localisation data" PREVIOUS="block_dashboard_cache_data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="address"/>
         <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="regioncode"/>

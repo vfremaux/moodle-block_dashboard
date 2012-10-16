@@ -1,4 +1,4 @@
-<?php // $Id: block_dashboard.php,v 1.17 2012-02-16 11:02:49 vf Exp $
+<?php // $Id: block_dashboard.php,v 1.20 2012-07-30 14:59:51 vf Exp $
 
 $string['backtocourse'] = 'Revenir au cours';
 $string['bar'] = 'Barres';
@@ -18,6 +18,8 @@ $string['configcrontime'] = 'Heure';
 $string['configdata'] = 'Données GoogleMaps';
 $string['configdisplay'] = 'Eléments d\'affichage';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
+$string['configenablehorizsums'] = 'Activer les totaux horizontaux';
+$string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configfileformat'] = 'Type de fichier de sortie';
 $string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
 $string['configfileoutput'] = 'Champs de sortie sur fichier';
@@ -86,7 +88,7 @@ $string['configzoom'] = 'Zoom';
 $string['csv'] = 'Enregistrements CSV';
 $string['csvwithoutheader'] = 'Enregistrements CSV sans ligne d\'en-tête';
 $string['daily'] = 'Tous les jours';
-$string['dashboard:canaddto'] = 'Peut ajouter le bloc au cours';
+$string['dashboard:addtocourse'] = 'Peut ajouter le bloc au cours';
 $string['dashboard:configure'] = 'Peut configurer le tableau de bord';
 $string['dashboard_big_result_threshold'] = 'Sécurité \"gros résultat\" ';
 $string['dashboard_cron_enabled'] = 'Activation du cron ';
@@ -119,6 +121,7 @@ $string['eventlink'] = 'Série des cibles de liens';
 $string['eventstart'] = 'Série des débuts de plage';
 $string['eventtitles'] = 'Série des titres';
 $string['exportall'] = 'Exporter toutes les données';
+$string['exportdataastable'] = 'Exporter les données en tableau';
 $string['exportconfig'] = 'Obtenir la configuration';
 $string['exportfiltered'] = 'Exporter les données filtrées';
 $string['extradbparams'] = 'Paramètres de la connexion accessoire';

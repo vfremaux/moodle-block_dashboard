@@ -1,4 +1,4 @@
-<?php // $Id: block_dashboard.php,v 1.16 2012-02-16 11:02:49 vf Exp $
+<?php // $Id: block_dashboard.php,v 1.19 2012-07-30 14:59:50 vf Exp $
 
 $string['backtocourse'] = 'Back to course';
 $string['bar'] = 'Bars';
@@ -17,7 +17,7 @@ $string['configcronmode'] = 'Cron refresh mode';
 $string['configcrontime'] = 'Hour';
 $string['configdata'] = 'GoogleMaps Markers Data';
 $string['configdisplay'] = 'Display control';
-$string['configenablehorizsums'] = 'Enambe horiz sums';
+$string['configenablehorizsums'] = 'Enable horiz sums';
 $string['configenablevertsums'] = 'Enable vertical sums';
 $string['configeventmapping'] = 'Data mapping for events';
 $string['configfileformat'] = 'File format';
@@ -88,7 +88,7 @@ $string['confiygmin'] = 'Q min';
 $string['csv'] = 'CSV records';
 $string['csvwithoutheader'] = 'CSV without headding line';
 $string['daily'] = 'daily';
-$string['dashboard:canaddto'] = 'Can add dashboards to course';
+$string['dashboard:addtocourse'] = 'Can add dashboards to course';
 $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard_big_result_threshold'] = ' \"Big Result\" security trap threshold ';
 $string['dashboard_cron_enabled'] = 'Cron activation';
@@ -122,6 +122,7 @@ $string['eventlink'] = 'Link series';
 $string['eventstart'] = 'Event start serie';
 $string['eventtitles'] = 'Title data serie';
 $string['exportall'] = 'Export all data';
+$string['exportdataastable'] = 'Export data as table';
 $string['exportconfig'] = 'Get the current config';
 $string['exportfiltered'] = 'Export filtered data';
 $string['extradbparams'] = 'Extra DB parameters';

@@ -348,15 +348,15 @@ $tabularstyle = (!empty($this->config->tabletype) && $this->config->tabletype ==
 <fieldset>
 <legend><?php print_string('tabularparams', 'block_dashboard') ?></legend>
 <table width="100%" cellpadding="5" cellspacing="0">
-<tr valign="top">
-	<td>
+<tr valign="top" height="16">
+	<td class="conflabels">
         <b><?php print_string('configverticalkeys', 'block_dashboard'); ?>: <?php helpbutton('tabular', get_string('configverticalkeys', 'block_dashboard'), 'block_dashboard') ?></b><br/>
         <b><?php print_string('confighorizkey', 'block_dashboard'); ?>: <?php helpbutton('tabular', get_string('confighorizkey', 'block_dashboard'), 'block_dashboard') ?></b><br/>
         <b><?php print_string('configverticalformats', 'block_dashboard'); ?>: <?php helpbutton('formatting', get_string('configverticalformats', 'block_dashboard'), 'block_dashboard') ?></b><br/>
         <b><?php print_string('confighorizformat', 'block_dashboard'); ?>: <?php helpbutton('formatting', get_string('confighorizformat', 'block_dashboard'), 'block_dashboard') ?></b><br/><br/>
-        <b><?php print_string('configspliton', 'block_dashboard'); ?>: <?php helpbutton('tablesplit', get_string('configspliton', 'block_dashboard'), 'block_dashboard') ?></b>
-        <b><?php print_string('configenablehorizsums', 'block_dashboard'); ?>: <?php helpbutton('configsums', get_string('configenablehorizsums', 'block_dashboard'), 'block_dashboard') ?></b>
-        <b><?php print_string('configenablevertsums', 'block_dashboard'); ?>: <?php helpbutton('configsums', get_string('configenablevertsums', 'block_dashboard'), 'block_dashboard') ?></b>
+        <b><?php print_string('configspliton', 'block_dashboard'); ?>: <?php helpbutton('tablesplit', get_string('configspliton', 'block_dashboard'), 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configenablehorizsums', 'block_dashboard'); ?>: <?php helpbutton('configsums', get_string('configenablehorizsums', 'block_dashboard'), 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configenablevertsums', 'block_dashboard'); ?>: <?php helpbutton('configsums', get_string('configenablevertsums', 'block_dashboard'), 'block_dashboard') ?></b><br/>
 	</td>
 	<td>
 		<?php
@@ -374,7 +374,7 @@ $tabularstyle = (!empty($this->config->tabletype) && $this->config->tabletype ==
             if (isset($this->config) && isset($this->config->verticalformats)) {
                 $verticalformats = htmlentities($this->config->verticalformats, ENT_NOQUOTES, 'UTF-8');
             }
-            echo '<input type="text" name="verticalformats" size="20" value="'.$verticalformats.'" />';
+            echo '<br/><input type="text" name="verticalformats" size="20" value="'.$verticalformats.'" />';
             $horizformat = '';
             if (isset($this->config) && isset($this->config->horizformat)) {
                 $horizformat = htmlentities($this->config->horizformat, ENT_NOQUOTES, 'UTF-8');
@@ -405,7 +405,7 @@ $tabularstyle = (!empty($this->config->tabletype) && $this->config->tabletype ==
             echo "<input type=\"radio\" name=\"vertsums\" value=\"0\" $vertsumsnochecked /> ".get_string('no')." - <input type=\"radio\" name=\"vertsums\" value=\"1\" $vertsumsyeschecked /> ".get_string('yes');
         ?>
 	</td>
-	<td>
+	<td class="conflabels">
         <b><?php print_string('configverticallabels', 'block_dashboard'); ?>:</b><br/>
         <b><?php print_string('confighorizlabel', 'block_dashboard'); ?>:</b><br/>
 	</td>

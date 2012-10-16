@@ -32,7 +32,7 @@
 
 $block_dashboard_capabilities = array(
 
-    'block/dashboard:canaddto' => array(
+    'block/dashboard:addtocourse' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,

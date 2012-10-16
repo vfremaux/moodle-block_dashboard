@@ -4,26 +4,26 @@
 *
 *
 */
-function require_jqplot_libs(){
+function require_jqplot_libs($wwwroot){
 	global $CFG;
 	
-	require_js($CFG->wwwroot.'/lib/jqplot/jquery-1.4.4.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/jquery.jqplot.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/excanvas.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.dateAxisRenderer.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.barRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.highlighter.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasOverlay.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.cursor.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.categoryAxisRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.pointLabels.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.logAxisRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasTextRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.pieRenderer.min.js');
-	require_js($CFG->wwwroot.'/lib/jqplot/plugins/jqplot.donutRenderer.min.js');
+	require_js($wwwroot.'/jqplot/jquery-1.4.4.min.js');
+	require_js($wwwroot.'/jqplot/jquery.jqplot.js');
+	require_js($wwwroot.'/jqplot/excanvas.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.dateAxisRenderer.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.barRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.highlighter.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.canvasOverlay.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.cursor.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.categoryAxisRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.pointLabels.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.logAxisRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.canvasTextRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.canvasAxisTickRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.enhancedLegendRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.pieRenderer.min.js');
+	require_js($wwwroot.'/jqplot/plugins/jqplot.donutRenderer.min.js');
 }
 
 /**

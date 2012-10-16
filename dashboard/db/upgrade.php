@@ -1,4 +1,4 @@
-<?php  //$Id: upgrade.php,v 1.2 2011-11-05 19:13:07 vf Exp $
+<?php  //$Id: upgrade.php,v 1.4 2012-09-19 18:52:56 vf Exp $
 
 // This file keeps track of upgrades to 
 // the vmoodle block
@@ -31,7 +31,7 @@ function xmldb_block_dashboard_upgrade($oldversion=0) {
     if ($result && $oldversion < 2011101102) {
 
     /// Define table dashboard_geo_cache to be created
-        $table = new XMLDBTable('dashboard_geo_cache');
+        $table = new XMLDBTable('block_dashboard_geo_cache');
 
     /// Adding fields to table dashboard_geo_cache
         $table->addFieldInfo('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
@@ -45,6 +45,18 @@ function xmldb_block_dashboard_upgrade($oldversion=0) {
     /// Launch create table for dashboard_geo_cache
         $result = $result && create_table($table);
     }
+
+    if ($result && $oldversion < 2012091800) {
+	    if ($table = new XMLDBTable('dashboard_cache')){
+			rename_table ($table, 'block_dashboard_cache');
+		}
+	    if ($table = new XMLDBTable('dashboard_cache_data')){
+			rename_table ($table, 'block_dashboard_cache_data');
+		}
+	    if ($table = new XMLDBTable('dashboard_geo_cache')){
+			rename_table ($table, 'block_dashboard_geo_cache');
+		}
+	}
     
     return $result;
 }

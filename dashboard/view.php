@@ -21,9 +21,6 @@
 	$context = get_context_instance(CONTEXT_BLOCK, $theBlock->instance->id);	
 	
 	$navlinks = array(
-			array('name' => $course->shortname,
-			      'type' => 'url',
-			      'link' => $CFG->wwwroot.'/cours/view.php?id='.$courseid),
 			array('name' => get_string('dashboards', 'block_dashboard'),
 			      'type' => 'title',
 			      'link' => ''),

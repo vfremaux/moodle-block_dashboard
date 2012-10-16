@@ -1,4 +1,4 @@
-<?php //$Id: block_dashboard.php,v 1.17 2011-11-02 23:03:48 vf Exp $
+<?php //$Id: block_dashboard.php,v 1.34 2012-09-19 18:52:47 vf Exp $
 
 /**
  * 
@@ -12,12 +12,19 @@
 
 require_once $CFG->dirroot.'/blocks/dashboard/lib.php';
 require_once $CFG->dirroot.'/blocks/dashboard/extradblib.php';
-require_once $CFG->libdir.'/jqplotlib.php';
-require_once $CFG->libdir.'/googleplotlib.php';
-require_once $CFG->libdir.'/timelinelib.php';
+if (file_exists($CFG->libdir.'/jqplotlib.php')){
+	$graphlibs = $CFG->libdir;
+	$graphwww = '/lib';
+} else {
+	$graphlibs = '_goodies/lib';
+	$graphwww = '/blocks/dashboard/_goodies/lib';
+}
+require_once $graphlibs.'/jqplotlib.php';
+require_once $graphlibs.'/googleplotlib.php';
+require_once $graphlibs.'/timelinelib.php';
 include_once $CFG->libdir.'/tablelib.php';
-require_jqplot_libs();
-timeline_require_js();
+require_jqplot_libs($graphwww);
+timeline_require_js($graphwww);
 // googlemaps_require_js();
 
 class block_dashboard extends block_base {
@@ -26,7 +33,7 @@ class block_dashboard extends block_base {
 
     function init() {
         $this->title = get_string('blockname', 'block_dashboard');	    	
-        $this->version = 2012022000;
+        $this->version = 2012091800;
 		$this->cron = 1;
     }
     
@@ -91,6 +98,10 @@ class block_dashboard extends block_base {
 	    return $this->content;
     }
     
+    /**
+    * Real raster that prints graphs and data
+    *
+    */
     function print_dashboard(){
     	global $CFG, $EXTRADBCONNECT, $COURSE;
     	
@@ -98,6 +109,7 @@ class block_dashboard extends block_base {
     	
 		$theBlock->config->limit = 20;
 
+		$coursepage = '';
 		if ($COURSE->format == 'page'){
 			include_once($CFG->dirroot.'/course/format/page/lib.php');
 			$pageid = optional_param('page', 0, PARAM_INT); // flexipage page number
@@ -106,6 +118,7 @@ class block_dashboard extends block_base {
 			} else {
 				$flexpage->id = $pageid;
 			}
+			$coursepage = "&page=".$flexpage->id;
 		}
 		
 		$rpage = optional_param('rpage'.$this->instance->id, 0, PARAM_INT); // result page
@@ -276,10 +289,10 @@ class block_dashboard extends block_base {
 					$sqlfiltername = (isset($this->filterfields->filtercanonicalfield[$radical])) ? $this->filterfields->filtercanonicalfield[$radical] : $radical ;
 					if (!empty($value)){
 						if (!is_array($value)){
-							$filters[] = " $sqlfiltername = '".$value."' ";
+							$filters[] = " $sqlfiltername = '".str_replace("'", "''", $value)."' ";
 						} else {
 							if (count($value) > 1 || $value[0] != 0){
-								$filters[] = " $sqlfiltername IN ('".implode("','", $value)."') ";
+								$filters[] = " $sqlfiltername IN ('".implode("','", str_replace("'", "''", $value))."') ";
 							}
 						}
 						$filtervalues[$radical] = $value;
@@ -364,8 +377,14 @@ class block_dashboard extends block_base {
 
 			$table->define_columns($tablecolumns);
 			$table->define_headers($tableheaders);
+			
+			$filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '' ;
 
-			$table->define_baseurl($CFG->wwwroot.'/course/view.php?id='.$COURSE->id.'&page='.@$flexpage->id);
+			if (@$this->config->inblocklayout){
+				$table->define_baseurl($CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd);
+			} else {
+				$table->define_baseurl($CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$this->instance->id.$coursepage.$filterquerystringadd);
+			}
 			
 			if (!empty($this->config->sortable)) $table->sortable(true, $xaxisfield, SORT_DESC); //sorted by xaxisfield by default
 			$table->collapsible(true);
@@ -567,6 +586,7 @@ class block_dashboard extends block_base {
 				if (!empty($this->config->showgraph)){
 					if (!empty($xaxisfield)  && $this->config->graphtype != 'googlemap' && $this->config->graphtype != 'timeline'){
 						if ($this->config->graphtype != 'pie'){
+							// TODO : check if $xaxisfield exists really (misconfiguration) 
 							$ticks[] = addslashes($result->$xaxisfield);
 							$ys = 0;
 							foreach($yseries as $yserie){
@@ -653,12 +673,21 @@ class block_dashboard extends block_base {
 			}
 
 			if (!empty($debug)) print_object($treedata);
-												
-			$url = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.'&page='.$flexpage->id.'&tsort'.$this->instance->id.'='.$sort;
+
+			if (@$this->config->inblocklayout){												
+				$url = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+			} else {
+				$url = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&blocksid='.$this->instance->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+			}
 			if (!empty($this->config->filters)){
 				$text .= '<form class="dashboard-filters" name="dashboardform'.$this->instance->id.'" method="GET">';
 				$text .= '<input type="hidden" name="id" value="'.s($COURSE->id).'" />';
-				$text .= '<input type="hidden" name="page" value="'.$flexpage->id.'" />';
+				if (!@$this->config->inblocklayout){
+					$text .= '<input type="hidden" name="blockid" value="'.s($this->instance->id).'" />';
+				}
+				if (!empty($coursepage)){
+					$text .= '<input type="hidden" name="page" value="'.$flexpage->id.'" />';
+				}
 				if ($sort == 'id DESC') $sort = '';
 				$text .= '<input type="hidden" name="tsort'.$this->instance->id.'" value="'.$sort.'" />';
 				$text .= $this->dashboard_print_filters($filtervalues, $sql);
@@ -667,6 +696,7 @@ class block_dashboard extends block_base {
 
 			if ($this->config->showdata){
 				$allexportstr = get_string('exportall', 'block_dashboard');
+				$tableexportstr = get_string('exportdataastable', 'block_dashboard');
 				$filteredexportstr = get_string('exportfiltered', 'block_dashboard');
 				$filterquerystring = (!empty($filterquerystring)) ? '&'.$filterquerystring : '' ;
 				if (empty($this->config->tabletype) || @$this->config->tabletype == 'linear'){
@@ -677,7 +707,7 @@ class block_dashboard extends block_base {
 					// $this->content->text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$pageexportstr</a> ";
 	
 					$text .= "<div style=\"text-align:right\">";
-					$text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}\">$allexportstr</a>";
+					$text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
 					if ($filterquerystring){
 						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredexportstr</a>";
 					}
@@ -685,10 +715,11 @@ class block_dashboard extends block_base {
 				} elseif (@$this->config->tabletype == 'tabular') {
 					// forget table and use $m matrix for making display
 					$text .= print_cross_table($this, $m, $hcols, $horizkey, $vertkeys, $hlabel, true);					
-					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$allexportstr</a></div>";
+					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a></div>";
+					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv_tabular.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$tableexportstr</a></div>";
 				} else {
 					$text .= dashboard_print_tree_view($this, $treedata, $treeoutput, $output, $outputf, $colorcoding, true);					
-					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$allexportstr</a></div>";
+					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a></div>";
 				}
 			} else {
 				$text .= '';
@@ -802,7 +833,7 @@ class block_dashboard extends block_base {
 				}
 			} else {
 				// timeline graph
-				if (empty($this->config->timelineeventstart) || empty($this->config->timelineeventstart)){
+				if (empty($this->config->timelineeventstart) || empty($this->config->timelineeventend)){
 					$text .= notify("Missing mappings (start or titles)", 'notifyproblem', '', true);
 				} else {
 					$text .= timeline_print_graph($this, 'dashboard'.$this->instance->id, $this->config->graphwidth, $this->config->graphheight, $data, true);
@@ -827,7 +858,7 @@ class block_dashboard extends block_base {
 
 		// showing query
 		if (@$this->config->showquery){
-			$text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace">';
+			$text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
 			$text .= '<pre>'.$filteredsql.'</pre>';
 			$text .= '</div>';
 		}
@@ -897,6 +928,8 @@ class block_dashboard extends block_base {
     *
     */
     function dashboard_graph_properties(){
+    	
+    	$jqplot = array();
     	
     	$yserieslabels = explode(';', $this->config->serieslabels);
     	
@@ -1185,7 +1218,7 @@ class block_dashboard extends block_base {
     	$sqlrad = preg_replace('/LIMIT.*/si', '', $sql);
     	$sqlkey = md5($sql);
     	
-    	$cachefootprint = get_record('dashboard_cache', 'querykey', $sqlkey);
+    	$cachefootprint = get_record('block_dashboard_cache', 'querykey', $sqlkey);
     	
     	$results = array();
     	
@@ -1196,8 +1229,8 @@ class block_dashboard extends block_base {
     	* If reload is forced
     	*/
     	if ((!isediting() || !@$CFG->block_dashboard_enable_isediting_security) && (!@$this->config->uselocalcaching || !$cachefootprint || ($cachefootprint && $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) || $forcereload)){
-	        delete_records('dashboard_cache', 'querykey', $sqlkey, 'access', $this->config->target);
-	        delete_records('dashboard_cache_data', 'querykey', $sqlkey, 'access', $this->config->target);
+	        delete_records('block_dashboard_cache', 'querykey', $sqlkey, 'access', $this->config->target);
+	        delete_records('block_dashboard_cache_data', 'querykey', $sqlkey, 'access', $this->config->target);
 	        
 	        list($usec, $sec) = explode(" ", microtime());
     		$t1 = (float)$usec + (float)$sec;
@@ -1216,7 +1249,7 @@ class block_dashboard extends block_base {
 						$cacherec->querykey = $sqlkey;
 			            $cacherec->recordid = $recarr[0]; // get first column in result as key
 			            $cacherec->record = base64_encode(serialize($rec));
-			            insert_record('dashboard_cache_data', addslashes_object($cacherec));
+			            insert_record('block_dashboard_cache_data', addslashes_object($cacherec));
 			        }
 		        }
 
@@ -1249,7 +1282,7 @@ class block_dashboard extends block_base {
 							$cacherec->querykey = $sqlkey;
 				            $cacherec->recordid = $reckey; // get first column in result as key
 				            $cacherec->record = base64_encode(serialize($rec));
-				            insert_record('dashboard_cache_data', addslashes_object($cacherec));
+				            insert_record('block_dashboard_cache_data', addslashes_object($cacherec));
 				        }
 				    }
 				}
@@ -1275,7 +1308,7 @@ class block_dashboard extends block_base {
 				$timerec->access = $this->config->target;
 				$timerec->querykey = $sqlkey;
 				$timerec->timereloaded = time();
-	            insert_record('dashboard_cache', $timerec);
+	            insert_record('block_dashboard_cache', $timerec);
 	        }
 			
 	        list($usec, $sec) = explode(' ', microtime());
@@ -1291,7 +1324,7 @@ class block_dashboard extends block_base {
 		        list($usec, $sec) = explode(' ', microtime());
 	    		$t1 = (float)$usec + (float)$sec;
 	    		
-	    		$rs = get_recordset('dashboard_cache_data', 'querykey', $sqlkey, 'id', '*', $offset, $limit);
+	    		$rs = get_recordset('block_dashboard_cache_data', 'querykey', $sqlkey, 'id', '*', $offset, $limit);
 		        while($rec = rs_fetch_next_record($rs)){
 		            $results[$rec->recordid] = unserialize(base64_decode($rec->record));
 		        }
@@ -1505,7 +1538,7 @@ class block_dashboard extends block_base {
         global $CFG, $COURSE;
 
         $context = get_context_instance(CONTEXT_COURSE, $COURSE->id);
-        if (has_capability('block/dashboard:canaddto', $context)){
+        if (has_capability('block/dashboard:addtocourse', $context)){
         	return true;
         }
         return false;
