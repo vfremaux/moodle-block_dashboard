@@ -5,7 +5,7 @@
 *
 */
 
-function timeline_require_js(){
+function timeline_require_js($libwww){
 	global $CFG;
 
 	global $CFG, $PAGE;
@@ -13,8 +13,8 @@ function timeline_require_js(){
 
 	if ($timelineloaded) return;
 	
-	require_js($libroot.'/timeline_api_2.3.0/setup.php', 1);
-	require_js($libroot.'/timeline_api_2.3.0/timeline_js/timeline-api.js', 1);
+	require_js($libwww.'/timeline_api_2.3.0/setup.php', 1);
+	require_js($libwww.'/timeline_api_2.3.0/timeline_js/timeline-api.js', 1);
 	$timelineloaded = true;
 }
 
