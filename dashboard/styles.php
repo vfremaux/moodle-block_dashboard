@@ -1,0 +1,123 @@
+.dashboard-filters{
+   margin:1px;
+   border:solid 1px #9B5992;
+}
+
+div.dashboard-query-box{
+   margin:1px;
+   border:solid 1px #9B5992;
+   color:#8080A0;
+   background-color:#E0E9F1;
+}
+
+table.dashboard-table{
+   border: 1px solid #7E7ACB;
+   border-collapse:separate;
+   padding:2px;
+}
+
+table.dashboard-table td{
+   border: 1px solid white;
+}
+
+.dashboard-table .hkey{
+   background-color:#9996D6;
+   color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+   padding:1px 5px;
+}
+
+.dashboard-horiz-serie{
+   background-color:#C2C0E7;
+   text-align:center;
+   font-weight:bolder;
+   border:2px solid white;
+   margin-top:2px;
+}
+
+.dashboard-table .vkey{
+   padding:1px 5px;
+}
+
+.dashboard-table .vkey.c0{
+   background-color:#8B87BE;
+   color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c1{
+   background-color:#9F9BCA;
+   color:#F0F0F7;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c2{
+   background-color:#9D98C9;
+   color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .data{
+   border:1px solid #A0A0A0; 
+   text-align:right;  
+}
+
+.dashboard-table .empty{
+   border:1px solid #F0F0F0;
+   background-color:#F8F8F8;
+}
+
+div.dashboard-special{
+   background-color:#EEFAA9;
+   color:#5B5A44;
+   font-size:0.8em;
+}
+
+.dashboard-tree1 li{
+   font-size:1.1em;
+   line-height:1.3em;
+}
+
+.dashboard-tree2 li{
+   font-size:1.0em;
+   line-height:1.2em;
+}
+
+.dashboard-tree3 li{
+   font-size:0.9em;
+   line-height:1.1em;
+}
+
+.dashboard-tree4 li{
+   font-size:0.8em;
+   line-height:1.0em;
+}
+
+.dashboard-table td.coltotal{
+   text-align:right;
+}
+
+.timeline-event-label{
+   font-size:0.8em;
+   margin-left:20px;
+}
+
+.jqplot-table-legend-swatch{
+   border-width:4px;
+   margin:1px;
+   width:9px;
+   height:9px;
+   border-style:solid;
+}
+
+.jqplot-xaxis-tick{
+  margin-top:10px;
+}
+
+.jqplot-yaxis-label{
+   left:-40px !important;
+}

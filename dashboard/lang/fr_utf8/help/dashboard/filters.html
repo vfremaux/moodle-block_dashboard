@@ -1,0 +1,80 @@
+<h2>Element de tableau de bord</h2>
+<h3>Filtres</h3>
+
+<p>Les données utiles pour l'affichage des tables et des graphes peuvent être filtrées selon certaines colonnes. Ce champ permet de définir les expressions qui servent de filtres. Ce champ accepte une liste à point-virgules pour définir successivement plusieurs filtres à présenter
+dans l'interface.</p>
+<p>La définition d'un filtre</p>
+<ul>
+	<li>Modifie dynamiquement la requête (voir ci-après les contraintes sur la requête) au moment de la production du bloc.</li>
+	<li>Ajoute automatiquement les listes déroulantes de critères qui permettent à l'utilisateur d'opérer le filtrage</li>
+</ul>
+
+<h4>Définition des filtres</h4>
+
+<p>Les filtres doivent être définis avec l'expression ENTIERE de la colonne résultat</p>
+
+<p>Exemple :</p>
+<p>Pour la requête</p>
+
+<pre>
+	SELECT
+	   DATE_FORMAT(FROM_UNIXTIME(l.time), '%Y') as year,
+	   DATE_FORMAT(FROM_UNIXTIME(l.time), '%m') as month,
+	   count(l.id) as queries
+	FROM
+		mdl_log l
+    GROUP BY
+        year,month
+</pre>
+
+<p>La valeur du filtre devra mentionner :</p>
+<pre>DATE_FORMAT(FROM_UNIXTIME(l.time), '%Y') as year</pre>
+
+<p>Pour mettre en place deux filtres indépendants sur le mois et l'année, on écrira :</p>
+<pre>DATE_FORMAT(FROM_UNIXTIME(l.time), '%Y') as year<b>;</b>DATE_FORMAT(FROM_UNIXTIME(l.time), '%Y') as year</pre>
+
+<p>Attention : lors de l'usage de deux filtres, chaque filtre fournit ses valeurs possibles indépendamment des autres. Il est donc potentiellement possible que certaines combinaisons de filtrage ne produisent aucun résultat.</p>
+
+<h4>Configuration de la requête</h4>
+
+<p>L'action des filtres nécessite qu'un marqueur soit implanté dans la requête pour y inscrire l'instruction
+dynamique de filtrage. Ce marqueur doit apparaitre comme une balise "<%%FILTERS%%>" en remplacement ou en complément d'une clause WHERE</p>
+<p><u>Exemples de position valide :</u></p>
+<pre>
+	SELECT 
+	  data1,data2
+	FROM
+	   table1 t1,
+	   table2 t2
+	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
+	ORDER BY
+	   data1
+</pre>	   
+<pre>
+	SELECT 
+	  data1,data2
+	FROM
+	   table1 t1,
+	   table2 t2
+	WHERE
+		t1.id = t2.t1key
+	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
+	ORDER BY
+	   data1
+</pre>	   
+
+<p><u>Exemples de position invalide :</u></p>
+<pre>
+	SELECT 
+	  data1,data2
+	FROM
+	   table1 t1,
+	   table2 t2
+	GROUP BY
+	    data2
+	   <span style="color:red">&lt;%%FILTERS%%&gt;</span>
+	ORDER BY
+	   data1
+</pre>	   
+
+  
