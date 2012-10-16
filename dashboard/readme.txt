@@ -59,6 +59,13 @@ Given a full query, the dashboard block mashes up :
 
 5. Define output fields, output modes, output labels... and discover features....
 
+# Library locations
+########################################
+
+Libraries will work from inside the block dashboard. 
+
+A further version might propose to move them into a "shared libs framework" local plugin for code packaging optimisation.
+
 # Install additive for running timelines
 ########################################
 
