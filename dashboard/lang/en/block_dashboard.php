@@ -215,6 +215,16 @@ $string['wednesday'] = 'Wednesday';
 $string['week'] = 'Week';
 $string['year'] = 'Year';
 
+$string['configquery_help'] = '
+<p>Query in dashboard should fllow minimal rules to be workable with:</p>
+<ul>
+<li>Only SELECT queries can be processed.</li>
+<li>Queries can perform any kind of JOIN.</li>
+<li>Some complex UNION or INTERSECT may cause perturbations in filter subquery processing. Result may be not guaranteed.</li>
+<li>All output field MUST be "aliased" for column and rederers mapping.</li>
+</ul>
+';
+
 $string['configformatting_help'] = '
 <p>This parameters allow to give a formatting instruction to data, based on the typical "sprintf"
 	syntax.</p>

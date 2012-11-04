@@ -213,6 +213,16 @@ $string['wednesday'] = 'Mercredi';
 $string['week'] = 'Semaine';
 $string['year'] = 'Année';
 
+$string['configquery_help'] = '
+<p>Les requêtes doivent suivre quelques règles pour pouvoir produire des sorties exploitables :</p>
+<ul>
+<li>Seules de requêtes de type SELECT peuvent être traitées.</li>
+<li>Les requêtes peuvent effectuer tout type de jointure.</li>
+<li>Certaines UNIONs ou INTERSECTions ou requêtes imbriquées complexes peuvent perturber les fonctions de réécriture de requête. Le résultat n\'est pas garanti.</li>
+<li>All output field MUST be "aliased" for column and rederers mapping.</li>
+</ul>
+';
+
 $string['configformatting_help'] = '
 <p>Ces champs permettent de reformater les données en sorties, selon des masques compatibles
 	avec la fonction "sprintf".</p>
