@@ -19,7 +19,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_dashboard_datacache" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboardcache" NEXT="block_dashboard_geocache">
+    <TABLE NAME="block_dashboard_datacache" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboard_cache" NEXT="block_dashboard_geocache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" PREVIOUS="id" NEXT="querykey"/>
