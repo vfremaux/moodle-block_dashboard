@@ -81,6 +81,7 @@ $string['configsplitsumonsort'] = 'Split-sums column';
 $string['configsums'] = 'Local sums settings';
 $string['configtable'] = 'Table settings';
 $string['configtabletype'] = 'Data table type';
+$string['configtabular'] = 'Tabular layout extra settings';
 $string['configtabulartable'] = 'Tabular table settings';
 $string['configtarget'] = 'Target db';
 $string['configtickspacing'] = 'Y tick spacing';
@@ -88,7 +89,6 @@ $string['configtimelinecolouring'] = 'Time line items colouring';
 $string['configtitle'] = 'Bloc title';
 $string['configtreeoutput'] = 'Tree output series';
 $string['configtreeoutputformats'] = 'Tree output series formatting';
-$string['configtreeview'] = 'Tabular table settings';
 $string['configtreeview'] = 'Tree view settings';
 $string['configupperbandunit'] = 'Upper band time scale';
 $string['configure'] = 'Configure';
@@ -112,29 +112,28 @@ $string['daily'] = 'daily';
 $string['dashboard:addtocourse'] = 'Add instance to course';
 $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard:systempathaccess'] = 'Can configure output in system data path';
-$string['dashboard_big_result_threshold'] = ' "Big Result" security trap threshold ';
+$string['dashboard_big_result_threshold'] = ' "Big Result" security ';
+$string['dashboard_big_result_threshold_desc'] = ' "Big Result" security trap threshold ';
 $string['dashboard_cron_enabled'] = 'Cron activation';
+$string['dashboard_cron_enabled_desc'] = 'Cron must be activated to output results in files';
 $string['dashboard_cron_freq'] = 'Weekly frequency';
+$string['dashboard_cron_freq_desc'] = 'Weekly frequency';
 $string['dashboard_cron_hour'] = 'Hour';
 $string['dashboard_cron_hour_desc'] = 'Hour for the automated generation';
 $string['dashboard_cron_min'] = 'Minutes ';
 $string['dashboard_cron_min_desc'] = 'Minutes for the automated generation';
 $string['dashboard_enable_isediting_security'] = 'Activates the editing secured mode.';
 $string['dashboard_enable_isediting_security_desc'] = 'Enable the isediting security. In secured mode, Queries are not executed while course is in editing mode to prevent users loosing control over block setup.';
-$string['dashboard_extra_db_db'] = 'Extra database (Postgre) : database ';
+$string['dashboard_extra_db_db'] = 'Database name';
 $string['dashboard_extra_db_db_desc'] = 'Extra database (Postgre) : database ';
-$string['dashboard_extra_db_host'] = 'Extra database (Postgre) : hostname ';
+$string['dashboard_extra_db_host'] = 'Hostname ';
 $string['dashboard_extra_db_host_desc'] = 'Extra database (Postgre) : hostname ';
-$string['dashboard_extra_db_password'] = 'Extra database (Postgre) : password ';
+$string['dashboard_extra_db_password'] = 'Password ';
 $string['dashboard_extra_db_password_desc'] = 'Extra database (Postgre) : password ';
-$string['dashboard_extra_db_port'] = 'Extra database (Postgre) : port ';
+$string['dashboard_extra_db_port'] = 'Port ';
 $string['dashboard_extra_db_port_desc'] = 'Extra database (Postgre) : port ';
-$string['dashboard_extra_db_user'] = 'Extra database (Postgre) : login ';
+$string['dashboard_extra_db_user'] = 'Login ';
 $string['dashboard_extra_db_user_desc'] = 'Extra database (Postgre) : login ';
-$string['plotgraphparams'] = 'Plotted graph settings';
-$string['dashboard_big_result_threshold_desc'] = ' "Big Result" security trap threshold ';
-$string['dashboard_cron_enabled_desc'] = 'Cron activation';
-$string['dashboard_cron_freq_desc'] = 'Weekly frequency';
 $string['dashboard_output_encoding'] = 'Output encoding';
 $string['dashboard_output_field_separator'] = ' Output field separator ';
 $string['dashboard_output_line_separator'] = 'Output line separator';
@@ -156,8 +155,8 @@ $string['eventstart'] = 'Event start serie';
 $string['eventtitles'] = 'Title data serie';
 $string['exportall'] = 'Export all data';
 $string['exportconfig'] = 'Get the current config';
-$string['exportfiltered'] = 'Export filtered data';
 $string['exportdataastable'] = 'Export data';
+$string['exportfiltered'] = 'Export filtered data';
 $string['extradbparams'] = 'Extra DB parameters';
 $string['fileoutput'] = 'Data Export settings';
 $string['friday'] = 'Friday';
@@ -188,8 +187,10 @@ $string['outputfilegeneration'] = 'Output file generation';
 $string['outputparams'] = 'Query output settings';
 $string['pageexport'] = 'Page export';
 $string['pie'] = 'Pie';
-$string['publishinpage'] = ' in separate page';
+$string['plotgraphparams'] = 'Plotted graph settings';
+$string['pluginname'] = 'Dashboard';
 $string['publishinblock'] = 'in the block space';
+$string['publishinpage'] = ' in separate page';
 $string['queryparams'] = 'Query settings';
 $string['saturday'] = 'Saturday';
 $string['securityparams'] = 'Security and performance settings';
@@ -199,19 +200,17 @@ $string['summatorsparams'] = 'Summators settings';
 $string['sunday'] = 'Sunday';
 $string['tablecolormapping'] = 'Output table color mapping';
 $string['tabular'] = 'Tabular';
-$string['configtabular'] = 'Tabular layout extra settings';
 $string['thursday'] = 'Thursday';
 $string['timegraph'] = 'Time curves';
 $string['timeline'] = 'Timeline';
-$string['timelineparams'] = 'Timeline extra settings';
 $string['timelinecolorfield'] = 'Timeline colouring field';
+$string['timelineparams'] = 'Timeline extra settings';
 $string['toomanyrecordsusepaging'] = 'This query has too many results. Paging for this query has been forced';
 $string['total'] = 'Total';
 $string['treeview'] = 'Tree view';
 $string['treeviewparams'] = 'Tree view extra settings';
 $string['tuesday'] = 'Tuesday';
 $string['viewdashboard'] = 'View dashboard';
-$string['wednesday'] = 'Wednesday';
 $string['wednesday'] = 'Wednesday';
 $string['week'] = 'Week';
 $string['year'] = 'Year';
@@ -221,15 +220,7 @@ $string['configformatting_help'] = '
 	syntax.</p>
 <p>When formatting a semi-column separated list, the formatting list should present an identical number
 	of formatting statements. An empty formatting string will pass through the original information.</p> 
-
-<h4>Example:</h4>
-<p>Using a query that defines a frequentation ratio</p>
-<pre>
-</pre>
-<p>Say we want to displays some results as float float using one decimal point formatting.</p>
-<p>Parameters "output fields" and "output formatting", would be:</p>
-<pre>mois;ratio</pre>
-<pre>;%.1f</pre>
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Raw_data_%28litteral%29_rendering" target="_blank">the Moodle Online Documentation for more information</a></p>
 ';
 
 $string['configfilters_help'] = '
@@ -241,68 +232,7 @@ Filters can accept multiple seletion mode and be preset to some values using opt
 query field list</p>
 <p>Filters should be aliased columns, and mention the complete column definition including aliasing
 clause</p>
-<h4>Example :</h4>
-<p>Using the query</p>
-
-<pre>
-	SELECT
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
-	   count(l.id) as queries
-	FROM
-		mdl_log l
-    GROUP BY
-        year,month
-</pre>
-
-<p>Filter value should mention:</p>
-<pre>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year</pre>
-
-<p>To setup distinct filters for resp. year and month, you should write:</p>
-<pre>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year<b>;</b>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y-%m\') as month</pre>
-
-<p>Beware : when using two filters, each of them provides its value list independently. Thus some filtering combination could result in "no values" ar all.</p>
-
-<h4>Query configuration</h4>
-
-<p>Filters operate on query results depending on a  "&lt;%%FILTERS%%&gt;" marker that can complete or replace a WHERE clause.</p>
-<p><u>Valid location samples:</u></p>
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	WHERE
-		t1.id = t2.t1key
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-
-<p><u>Invalid location samples:</u></p>
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	GROUP BY
-	    data2
-	   <span style="color:red">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Raw_data_%28litteral%29_rendering#Filter_Options" target="_blank">the Moodle Online Documentation for more information</a></p>
 ';
 
 $string['configfilterdefaults_help'] = '
@@ -312,21 +242,11 @@ $string['configfilterdefaults_help'] = '
 <p>When setup, the data will be filtered at first rendering of the dashboard in page. This may be usefull for
 queries that would output a lot of results. In the case a preselection is made, some options could moreover
 avoid to browse back to the "all data" situation.</p>
-
-<p>Note that filtering values are ordered.</p>
-
 <h4>Several filters</h4>
-
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
 (";" separated). Non used values should be left as "empty strings".</p> 
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Raw_data_%28litteral%29_rendering#Filter_Options" target="_blank">the Moodle Online Documentation for more information</a></p>
 
-<h4>Special values</h4>
-
-<p>Some values allow having a dynamic effect in defaults:</p> 
-<ul>
-	<li>"LAST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for most recent).</li>
-	<li>"FIRST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for oldest).</li>
-</ul>                                                           
 ';
 
 $string['configfilteroptions_help'] = '
@@ -340,65 +260,20 @@ $string['configfilteroptions_help'] = '
 </ul>                                                           
 
 <h4>Several filters</h4>
-
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
 (";" separated). Non used values should be left as "empty strings".</p> 
-
-<h4>Example</h4>
-
-<p>Say we use filters:</p>
-<pre>year;month;day</pre>
-
-<p>options</p>
-
-<pre>s;m;</pre>
-
-<p>will allow choosing only one year for data, a month selection, and one day or all day range.</p>
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Raw_data_%28litteral%29_rendering#Filter_Options" target="_blank">the Moodle Online Documentation for samples</a></p>
 ';
 
 $string['configgmdata_help'] = '
 <h3>Geolocated information</h3>
 
-<p>PLotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
+<p>Plotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
 	or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
 	coordinate and will cache this information.</p>
 <p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Geocoding API of Google</a> for more information.</p>
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Plotting_geographic_information" target="_blank">the Moodle Online Documentation for detailed information</a></p>
 
-<h4>Geographic data settings</h4>
-
-<p>Geolocated information are plotted on map as graphical markers. Markers can be defined as :</p>
-<ul>
-<li>A quadruplet: Title, Latitude, Longitude, Marker Class</li>
-<li>A sextuplet: Title, Address, Post code, City, Region Code, Marker Class</li>
-</ul>
-
-<p>Information fields have following specification:</p>
-
-<ul>
-<li><i>Title</i>: Textual label of the marker</li>
-<li><i>Latitude</i>: floating point latitude</li>
-<li><i>Longitude</i>: floating point longitude</li>
-<li><i>Address</i>: road information</li>
-<li><i>Post code</i>: Official post or zip code</li>
-<li><i>City</i>: City name</li>
-<li><i>Marker Class</i>: A classname, that will bind to a graphical icon</li>
-</ul>	
-
-<p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or more field (or alias) names separated by semicolons (";").</p>
-<ul>
-<li><i>Title input</i>: Query output fieldname providing the textual label</li>
-<li><i>Location input</i>: 
-<ul>
-<li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point values : "lat,lng" (ex : 47.098456,1.4534456)</li>
-<li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order : address, post code, city, and region code (*)</li>
-</ul>
-</li>
-<li><i>Marker type input</i>: The query output fieldname that provides a class label</li>
-</ul>
-	
-<p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
-<pre>address;cp;city;"GB"</pre>
-<p>will always provide the value "GB" as region code.</p>
 ';
 
 $string['configoutputfields_help'] = '
@@ -406,40 +281,7 @@ $string['configoutputfields_help'] = '
 
 <p>Specifies which output fields will be used in the output table (display data).</p>
 <p>Fields must be mentionned using real or aliased column identity. SQL statement must be represented by a named alias. Multiple output columns must be separated by semi-columns (;).</p>
-<h4>Example:</h4>
-<p>If query is: </p>
-<pre>
-SELECT
-   YEAR(FROM_UNIXTIME(time)) as year,
-   count(*) access
-FROM
-   mdl_log
-GROUP BY
-year
-</pre>
-<p>Output columns could be defined as:</p>
-<pre>year;access</pre>
-
-<h4>Special features on data output</h4>
-
-<p>When a column name of the output is mentionned as</p> 
-<pre>S(<i>column_name</i>)</pre> 
-<p>output values will be accumulated in order of the
-display. </p>
-';
-
-$string['configquery_help'] = '
-<p>Dashboard will produce a vue based on a data query submitted to the database.</p>
-<p>This query:</p>
-<ul>
-	<li>needs define output fields (using AS aliasing)</li>
-	<li>can use JOIN or complex UNIONs in some cases</li>
-	<li>can use aggregating operators and GROUP BY clauses</li>
-	<li>should NOT have an ORDER BY if data is intended to be displayed in data tables</li>
-</ul>
-
-<h3>Placeholder for filters</h3>
-<p>If some data filtering is to be used, then a &lt;%%FILTERS%%&gt; tag needs to be inserted as placeholder in the original query as WHERE clause or for completing a WHERE clause</p>  
+<p>See <a href="http://docs.moodle.org/23/en/Dashboard_Configuration:_Special_Features_on_Columns_for_Output" target="_blank">the Moodle Online Documentation for complementary information</a></p>
 ';
 
 $string['configsplitsumonsort_help'] = '

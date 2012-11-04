@@ -79,6 +79,7 @@ class block_dashboard extends block_base {
             return $this->content;
         }
 
+		$this->content = new StdClass();
 		if (@$this->config->inblocklayout){
 	        $this->content->text = $this->print_dashboard();
 	    } else {
