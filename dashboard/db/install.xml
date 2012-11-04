@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="block_dashboard_cache" COMMENT="Default comment for dashboard, please edit me" NEXT="block_dashboard_cache_data">
+    <TABLE NAME="block_dashboard_cache" COMMENT="Default comment for dashboard, please edit me" NEXT="block_dashboard_datacache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" PREVIOUS="id" NEXT="querykey"/>
@@ -19,7 +19,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_dashboard_cache_data" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboard_cache" NEXT="block_dashboard_geo_cache">
+    <TABLE NAME="block_dashboard_datacache" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboardcache" NEXT="block_dashboard_geocache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" PREVIOUS="id" NEXT="querykey"/>
@@ -35,7 +35,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_dashboard_geo_cache" COMMENT="Caches geo localisation data" PREVIOUS="block_dashboard_cache_data" NEXT="block_dashboard_filter_cache_data">
+    <TABLE NAME="block_dashboard_geocache" COMMENT="Caches geo localisation data" PREVIOUS="block_dashboard_datacache" NEXT="block_dashboard_filtercache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="address"/>
         <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="regioncode"/>
@@ -46,7 +46,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_dashboard_filter_cache_data" COMMENT="Stores cache data for query filtering domains" PREVIOUS="block_dashboard_geo_cache">
+    <TABLE NAME="block_dashboard_filtercache" COMMENT="Stores cache data for query filtering domains" PREVIOUS="block_dashboard_geocache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="querykey"/>
         <FIELD NAME="querykey" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="query hash" PREVIOUS="id" NEXT="filterkey"/>

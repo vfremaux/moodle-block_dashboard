@@ -1149,7 +1149,7 @@ class block_dashboard extends block_base {
     	*/
     	if ((!$PAGE->user_is_editing() || !@$CFG->block_dashboard_enable_isediting_security) && (!@$this->config->uselocalcaching || !$cachefootprint || ($cachefootprint && $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) || $forcereload)){
 	        $DB->delete_records('block_dashboard_cache', array('querykey' => $sqlkey, 'access' => $this->config->target));
-	        $DB->delete_records('block_dashboard_cache_data', array('querykey' => $sqlkey, 'access' => $this->config->target));
+	        $DB->delete_records('block_dashboard_datacache', array('querykey' => $sqlkey, 'access' => $this->config->target));
 	        list($usec, $sec) = explode(" ", microtime());
     		$t1 = (float)$usec + (float)$sec;
 			if ($this->config->target == 'moodle'){
@@ -1166,7 +1166,7 @@ class block_dashboard extends block_base {
 						$cacherec->querykey = $sqlkey;
 			            $cacherec->recordid = $recarr[0]; // get first column in result as key
 			            $cacherec->record = base64_encode(serialize($rec));
-			            $DB->insert_record('block_dashboard_cache_data', $cacherec);
+			            $DB->insert_record('block_dashboard_datacache', $cacherec);
 			        }
 		        }
 
@@ -1195,7 +1195,7 @@ class block_dashboard extends block_base {
 							$cacherec->querykey = $sqlkey;
 				            $cacherec->recordid = $reckey; // get first column in result as key
 				            $cacherec->record = base64_encode(serialize($rec));
-				            $DB->insert_record('block_dashboard_cache_data', str_replace("'", "''", $cacherec));
+				            $DB->insert_record('block_dashboard_datacache', str_replace("'", "''", $cacherec));
 				        }
 				    }
 				}
@@ -1234,7 +1234,7 @@ class block_dashboard extends block_base {
 	    		// we are caching and have a key
 		        list($usec, $sec) = explode(' ', microtime());
 	    		$t1 = (float)$usec + (float)$sec;
-	    		$rss = $DB->get_records('block_dashboard_cache_data', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
+	    		$rss = $DB->get_records('block_dashboard_datacache', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
 		        foreach($rss as $rec){
 		            $results[$rec->recordid] = unserialize(base64_decode($rec->record));
 		        }
