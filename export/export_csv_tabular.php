@@ -6,7 +6,9 @@
 *
 */
 	// needs buffering for a really clean file output
+	
 	include '../../../config.php';
+	
 	$debug = optional_param('debug', false, PARAM_BOOL);
 	if (!$debug){
 		ob_start();
@@ -22,15 +24,19 @@
 	$output = optional_param('output', 'csv', PARAM_ALPHA); // output format (csv)
 	$limit = optional_param('limit', '', PARAM_INT);
 	$offset = optional_param('offset', '', PARAM_INT); 
+
 	if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
 		print_error('badcourseid');
 	}
+	
 	require_login($course);
 
 	if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))){
 	    print_error('badblockinstance', 'block_dashboard');
 	}
+	
 	$theBlock = block_instance('dashboard', $instance);
+	
 	// prepare data for tables
 
 	$outputfields = explode(';', @$theBlock->config->outputfields);
@@ -88,6 +94,7 @@
 		$filtervalues = array();
 		$filters = array();
 		$filterinputs = array();
+		
 		foreach($filterkeys as $key){
 			$filterinputs[$key] = $_GET[$key];
 		}
@@ -99,6 +106,7 @@
 				$filterinputs[$key] = $_GET[$key];
 			}
 		}
+		
 		// process defaults if setup, faking $_GET input
 		if (!empty($theBlock->filterfields->defaults)){
 			foreach($theBlock->filterfields->defaults as $filter => $default){
@@ -107,6 +115,7 @@
 				if (!array_key_exists('filter'.$instanceid.'_'.$canonicalfilter, $filterinputs)) $filterinputs['filter'.$instanceid.'_'.$canonicalfilter] = $default;
 			}
 		}
+		
 		if (!empty($filterinputs)){
 			foreach($filterinputs as $key => $value){
 				if ($theBlock->is_filter_global($filter)){
@@ -140,12 +149,14 @@
 		$filteredsql = str_replace('<%%FILTERS%%>', '', $sql);
 	}
 	$sql = str_replace('<%%FILTERS%%>', '', $sql); // needed to prepare for filter range prefetch
+	
 	$sort = optional_param('tsort', '', PARAM_TEXT);
 	if (!empty($sort)){
 		// do not sort if already sorted in explained query
 		if (!preg_match('/ORDER\s+BY/si', $sql))
 		    $filteredsql .= " ORDER BY $sort";
 	}
+	
 	$filteredsql = $theBlock->protect($filteredsql);
 
 	/*
@@ -154,6 +165,7 @@
 	} else {
 		$offset = '';
 	}*/
+	
 	$results = $theBlock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
 
 	if ($results){
@@ -183,6 +195,7 @@
 			$matrix[] = "['".addslashes($hkeyvalue)."']";
 			$matrixst = "\$m".implode($matrix);
 			if (!in_array($hkeyvalue, $hcols)) $hcols[] = $hkeyvalue;
+			
 			// now put the cell value in it
 			$outvalues = array();
 			foreach($outputfields as $field){
@@ -195,25 +208,29 @@
 				}
 
 				if (!empty($outputf[$field])){
-					$datum = dashboard_format_data($outputf[$field], $result->$field, $cumulativeix);
+					$datum = dashboard_format_data($outputf[$field], $r->$field, $cumulativeix);
 				} else {
-					$datum = dashboard_format_data(null, @$result->$field, $cumulativeix);
+					$datum = dashboard_format_data(null, @$r->$field, $cumulativeix);
 				}
+				/*
+				// no colour possible that way in excel
 				if (!empty($theBlock->config->colorfield) && $theBlock->config->colorfield == $field){
 					$datum = dashboard_colour_code($theBlock, $datum, $colorcoding);
 				}
-				$outvalues[] = str_replace("\"", "\\\"", $datum);
+				*/
+				$outvalues[] = str_replace('"', '\\"', $datum);
 			}
 			$matrixst .= ' = "'.implode(' ',$outvalues).'"';
+			
 			// make the matrix in memory
 			eval($matrixst.";");
-
-			print_cross_table_csv($theBlock, $m, $hcols, $horizkey, $vertkeys, $hlabel, true);					
-			echo $CFG->dashboard_csv_line_separator;
+			
 		}
+
+		print_cross_table_csv($theBlock, $m, $hcols, $horizkey, $vertkeys, $hlabel, true);					
+		
+		echo $CFG->dashboard_csv_line_separator;
 	} else {
 		echo "No results. Empty file";
 	}
-
-
 ?>

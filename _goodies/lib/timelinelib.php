@@ -7,6 +7,7 @@
 
 function timeline_require_js($libroot){
 	global $CFG, $PAGE;
+
 	static $timelineloaded = false;
 
 	if ($timelineloaded) return;

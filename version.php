@@ -18,15 +18,15 @@
  * Version details
  *
  * @package    block
- * @subpackage user_mnet_hosts
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @subpackage dashboard
+ * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012062100;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011120500;        // Requires this Moodle version
+$plugin->version   = 2013042501;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2012062500;        // Requires this Moodle version
 $plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.2.0 (build 2012062100)'; 
+$plugin->release = '2.3.0 (build 2013042501)'; 
 $plugin->maturity = MATURITY_BETA;

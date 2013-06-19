@@ -32,7 +32,7 @@
 class block_dashboard_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
-    	global $CFG, $COURSE;
+    	global $CFG, $COURSE, $OUTPUT;
 
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
 
@@ -49,7 +49,7 @@ class block_dashboard_edit_form extends block_edit_form {
 		$layoutopts[1] = get_string('publishinblock', 'block_dashboard');
         $mform->addElement('select', 'config_inblocklayout', get_string('configlayout', 'block_dashboard'), $layoutopts);
 
-		/** Display settings **/
+		/** Display settings **
 
         $mform->addElement('header', 'configheader2', get_string('configdisplay', 'block_dashboard'));
 
@@ -67,9 +67,9 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('selectyesno', 'config_showfilterqueries', get_string('configshowfilterqueries', 'block_dashboard'));
         $mform->setType('config_showfilterqueries', PARAM_BOOL);
 
-		/** Query definition **/
+		/** Query definition **
 
-        $mform->addElement('header', 'configheader3', get_string('queryparams', 'block_dashboard'));
+        $mform->addElement('header', 'configheader3', get_string('querydesc', 'block_dashboard'));
         
 		$targets = array('moodle' => 'Moodle', 'extra' => 'Extra DB');
         $mform->addElement('select', 'config_target', get_string('configtarget', 'block_dashboard'), $targets);
@@ -93,7 +93,40 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addGroup($group, 'group1', get_string('configpagesize', 'block_dashboard'), '&nbsp;', false);
 		$mform->addHelpButton('group1', 'configbigresult', 'block_dashboard');
 
-		/** Data filtering options **/
+		/** Query params options **
+
+        $mform->addElement('header', 'configheader45', get_string('queryparams', 'block_dashboard'));
+
+        $headgroup = array();
+        $headgroup[0] = &$mform->createElement('html', '<img src="'.$OUTPUT->pix_url('spacer').'" style="width:120px;height:1px" /><b>'.get_string('sqlparamvar', 'block_dashboard').'</b>');
+        $headgroup[1] = &$mform->createElement('html', '<img src="'.$OUTPUT->pix_url('spacer').'" style="width:100px;height:1px" /><b>'.get_string('sqlparamlabel', 'block_dashboard').'</b>');
+        $headgroup[2] = &$mform->createElement('html', '<img src="'.$OUTPUT->pix_url('spacer').'" style="width:100px;height:1px" /><b>'.get_string('sqlparamtype', 'block_dashboard').'</b>');
+        $headgroup[3] = &$mform->createElement('html', '<img src="'.$OUTPUT->pix_url('spacer').'" style="width:100px;height:1px" /><b>'.get_string('sqlparamvalues', 'block_dashboard').'</b>');
+        $mform->addGroup($headgroup, 'group15', '', '', false);
+
+		$typeopts = array('choice' => get_string('choicevalue', 'block_dashboard'),
+					  'text' => get_string('textvalue', 'block_dashboard'),
+					  'select' => get_string('listvalue', 'block_dashboard'),
+					  'range' => get_string('rangevalue', 'block_dashboard'),
+					  'date' => get_string('datevalue', 'block_dashboard'),
+					  'daterange' => get_string('daterangevalue', 'block_dashboard'),
+					  );
+
+        $groupitems = array();
+        $groupitems[0] = &$mform->createElement('text', 'sqlparamvar', get_string('sqlparamvar', 'block_dashboard'), '', array('size' => 15));
+        $groupitems[1] = &$mform->createElement('text', 'sqlparamlabel', get_string('sqlparamlabel', 'block_dashboard'), array('size' => 15));
+        $groupitems[2] = &$mform->createElement('select', 'sqlparamtype', get_string('sqlparamtype', 'block_dashboard'), $typeopts);
+        $groupitems[3] = &$mform->createElement('textarea', 'sqlparamvalues', '', array('rows' => 5, 'cols' => '15'));
+		$repeatarray[] = &$mform->createElement('group', 'sqlparams', '', $groupitems, false);
+
+		$mform->setType('sqlparamvar', PARAM_ALPHANUM);    	
+		$mform->setType('sqlparamlabel', PARAM_TEXT);    	
+		$mform->setType('sqlparamvar', PARAM_ALPHANUM);    	
+
+		$repeateloptions = array();
+		$this->repeat_elements($repeatarray, 5, $repeateloptions, 'option_repeats', 'option_add_fields', 1);        
+
+		/** Data filtering options **
 
         $mform->addElement('header', 'configheader5', get_string('configfilters', 'block_dashboard'));
 
@@ -111,7 +144,7 @@ class block_dashboard_edit_form extends block_edit_form {
 		$mform->addHelpButton('config_uselocalcaching', 'configcaching', 'block_dashboard');
         $mform->addElement('text', 'config_cachingttl', get_string('configcachingttl', 'block_dashboard'), array('size' => 10));
 
-		/** General table options **/
+		/** General table options **
 
         $mform->addElement('header', 'configheader7', get_string('configtable', 'block_dashboard'));
         $tabletypeopts['linear'] = get_string('linear', 'block_dashboard');
@@ -120,7 +153,7 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('select', 'config_tabletype', get_string('configtabletype', 'block_dashboard'), $tabletypeopts);
 		$mform->addHelpButton('config_tabletype', 'configtabletype', 'block_dashboard');
 		
-		/** Linear table options **/
+		/** Linear table options **
 
         $mform->addElement('header', 'configheader8', get_string('configlineartable', 'block_dashboard'));
         $mform->addElement('selectyesno', 'config_cleandisplay', get_string('configcleandisplay', 'block_dashboard'));
@@ -128,7 +161,7 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_splitsumonsort', get_string('configsplitsumonsort', 'block_dashboard'));
 		$mform->addHelpButton('config_splitsumonsort', 'configsplitsumonsort', 'block_dashboard');
 
-		/** Tabular table options **/
+		/** Tabular table options **
 
         $mform->addElement('header', 'configheader9', get_string('configtabulartable', 'block_dashboard'));
 		$mform->addHelpButton('configheader9', 'configtabular', 'block_dashboard');
@@ -178,7 +211,7 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_graphheight', get_string('configgraphheight', 'block_dashboard'), array('size' => 10));
         $mform->addElement('text', 'config_graphwidth', get_string('configgraphwidth', 'block_dashboard'), array('size' => 10));
 
-		/** JQPlotted graphs settings **/ 
+		/** JQPlotted graphs settings **
 
         $mform->addElement('header', 'configheader12', get_string('plotgraphparams', 'block_dashboard'));
         $mform->addElement('text', 'config_xaxisfield', get_string('configxaxisfield', 'block_dashboard'), array('size' => 10));
@@ -201,7 +234,7 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_tickspacing', get_string('configtickspacing', 'block_dashboard'), array('size' => 6));
         $mform->addElement('selectyesno', 'config_showlegend', get_string('configshowlegend', 'block_dashboard'));
 
-		/** Google map graphs **/
+		/** Google map graphs **
 
         $mform->addElement('header', 'configheader13', get_string('googleparams', 'block_dashboard'));
 		$mform->addHelpButton('configheader13', 'configgmdata', 'block_dashboard');
@@ -223,7 +256,7 @@ class block_dashboard_edit_form extends block_edit_form {
 		$mform->addGroup($group2, 'locationgroup', get_string('configlocation', 'block_dashboard'), '&nbsp;', false);
 		$mform->addHelpButton('locationgroup', 'configlocation', 'block_dashboard');
 
-		/** Timeline plotted graphs **/
+		/** Timeline plotted graphs **
 
         $mform->addElement('header', 'configheader14', get_string('timelineparams', 'block_dashboard'));
         $mform->addElement('selectyesno', 'config_showlowerband', get_string('configshowlowerband', 'block_dashboard'));
@@ -252,7 +285,7 @@ class block_dashboard_edit_form extends block_edit_form {
 		$mform->addGroup($group4, 'group4', get_string('configtimelinecolouring', 'block_dashboard'), '&nbsp;&nbsp;', false);
 		$mform->addHelpButton('group4', 'configcolouring', 'block_dashboard');
 
-		/** Global summators settins **/
+		/** Global summators settins **
 
         $mform->addElement('header', 'configheader14', get_string('summatorsparams', 'block_dashboard'));
 
@@ -281,7 +314,7 @@ class block_dashboard_edit_form extends block_edit_form {
 		$freq['6'] = get_string('saturday', 'block_dashboard');
         $mform->addElement('select', 'config_cronfrequency', get_string('configcronfrequency', 'block_dashboard'), $freq);
 
-		/** File output settings **/
+		/** File output settings **
 
         $mform->addElement('header', 'configheader18', get_string('fileoutput', 'block_dashboard'));
 
@@ -303,6 +336,14 @@ class block_dashboard_edit_form extends block_edit_form {
 			$mform->addElement('text', 'config_filepathadminoverride', get_string('configfilepathadminoverride', 'block_dashboard'), array('size' => 20));
 			$mform->addHelpButton('config_filepathadminoverride', 'configfilelocationadmin', 'block_dashboard');
 		}
+		
+		*/
+
+        $mform->addElement('header', 'configheader20', get_string('configdahsboardparams', 'block_dashboard'));
+		$generalparamsconfigstr = get_string('generalparams', 'block_dashboard');
+		$generalparamslink = "<a href=\"{$CFG->wwwroot}/blocks/dashboard/setup.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}\">$generalparamsconfigstr</a>";
+
+		$mform->addElement('static', '', '', $generalparamslink);
 
         $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
 		$importconfigstr = get_string('importconfig', 'block_dashboard');
@@ -311,7 +352,18 @@ class block_dashboard_edit_form extends block_edit_form {
       	<a href=\"{$CFG->wwwroot}/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}&amp;what=get\" target=\"_blank\">$exportconfigstr</a>";
 
 		$mform->addElement('static', '', '', $import_export);
-
-
 	}	
+	
+	function set_data($defaults){
+		if (!empty($this->block->config)){
+			if (!empty($this->block->config->sqlparams)){
+				foreach($this->block->config->sqlparams as $paramid => $paramdef){
+					print_object($paramdef);
+					$varkey = "config_sqlparams[$paramid][sqlparamvar]";
+					$defaults->$varkey = $paramdef['sqlparamvar'];
+				}
+			}
+		}
+		parent::set_data($defaults);
+	}
 }

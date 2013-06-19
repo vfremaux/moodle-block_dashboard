@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/dashboard/db" VERSION="20120622" COMMENT="XMLDB file for Moodle blocks/dashboard"
+<XMLDB PATH="blocks/dashboard/db" VERSION="20130323" COMMENT="XMLDB file for Moodle blocks/dashboard"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="block_dashboard_cache" COMMENT="Default comment for dashboard, please edit me" NEXT="block_dashboard_datacache">
+    <TABLE NAME="block_dashboard_cache" COMMENT="Stores footprints" NEXT="block_dashboard_cache_data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" PREVIOUS="id" NEXT="querykey"/>
@@ -19,7 +19,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_dashboard_datacache" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboard_cache" NEXT="block_dashboard_geocache">
+    <TABLE NAME="block_dashboard_cache_data" COMMENT="Default comment for dashboard, please edit me" PREVIOUS="block_dashboard_cache" NEXT="block_dashboard_geo_cache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="access"/>
         <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" PREVIOUS="id" NEXT="querykey"/>
@@ -35,7 +35,7 @@
         <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="querykey" COMMENT="Fast sort of query sets" PREVIOUS="access_ix"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="block_dashboard_geocache" COMMENT="Caches geo localisation data" PREVIOUS="block_dashboard_datacache" NEXT="block_dashboard_filtercache">
+    <TABLE NAME="block_dashboard_geo_cache" COMMENT="Caches geo localisation data" PREVIOUS="block_dashboard_cache_data" NEXT="block_dashboard_filter_cache">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="address"/>
         <FIELD NAME="address" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="regioncode"/>
@@ -46,19 +46,19 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_dashboard_filtercache" COMMENT="Stores cache data for query filtering domains" PREVIOUS="block_dashboard_geocache">
+    <TABLE NAME="block_dashboard_filter_cache" COMMENT="Stores cache data for query filtering domains" PREVIOUS="block_dashboard_geo_cache">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="querykey"/>
-        <FIELD NAME="querykey" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="query hash" PREVIOUS="id" NEXT="filterkey"/>
-        <FIELD NAME="filterkey" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="querykey" NEXT="recordid"/>
-        <FIELD NAME="recordid" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" PREVIOUS="filterkey" NEXT="record"/>
-        <FIELD NAME="record" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" PREVIOUS="recordid"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="access"/>
+        <FIELD NAME="access" TYPE="char" LENGTH="10" NOTNULL="true" DEFAULT="moodle" SEQUENCE="false" ENUM="false" COMMENT="Database access type" PREVIOUS="id" NEXT="querykey"/>
+        <FIELD NAME="querykey" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Filter Query hascode" PREVIOUS="access" NEXT="filterrecord"/>
+        <FIELD NAME="filterrecord" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="querykey" NEXT="timereloaded" />
+        <FIELD NAME="timereloaded" TYPE="int" LENGTH="11" UNSIGNED="true" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="filterrecord"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="unique_filter" UNIQUE="true" FIELDS="querykey, filterkey"/>
+        <INDEX NAME="querykey_ix" UNIQUE="false" FIELDS="access,querykey"/>
       </INDEXES>
     </TABLE>
   </TABLES>

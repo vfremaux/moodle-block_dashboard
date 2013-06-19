@@ -51,7 +51,7 @@ Given a full query, the dashboard block mashes up :
 
 1. Deploy the block in Moodle/blocks as usual
 
-2. Activate notifications to isntall the data model
+2. Activate notifications to install the data model
 
 3. Create a course, better a flexipage or paged format course if available
 

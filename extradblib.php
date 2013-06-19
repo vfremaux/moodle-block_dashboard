@@ -55,6 +55,7 @@ function extra_db_error($error, $return = false){
 */
 function extra_db_notify($error){
 	global $OUTPUT;
+
 	// TODO : implement environment dependant code here
 	
 	// example : Moodle 1.9 environement : simplest way, non internationalised
@@ -167,7 +168,6 @@ function extra_db_query($sql, $renew = false, $return = false, &$error){
 			return false;
 		}
 	}
-
 }
 
 ?>

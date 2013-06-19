@@ -1,27 +1,26 @@
 <?php
 
 	include '../../config.php';
-
+	
 	$courseid = required_param('id', PARAM_INT);
 	$blockid = required_param('blockid', PARAM_INT);
 
 	if (!$course = $DB->get_record('course', array('id' => $courseid))){
 		print_error('invalidcourseid');
 	}
-
+	
 	require_login($course);
-
-    $pinned = optional_param('pinned', false, PARAM_INT);
-    $blocktable = ($pinned) ? 'block_pinned' : 'block_instances' ;
-    if (!$instance = $DB->get_record($blocktable, array('id' => $blockid))){
+	
+    if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))){
         print_error('invalidblockid');
     }
+
     $theBlock = block_instance('dashboard', $instance);
 	$context = context_block::instance($theBlock->instance->id);	
 
 	$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
 	$PAGE->navbar->add(@$theBlock->config->title, NULL);
-	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid.'&pinned='.$pinned);
+	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid);
 	$PAGE->set_title($SITE->shortname);
 	$PAGE->set_heading($SITE->shortname);
 	echo $OUTPUT->header();
