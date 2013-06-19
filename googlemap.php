@@ -18,6 +18,7 @@ if ($courseid != SITEID){
 	if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
 		print_error('invalidcourseid');
 	}
+	
 	require_login($course);
 }
 

@@ -32,20 +32,30 @@
 
 $capabilities = array(
 
-    'block/dashboard:systempathaccess' => array(
+    'block/dashboard:addinstance' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),
 
-    'block/dashboard:addtocourse' => array(
+    'block/dashboard:myaddinstance' => array(
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'block/dashboard:systempathaccess' => array(
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),
@@ -54,7 +64,7 @@ $capabilities = array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
-        'legacy' => array(
+        'archetypes' => array(
             'manager' => CAP_ALLOW
         )
     ),

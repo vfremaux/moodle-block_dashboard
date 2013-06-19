@@ -91,7 +91,7 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
 	
 	$title = addslashes($title);
 
-	$answeredarr = array($data->serie1, $data->aanswered, $data->canswered);
+	$answeredarr = array($data->answered, $data->aanswered, $data->canswered);
 	$matchedarr = array($data->matched, $data->amatched, $data->cmatched);
 	$hitratioarr = array($data->hitratio * 100, $data->ahitratio * 100, $data->chitratio * 100);
 

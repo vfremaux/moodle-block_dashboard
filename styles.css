@@ -126,3 +126,21 @@ div.dashboard-special{
 .jqplot-yaxis-label{
    left:-40px !important;
 }
+
+.off{
+	display:none !important;
+}
+
+.on{
+	display:block;
+}
+
+.dashboard-sql-params{
+    margin-top:2px;
+	font-size:0.75em;
+	display:inline;
+}
+
+#dashboardsettings-menu LI{
+	line-height:1.7em;
+}

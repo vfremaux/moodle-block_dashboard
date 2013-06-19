@@ -1,0 +1,1101 @@
+<?php
+
+/**
+ * Dashboard instance setup form
+ * 
+ * @package block-dashboard
+ * @category blocks
+ * @author Valery Fremaux (valery@club-internet.fr)
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @version Moodle 2.2
+ */
+ 
+if (!isset($theBlock->config->target)) $theBlock->config->target = 'moodle';
+if (!isset($theBlock->config->hidetitle)) $theBlock->config->hidetitle = 0;
+if (!isset($theBlock->config->showdata)) $theBlock->config->showdata = 1;
+if (!isset($theBlock->config->showgraph)) $theBlock->config->showgraph = 1;
+if (!isset($theBlock->config->shownumsums)) $theBlock->config->shownumsums = 1;
+if (!isset($theBlock->config->showquery)) $theBlock->config->showquery = 0;
+if (!isset($theBlock->config->showfilterqueries)) $theBlock->config->showfilterqueries = 0;
+if (!isset($theBlock->config->inblocklayout)) $theBlock->config->inblocklayout = ($COURSE->format == 'page') ? 1 :  0 ;
+
+?>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line-height:1.5em" >
+        <b><?php print_string('configtitle', 'block_dashboard'); ?>:</b><br/>
+        <b><?php print_string('confighidetitle', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+        <?php 
+            $theBlocktitle = '';
+            if (isset($theBlock->config) && isset($theBlock->config->title)) {
+                $theBlocktitle = $theBlock->config->title;
+            }
+            echo '<input type="text" name="title" size="60" value="'.$theBlocktitle.'" />';
+            $hidetitle = '';
+            if (isset($theBlock->config) && isset($theBlock->config->hidetitle)) {
+                $hidetitle = ($theBlock->config->hidetitle) ? ' checked="checked" ' : '' ;
+            }
+            echo '<br/><input type="checkbox" name="hidetitle" '.$hidetitle.' /> '.get_string('checktohide', 'block_dashboard');
+        ?>
+    </td>
+</tr>
+</table>
+
+<fieldset>
+<legend><?php print_string('dashboardlayout', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line-height:1.5em" >
+        <b><?php print_string('configlayout', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+    	<?php 
+    	$yesnoopts = array('0' => get_string('no'), '1' => get_string('yes'));
+    	echo html_writer::select($yesnoopts, 'inblocklayout', $theBlock->config->inblocklayout, '') 
+    	?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<?php
+dashboard_print_setting_tabs($theBlock->config);
+?>
+
+<fieldset id="dashboardsettings-panel-querydesc" class="dashboardsettings-panel on">
+<legend><?php print_string('querydesc', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right">
+        <b><?php print_string('configtarget', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+    	<?php
+    	$targets = array('moodle' => 'Moodle', 'extra' => 'Extra DB');
+    	echo html_writer::select($targets, 'target', $theBlock->config->target);
+    	?>
+    </td>
+    <td align="right">
+        <b><?php print_string('configdisplay', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+	    <?php print_string('configshowdata', 'block_dashboard'); ?>
+	    <input type="radio" name="showdata" value="1" <?php echo ($theBlock->config->showdata) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="showdata" value="0" <?php echo (!$theBlock->config->showdata) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+
+	    <?php print_string('configshowgraph', 'block_dashboard'); ?>
+	    <input type="radio" name="showgraph" value="1" <?php echo ($theBlock->config->showgraph) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="showgraph" value="0" <?php echo (!$theBlock->config->showgraph) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+
+	    <?php print_string('configshownumsums', 'block_dashboard'); ?>
+	    <input type="radio" name="shownumsums" value="1" <?php echo ($theBlock->config->shownumsums) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="shownumsums" value="0" <?php echo (!$theBlock->config->shownumsums) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+
+	    <?php print_string('configshowquery', 'block_dashboard'); ?>
+	    <input type="radio" name="showquery" value="1" <?php echo ($theBlock->config->showquery) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="showquery" value="0" <?php echo (!$theBlock->config->showquery) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+	    <?php print_string('configshowfilterqueries', 'block_dashboard'); ?>
+	    <input type="radio" name="showfilterqueries" value="1" <?php echo ($theBlock->config->showfilterqueries) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="showfilterqueries" value="0" <?php echo (!$theBlock->config->showfilterqueries) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right">
+        <b><?php print_string('configquery', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configquery', 'block_dashboard') ?></b>
+    </td>
+    <td align="center" colspan="3">
+        <?php 
+            $theBlocktitle = '';
+            if (isset($theBlock->config) && isset($theBlock->config->query)) {
+                $theBlocktitle = $theBlock->config->query;
+            }
+            echo '<textarea name="query" cols="80" rows="10" >'.$theBlocktitle.'</textarea>';
+        ?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-queryparams" class="dashboardsettings-panel off">
+<legend><?php print_string('queryparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="center" colspan="4">
+        <?php print_string('configparams', 'block_dashboard'); ?>    	
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">    	
+        <b><?php print_string('sqlparamvar', 'block_dashboard'); ?></b>
+    </td>
+    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+        <b><?php print_string('sqlparamlabel', 'block_dashboard'); ?></b>
+    </td>
+    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+        <b><?php print_string('sqlparamtype', 'block_dashboard'); ?></b>
+    </td>
+    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+        <b><?php print_string('sqlparamvalues', 'block_dashboard'); ?></b>
+    </td>
+</tr>
+<?php 
+for($i = 1 ; $i < 5 ; $i ++){ 
+	$varkey = 'sqlparamvar'.$i;
+	$labelkey = 'sqlparamlabel'.$i;
+	$typekey = 'sqlparamtype'.$i;
+	$valueskey = 'sqlparamvalues'.$i;
+	echo '<tr valign="top">';
+    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo "<input type=\"text\" size=\"20\" name=\"$varkey\" value=\"".@$theBlock->config->$varkey."\" />";
+    echo '</td>';
+    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo "<input type=\"text\" size=\"20\" name=\"$labelkey\" value=\"".@$theBlock->config->$labelkey."\" />";
+    echo '</td>';
+    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+	$typeopts = array('choice' => get_string('choicevalue', 'block_dashboard'),
+					  'text' => get_string('textvalue', 'block_dashboard'),
+					  'select' => get_string('listvalue', 'block_dashboard'),
+					  'range' => get_string('rangevalue', 'block_dashboard'),
+					  'date' => get_string('datevalue', 'block_dashboard'),
+					  'daterange' => get_string('daterangevalue', 'block_dashboard'),
+					  );
+	echo html_writer::select($typeopts, $typekey, @$theBlock->config->$typekey, '');
+    echo '</td>';
+    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo "<textarea name=\"$valueskey\" rows=\"5\" cols=\"30\">".@$theBlock->config->$valueskey.'</textarea>';
+    echo '</td>';
+	echo '</tr>';
+}
+?>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-outputparams" class="dashboardsettings-panel off">
+<legend><?php print_string('outputparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="center" colspan="4">
+        <?php print_string('configreminderonsep', 'block_dashboard'); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" width="50%" style="line-height:1.5em;font-size:0.85em" colspan="2">
+    	<table width="100%">
+    		<tr valign="top">
+        		<td width="50%" align="right"><b><?php print_string('configoutputfields', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configoutputfields', 'block_dashboard') ?></b> </td>
+		    	<td width="50%" align="left">
+		        <?php 
+		            $fields = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->outputfields)) {
+		                $fields = $theBlock->config->outputfields;
+		            }
+		            echo '<input type="text" name="outputfields" size="30" value="'.$fields.'" />';
+		        ?>
+		      	</td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configoutputformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b> </td>
+		      	<td align="left">
+		        <?php 
+		            $formats = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->outputformats)) {
+		                $formats = htmlentities($theBlock->config->outputformats, ENT_QUOTES, 'UTF-8');
+		            }
+		            echo '<input type="text" name="outputformats" size="30" value="'.$formats.'" />';
+		        ?>
+		      	</td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configpagesize', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configpagesize', 'block_dashboard') ?></b></td>
+			    <td align="left">
+		        <?php 
+		            $pagesize = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->pagesize)) {
+		                $pagesize = $theBlock->config->pagesize;
+		            }
+		            $bigresult = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->bigresult)) {
+		                $bigresult = 'checked="checked"';
+		            }
+		            
+		            echo '<input type="text" name="pagesize" size="10" value="'.p($pagesize).'" /> <input type="checkbox" name="bigresult" value="1" '.$bigresult.' />'.get_string('bigresult', 'block_dashboard').' ';
+		            echo $OUTPUT->help_icon('configbigresult', 'block_dashboard');
+				?>
+				</td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configcaching', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configcaching', 'block_dashboard') ?></b></td>
+			    <td align="left">
+			    <?php
+		            $uselocalcachingyeschecked = '';
+		            $uselocalcachingnochecked = ' checked=\"checked\" ';
+		            if (isset($theBlock->config) && isset($theBlock->config->uselocalcaching)) {
+		                $uselocalcachingyeschecked = ($theBlock->config->uselocalcaching) ? ' checked=\"checked\" ' : '' ;
+		                $uselocalcachingnochecked = ($theBlock->config->uselocalcaching) ? ' checked=\"checked\" ' : '' ;
+		            }
+		            echo "<input type=\"radio\" name=\"uselocalcaching\" value=\"0\" $uselocalcachingnochecked /> ".get_string('no')." - <input type=\"radio\" name=\"uselocalcaching\" value=\"1\" $uselocalcachingyeschecked /> ".get_string('yes');
+			     ?>
+			     </td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configcachingttl', 'block_dashboard'); ?>:</b></td>
+			    <td align="left">
+			    <?php
+		            $cachingttl = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->cachingttl)) {
+		                $cachingttl = $theBlock->config->cachingttl;
+		            }
+		            echo '<input type="text" name="cachingttl" size="10" value="'.$cachingttl.'" /> '.get_string('minutes');
+			    ?>
+			    </td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configcleandisplay', 'block_dashboard'); ?>:</b></td>
+				<td align="left">
+				<?php
+		            $cleandisplayyes = 'checked="checked"';
+		            $cleandisplayno = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->cleandisplay)) {
+		            	if ($theBlock->config->cleandisplay){
+			                $cleandisplayyes = 'checked="checked"';
+			                $cleandisplayno = '';
+			            } else {
+			                $cleandisplayyes = '';
+			                $cleandisplayno = 'checked="checked"';
+			            }
+		            }
+		            echo "<input type=\"radio\" name=\"cleandisplay\" value=\"1\" $cleandisplayyes /> ".get_string('yes'). " <input type=\"radio\" name=\"cleandisplay\" value=\"0\" $cleandisplayno /> ".get_string('no');			            
+			    ?>
+			    </td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configsortable', 'block_dashboard'); ?>:</b></td>
+				<td align="left">
+				<?php
+		            $sortableyes = 'checked="checked"';
+		            $sortableno = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->sortable)) {
+		            	if ($theBlock->config->sortable){
+			                $sortableyes = 'checked="checked"';
+			                $sortableno = '';
+			            } else {
+			                $sortableyes = '';
+			                $sortableno = 'checked="checked"';
+			            }
+		            }
+		            echo "<input type=\"radio\" name=\"sortable\" value=\"1\" $sortableyes /> ".get_string('yes'). " <input type=\"radio\" name=\"sortable\" value=\"0\" $sortableno /> ".get_string('no');			            
+			    ?>
+			    </td>
+        	</tr>
+    		<tr>
+        		<td align="right"><b><?php print_string('configsplitsumsonsort', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configsplitsumsonsort', 'block_dashboard') ?></b></td>
+				<td align="left">
+					<?php
+		            $splitsumsonsort = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->splitsumsonsort)) {
+		                $splitsumsonsort = $theBlock->config->splitsumsonsort;
+		            }
+		            echo "<input type=\"text\" name=\"splitsumsonsort\" value=\"$splitsumsonsort\" />";
+		            ?>
+			    </td>
+        	</tr>
+        </table>
+    </td>
+    <td align="right" style="font-size:0.9em" colspan="2">
+    	<table width="100%">
+    		<tr valign="top">
+    			<td width="50%" align="right"><b><?php print_string('configoutputfieldslabels', 'block_dashboard'); ?>:</b></td>
+    			<td width="50%" align="left">
+		        <?php 
+		            $fieldlabels = '';
+		            if (isset($theBlock->config) && isset($theBlock->config->fieldlabels)) {
+		                $fieldlabels = $theBlock->config->fieldlabels;
+		            }
+		            echo '<textarea name="fieldlabels" cols="30" rows="5" >'.$fieldlabels.'</textarea>';
+		        ?>
+    			</td>
+    		</tr>
+    	</table>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configfilters', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilters', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfilterdefaults', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilterdefaults', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfilteroptions', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilteroptions', 'block_dashboard') ?></b>
+    </td>
+    <td style="line-height:1.5em">
+        <?php 
+            $filters = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filters)) {
+                $filters = $theBlock->config->filters;
+            }
+            echo '<input type="text" name="filters" size="40" value="'.htmlentities($filters, ENT_QUOTES, 'UTF-8').'" />';
+            $filterdefaults = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filterdefaults)) {
+                $filterdefaults = $theBlock->config->filterdefaults;
+            }
+            echo '<br/><input type="text" name="filterdefaults" size="30" value="'.htmlentities($filterdefaults, ENT_QUOTES, 'UTF-8').'" />';
+            $filteroptions = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filteroptions)) {
+                $filteroptions = $theBlock->config->filteroptions;
+            }
+            echo '<br/><input type="text" name="filteroptions" size="30" value="'.htmlentities($filteroptions, ENT_QUOTES, 'UTF-8').'" />';
+        ?>
+    </td>
+    <td align="right">
+        <b><?php print_string('configfilterlabels', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+        <?php 
+            $filterlabels = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filterlabels)) {
+                $filterlabels = $theBlock->config->filterlabels;
+            }
+            echo '<textarea name="filterlabels" cols="30" rows="5" >'.$filterlabels.'</textarea>';
+        ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configtabletype', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtabletype', 'block_dashboard') ?></b>
+    </td>
+    <td style="line-height:1.5em">
+        <?php 
+            $tabletype = '';
+            if (isset($theBlock->config) && isset($theBlock->config->tabletype)) {
+                $tabletype = $theBlock->config->tabletype;
+            }
+            
+            $tabletypeopts['linear'] = get_string('linear', 'block_dashboard');
+            $tabletypeopts['tabular'] = get_string('tabular', 'block_dashboard');
+            $tabletypeopts['treeview'] = get_string('treeview', 'block_dashboard');
+            
+            echo html_writer::select($tabletypeopts, 'tabletype', $tabletype, array(), array('onchange' => 'showmoreoptions(this)'));
+        ?>
+    </td>
+    <td align="right">
+    </td>
+    <td>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<?php 
+// $tabularstyle = (!empty($theBlock->config->tabletype) && $theBlock->config->tabletype == 'tabular') ? 'visibility:visible;display:block' : 'visibility:hidden;display:none' ;
+?>
+<fieldset id="dashboardsettings-panel-tabularparams" class="dashboardsettings-panel off">
+<legend><?php print_string('tabularparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top" height="16">
+	<td class="conflabels">
+        <b><?php print_string('configverticalkeys', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtabular', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('confighorizkey', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtabular', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configverticalformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('confighorizformat', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/><br/>
+        <b><?php print_string('configspliton', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtablesplit', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configenablehorizsums', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configsums', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configenablevertsums', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configsums', 'block_dashboard') ?></b><br/>
+	</td>
+	<td>
+		<?php
+            $verticalkeys = '';
+            if (isset($theBlock->config) && isset($theBlock->config->verticalkeys)) {
+                $verticalkeys = $theBlock->config->verticalkeys;
+            }
+            echo '<input type="text" name="verticalkeys" size="20" value="'.$verticalkeys.'" />';
+            $horizkey = '';
+            if (isset($theBlock->config) && isset($theBlock->config->horizkey)) {
+                $horizkey = $theBlock->config->horizkey;
+            }
+            echo '<br/><input type="text" name="horizkey" size="20" value="'.$horizkey.'" />';
+            $verticalformats = '';
+            if (isset($theBlock->config) && isset($theBlock->config->verticalformats)) {
+                $verticalformats = htmlentities($theBlock->config->verticalformats, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<br/><input type="text" name="verticalformats" size="20" value="'.$verticalformats.'" />';
+            $horizformat = '';
+            if (isset($theBlock->config) && isset($theBlock->config->horizformat)) {
+                $horizformat = htmlentities($theBlock->config->horizformat, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<br/><input type="text" name="horizformat" size="20" value="'.$horizformat.'" />';
+            $spliton = '';
+            if (isset($theBlock->config) && isset($theBlock->config->spliton)) {
+                $spliton = $theBlock->config->spliton;
+            }
+            echo '<br/><br/><input type="text" name="spliton" size="20" value="'.$spliton.'" />';
+
+            $horizsumsyeschecked = '';
+            $horizsumsnochecked = ' checked=\"checked\" ';
+            if (isset($theBlock->config) && isset($theBlock->config->horizsums)) {
+                $horizsumsyeschecked = ($theBlock->config->horizsums) ? ' checked=\"checked\" ' : '' ;
+                $horizsumsnochecked = ($theBlock->config->horizsums) ? ' checked=\"checked\" ' : '' ;
+            }
+            echo '<br/>';
+            echo "<input type=\"radio\" name=\"horizsums\" value=\"0\" $horizsumsnochecked /> ".get_string('no')." - <input type=\"radio\" name=\"horizsums\" value=\"1\" $horizsumsyeschecked /> ".get_string('yes');
+
+            $vertsumsyeschecked = '';
+            $vertsumsnochecked = ' checked=\"checked\" ';
+            if (isset($theBlock->config) && isset($theBlock->config->vertsums)) {
+                $vertsumsyeschecked = ($theBlock->config->vertsums) ? ' checked=\"checked\" ' : '' ;
+                $vertsumsnochecked = ($theBlock->config->vertsums) ? ' checked=\"checked\" ' : '' ;
+            }
+            echo '<br/>';
+            echo "<input type=\"radio\" name=\"vertsums\" value=\"0\" $vertsumsnochecked /> ".get_string('no')." - <input type=\"radio\" name=\"vertsums\" value=\"1\" $vertsumsyeschecked /> ".get_string('yes');
+        ?>
+	</td>
+	<td class="conflabels">
+        <b><?php print_string('configverticallabels', 'block_dashboard'); ?>:</b><br/>
+        <b><?php print_string('confighorizlabel', 'block_dashboard'); ?>:</b><br/>
+	</td>
+	<td>
+		<?php
+            $verticallabels = '';
+            if (isset($theBlock->config) && isset($theBlock->config->verticallabels)) {
+                $verticallabels = htmlentities($theBlock->config->verticallabels, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<input type="text" name="verticallabels" size="30" value="'.$verticallabels.'" />';
+            $horizlabel = '';
+            if (isset($theBlock->config) && isset($theBlock->config->horizlabel)) {
+                $horizlabel = htmlentities($theBlock->config->horizlabel, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<br/><input type="text" name="horizlabel" size="20" value="'.$horizlabel.'" />';
+        ?>
+	</td>
+</tr>
+</table>
+</fieldset>
+
+<?php 
+// $treeviewstyle = (!empty($theBlock->config->tabletype) && $theBlock->config->tabletype == 'treeview') ? 'visibility:visible;display:block' : 'visibility:hidden;display:none' ;
+?>
+<fieldset id="dashboardsettings-panel-treeviewparams" class="dashboardsettings-panel off">
+<legend><?php print_string('treeviewparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+	<td>
+        <b><?php print_string('configparent', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('confighierarchic', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configtreeoutput', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtreeoutput', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configtreeoutputformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/>
+	</td>
+	<td>
+		<?php
+            $parentserie = '';
+            if (isset($theBlock->config) && isset($theBlock->config->parentserie)) {
+                $parentserie = $theBlock->config->parentserie;
+            }
+            echo '<input type="text" name="parentserie" size="20" value="'.$parentserie.'" />';
+            $treeoutput = '';
+            if (isset($theBlock->config) && isset($theBlock->config->treeoutput)) {
+                $treeoutput = $theBlock->config->treeoutput;
+            }
+            echo '<br/><input type="text" name="treeoutput" size="30" value="'.$treeoutput.'" />';
+            $treeoutputformats = '';
+            if (isset($theBlock->config) && isset($theBlock->config->treeoutputformats)) {
+                $treeoutputformats = $theBlock->config->treeoutputformats;
+            }
+            echo '<br/><input type="text" name="treeoutputformats" size="30" value="'.$treeoutputformats.'" />';
+        ?>
+	</td>
+	<td>
+	</td>
+	<td>
+		<?php
+        ?>
+	</td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-graphparams" class="dashboardsettings-panel off">
+<legend><?php print_string('graphparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="center" colspan="4">
+        <?php print_string('configreminderonsep', 'block_dashboard'); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right">
+        <b><?php print_string('configxaxisfield', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configxaxis', 'block_dashboard') ?></b>
+    </td>
+    <td>
+        <?php 
+            $xaxisfield = '';
+            if (isset($theBlock->config) && isset($theBlock->config->xaxisfield)) {
+                $xaxisfield = $theBlock->config->xaxisfield;
+            }
+            echo '<input type="text" name="xaxisfield" size="30" value="'.$xaxisfield.'" />';
+        ?>
+    </td>
+    <td align="right">
+        <b><?php print_string('configxaxislabel', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+        <?php 
+            $xaxislabel = '';
+            if (isset($theBlock->config) && isset($theBlock->config->xaxislabel)) {
+                $xaxislabel = $theBlock->config->xaxislabel;
+            }
+            echo '<input type="text" name="xaxislabel" value="'.$xaxislabel.'" />';
+        ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5">
+        <b><?php print_string('configyseries', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configyseries', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configyseriesformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configymin', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configexplicitscaling', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configymax', 'block_dashboard'); ?>:</b><br/>
+        <b><?php print_string('configtickspacing', 'block_dashboard'); ?>:</b><br/>
+        <b><?php print_string('configyaxisscale', 'block_dashboard'); ?>:</b>
+    </td>
+    <td style="line-height:1.5">
+        <?php 
+            $yseries = '';
+            if (isset($theBlock->config) && isset($theBlock->config->yseries)) {
+                $yseries = $theBlock->config->yseries;
+            }
+            echo '<input type="text" name="yseries" size="30" value="'.$yseries.'" />';
+            $yseriesformats = '';
+            if (isset($theBlock->config) && isset($theBlock->config->yseriesformats)) {
+                $yseriesformats = htmlentities($theBlock->config->yseriesformats, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<br/><input type="text" name="yseriesformats" size="30" value="'.$yseriesformats.'" />';
+            $ymin = '';
+            if (isset($theBlock->config) && isset($theBlock->config->ymin)) {
+                $ymin = $theBlock->config->ymin;
+            }
+            echo '<br/><input type="text" name="ymin" size="10" value="'.$ymin.'" />';
+            $ymax = '';
+            if (isset($theBlock->config) && isset($theBlock->config->ymax)) {
+                $ymax = $theBlock->config->ymax;
+            }
+            echo '<br/><input type="text" name="ymax" size="10" value="'.$ymax.'" />';
+            $tickspacing = '';
+            if (isset($theBlock->config) && isset($theBlock->config->tickspacing)) {
+                $tickspacing = $theBlock->config->tickspacing;
+            }
+            echo '<br/><input type="text" name="tickspacing" size="10" value="'.$tickspacing.'" />';
+            $yaxisscale = '';
+            if (isset($theBlock->config) && isset($theBlock->config->yaxisscale)) {
+                $yaxisscale = $theBlock->config->yaxisscale;
+            }
+            $checked1 = ( $yaxisscale == 'linear' ) ? 'checked ="checked"' : '' ;
+            $checked2 = ( $yaxisscale == 'log' ) ? 'checked ="checked"' : '' ;
+            echo '<br/><input type="radio" name="yaxisscale" value="linear" '.$checked1.' /> '.get_string('linear', 'block_dashboard').' - ';
+			echo '<input type="radio" name="yaxisscale" value="log" '.$checked2.' /> '.get_string('log', 'block_dashboard');
+        ?>
+    </td>
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configserieslabels', 'block_dashboard'); ?>:</b><br/><br/><br/>
+        <b><?php print_string('configyaxislabel', 'block_dashboard'); ?>:</b><br/>
+    	<b><?php print_string('configyaxistickangle', 'block_dashboard'); ?>:</b><br/>
+    </td>
+    <td>
+        <?php 
+            $serieslabels = '';
+            if (isset($theBlock->config) && isset($theBlock->config->serieslabels)) {
+                $serieslabels = htmlentities($theBlock->config->serieslabels, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<textarea name="serieslabels" cols="30" rows="4" >'.$serieslabels.'</textarea>';
+            $yaxislabel = '';
+            if (isset($theBlock->config) && isset($theBlock->config->yaxislabel)) {
+                $yaxislabel = $theBlock->config->yaxislabel;
+            }
+            echo '<br/><input type="text" name="yaxislabel" size="30" value="'.$yaxislabel.'" />';
+            $yaxistickangle = '';
+            if (isset($theBlock->config) && isset($theBlock->config->yaxistickangle)) {
+                $yaxistickangle = $theBlock->config->yaxistickangle;
+            }
+            $checked1 = ( $yaxistickangle == '-45' ) ? 'checked ="checked"' : '' ;
+            $checked2 = ( $yaxistickangle == '0' ) ? 'checked ="checked"' : '' ;
+            $checked3 = ( $yaxistickangle == '45' ) ? 'checked ="checked"' : '' ;
+            $checked4 = ( $yaxistickangle == '90' ) ? 'checked ="checked"' : '' ;
+            echo '<br/><input type="radio" name="yaxistickangle" value="-45" '.$checked1.' /> -45 - ';
+			echo '<input type="radio" name="yaxistickangle" value="0" '.$checked2.' /> 0 - ';
+            echo '<input type="radio" name="yaxistickangle" value="45" '.$checked3.' /> 45 - ';
+            echo '<input type="radio" name="yaxistickangle" value="90" '.$checked4.' /> 90 ';
+        ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configgraphtype', 'block_dashboard'); ?>:</b><br/>
+    	<b><?php print_string('configgraphwidth', 'block_dashboard'); ?>:</b><br/>
+        <b><?php print_string('configgraphheight', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+        <?php 
+            $graphtypes = array(
+            	'line' => get_string('line', 'block_dashboard'), 
+            	'bar' => get_string('bar', 'block_dashboard'), 
+            	'pie' => get_string('pie', 'block_dashboard'), 
+            	'donut' => get_string('donut', 'block_dashboard'),
+            	'timegraph' => get_string('timegraph', 'block_dashboard'),
+            	'timeline' => get_string('timeline', 'block_dashboard'),
+            	'googlemap' => get_string('googlemap', 'block_dashboard'),
+            );
+            $graphtype = 0;
+            if (isset($theBlock->config) && isset($theBlock->config->graphtype)) {
+                $graphtype = $theBlock->config->graphtype;
+            }
+            echo html_writer::select($graphtypes, 'graphtype', $graphtype, array(), array('onchange' => 'showmoreoptions(this);'));
+            $graphwidth = 450;
+            if (isset($theBlock->config) && isset($theBlock->config->graphwidth)) {
+                $graphwidth = $theBlock->config->graphwidth;
+            }
+            $graphheight = 250;
+            if (isset($theBlock->config) && isset($theBlock->config->graphheight)) {
+                $graphheight = $theBlock->config->graphheight;
+            }
+        ?>
+        <br/><input type="text" name="graphwidth" value="<?php echo $graphwidth ?>" /><br/>
+        <input type="text" name="graphheight" value="<?php echo $graphheight ?>" />
+    </td>
+    <td align="right">
+        <b><?php print_string('configshowlegend', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+	    <?php print_string('configshowlegend', 'block_dashboard'); ?>
+	    <input type="radio" name="showlegend" value="1" <?php echo (@$theBlock->config->showlegend) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('yes'); ?>
+	    <input type="radio" name="showlegend" value="0" <?php echo (!@$theBlock->config->showlegend) ? 'checked="checked"' : '' ?> />
+	    <?php print_string('no'); ?>
+	    <?php echo '<br/>' ?>
+	</td>
+</tr>
+</table>
+</fieldset>
+
+<?php 
+// $googlemapstyle = (!empty($theBlock->config->graphtype) && $theBlock->config->graphtype == 'googlemap') ? 'visibility:visible;display:block' : 'visibility:hidden;display:none' ;
+?>
+<fieldset id="dashboardsettings-panel-googleparams" class="dashboardsettings-panel off">
+<legend><?php print_string('googleparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line_height:1.5em">
+        <b><?php print_string('configmaptype', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configmaptype', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configzoom', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configzoom', 'block_dashboard') ?></b><br/><br/><br/>
+        <b><?php print_string('configdata', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configgmdata', 'block_dashboard') ?></b>
+    </td>
+    <td>
+        <?php 
+        	$maptypeopts = array(
+        		'ROADMAP' => get_string('maptyperoadmap', 'block_dashboard'),
+        		'SATELLITE' => get_string('maptypesatellite', 'block_dashboard'),
+        		'HYBRID' => get_string('maptypehybrid', 'block_dashboard'),
+        		'TERRAIN' => get_string('maptypeterrain', 'block_dashboard'),
+        	);
+            $maptype = 'ROADMAP';
+            if (isset($theBlock->config) && isset($theBlock->config->maptype)) {
+                $maptype = $theBlock->config->maptype;
+            }
+            echo html_writer::select($maptypeopts, 'maptype', $maptype);
+            $zoom = '6';
+            if (isset($theBlock->config) && isset($theBlock->config->zoom)) {
+                $zoom = $theBlock->config->zoom;
+            }
+            echo '<br/><input type="text" name="zoom" size="30" value="'.$zoom.'" />';
+
+            $datatitles = '';
+            if (isset($theBlock->config) && isset($theBlock->config->datatitles)) {
+                $datatitles = $theBlock->config->datatitles;
+            }
+            $datalocations = '';
+            if (isset($theBlock->config) && isset($theBlock->config->datalocations)) {
+                $datalocations = $theBlock->config->datalocations;
+            }
+            $datatypes = '';
+            if (isset($theBlock->config) && isset($theBlock->config->datatypes)) {
+                $datatypes = $theBlock->config->datatypes;
+            }
+            echo '<br/><br/><table cellpadding="2"><tr><td>'.get_string('datatitles', 'block_dashboard').'</td><td>'.get_string('datalocations', 'block_dashboard').'</td><td>'.get_string('datatypes', 'block_dashboard').'</td></tr>';
+            echo '<tr><td><input type="text" name="datatitles" size="12" value="'.$datatitles.'" /></td>';
+            echo '<td><input type="text" name="datalocations" size="35" value="'.$datalocations.'" /></td>';
+            echo '<td><input type="text" name="datatypes" size="12" value="'.$datatypes.'" /></td></tr></table>';
+        ?>
+    </td>
+    <td align="right" style="line_height:1.5em">
+        <b><?php print_string('configlocation', 'block_dashboard'); ?>:</b><br/>
+    </td>
+    <td>
+        <?php 
+            $lat = '0';
+            $lng = '0';
+            if (isset($theBlock->config) && isset($theBlock->config->lat)) {
+                $lat = $theBlock->config->lat;
+            }
+            if (isset($theBlock->config) && isset($theBlock->config->lng)) {
+                $lng = $theBlock->config->lng;
+            }
+            echo '(lat : <input type="text" size="8" name="lat" value="'.$lat.'" />, long : <input type="text"  size="8" name="lng" value="'.$lng.'" />)';
+        ?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<?php 
+// $timelinestyle = (!empty($theBlock->config->graphtype) && $theBlock->config->graphtype == 'timeline') ? 'visibility:visible;display:block' : 'visibility:hidden;display:none' ;
+?>
+<fieldset id="dashboardsettings-panel-timelineparams" class="dashboardsettings-panel off">
+<legend><?php print_string('timelineparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configshowlowerband', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configbands', 'block_dashboard') ?></b><br/>
+    </td>
+    <td style="line-height:1.5em">
+    <?php
+    	$showlowerbandyes = 'checked="checked"';
+    	$showlowerbandno = '';
+        if (isset($theBlock->config) && isset($theBlock->config->showlowerband)) {
+            $showlowerbandyes = ($theBlock->config->showlowerband) ? ' checked="checked" ' : '' ;
+            $showlowerbandno = (!$theBlock->config->showlowerband) ? ' checked="checked" ' : '' ;
+        }
+    ?>
+    	<input type="radio" name="showlowerband" value="1" <?php echo $showlowerbandyes ?> > <?php print_string('yes') ?> - <input type="radio" name="showlowerband" value="0" <?php echo $showlowerbandno ?> > <?php print_string('no') ?>
+    </td>
+    <td align="right" style="line-height:1.8em">
+        <b><?php print_string('configupperbandunit', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtimeunits', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configlowerbandunit', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configtimeunits', 'block_dashboard') ?></b>
+    </td>
+    <td style="line-height:1.5em">
+	<?php
+    	$upperbandunit = 'MONTH';
+        if (isset($theBlock->config) && isset($theBlock->config->upperbandunit)) {
+            $upperbandunit = $theBlock->config->upperbandunit;
+        }
+        $upperunits = array('MONTH' => get_string('month', 'block_dashboard'),
+        	'WEEK' => get_string('week', 'block_dashboard'),
+        	'DAY' => get_string('day', 'block_dashboard'),
+        	'HOUR' => get_string('hour', 'block_dashboard'));
+		echo html_writer::select($upperunits, 'upperbandunit', $upperbandunit);
+
+    	$lowerbandunit = 'YEAR';
+        if (isset($theBlock->config) && isset($theBlock->config->lowerbandunit)) {
+            $lowerbandunit = $theBlock->config->lowerbandunit;
+        }
+        $lowerunits = array('YEAR' => get_string('year', 'block_dashboard'),
+        	'MONTH' => get_string('month', 'block_dashboard'),
+        	'WEEK' => get_string('week', 'block_dashboard'),
+        	'DAY' => get_string('day', 'block_dashboard'));
+		echo '<br/>';
+		echo html_writer::select($lowerunits, 'lowerbandunit', $lowerbandunit);
+	?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configeventmapping', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configeventmapping', 'block_dashboard') ?></b><br/>
+    </td>
+    <td colspan="3" style="line-height:1.5em">
+        <?php 
+        	$eventtitle = '';
+            if (isset($theBlock->config) && isset($theBlock->config->timelineeventtitle)) {
+                $eventtitle = $theBlock->config->timelineeventtitle;
+            }
+
+        	$eventstart = '';
+            if (isset($theBlock->config) && isset($theBlock->config->timelineeventstart)) {
+                $eventstart = $theBlock->config->timelineeventstart;
+            }
+
+        	$eventend = '';
+            if (isset($theBlock->config) && isset($theBlock->config->timelineeventend)) {
+                $eventend = $theBlock->config->timelineeventend;
+            }
+
+        	$eventlink = '';
+            if (isset($theBlock->config) && isset($theBlock->config->timelineeventlink)) {
+                $eventlink = $theBlock->config->timelineeventlink;
+            }
+
+        	$eventdesc = '';
+            if (isset($theBlock->config) && isset($theBlock->config->timelineeventdesc)) {
+                $eventdesc = $theBlock->config->timelineeventdesc;
+            }
+
+            echo '<br/><br/><table cellpadding="2"><tr>';
+            echo '<td>'.get_string('eventtitles', 'block_dashboard').'</td>';
+            echo '<td>'.get_string('eventstart', 'block_dashboard').'</td>';
+            echo '<td>'.get_string('eventend', 'block_dashboard').'</td>';
+            echo '<td>'.get_string('eventlink', 'block_dashboard').'</td>';
+            echo '<td>'.get_string('eventdesc', 'block_dashboard').'</td>';
+            echo '</tr>';
+            echo '<tr><td><input type="text" name="timelineeventtitle" size="12" value="'.$eventtitle.'" /></td>';
+            echo '<td><input type="text" name="timelineeventstart" size="12" value="'.$eventstart.'" /></td>';
+            echo '<td><input type="text" name="timelineeventend" size="12" value="'.$eventend.'" /></td>';
+            echo '<td><input type="text" name="timelineeventlink" size="12" value="'.$eventlink.'" /></td>';
+            echo '<td><input type="text" name="timelineeventdesc" size="12" value="'.$eventdesc.'" /></td>';
+            echo '</tr></table>';
+        ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="center">
+        <?php print_string('configcolors', 'block_dashboard'); ?>
+        <br/><textarea cols="20" rows="10" name="timelinecolors" ><?php echo @$theBlock->config->timelinecolors ?></textarea>
+    </td>
+    <td align="center">
+        <b><?php print_string('configcolorfield', 'block_dashboard'); ?>:</b>
+        <br/><input type="text" name="timelinecolorfield" value="<?php echo @$theBlock->config->timelinecolorfield ?>" size="20" />
+    </td>
+    <td align="center">
+        <?php print_string('configcoloredvalues', 'block_dashboard'); ?>
+        <br/><textarea cols="20" rows="10" name="timelinecolorkeys" ><?php echo @$theBlock->config->timelinecolorkeys ?></textarea>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-summatorsparams" class="dashboardsettings-panel off">
+<legend><?php print_string('summatorsparams', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="center" colspan="4">
+        <?php print_string('configreminderonsep', 'block_dashboard'); ?>
+    </td>
+</tr>
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('confignumsums', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configsummators', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('confignumsumsformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b>
+    </td>
+    <td>
+        <?php 
+            $numsums = '';
+            if (isset($theBlock->config) && isset($theBlock->config->numsums)) {
+                $numsums = $theBlock->config->numsums;
+            }
+            echo '<input type="text" name="numsums" size="30" value="'.$numsums.'" />';
+            $numsumformats = '';
+            if (isset($theBlock->config) && isset($theBlock->config->numsumformats)) {
+                $numsumformats = htmlentities($theBlock->config->numsumformats, ENT_NOQUOTES, 'UTF-8');
+            }
+            echo '<br/><input type="text" name="numsumformats" size="30" value="'.$numsumformats.'" />';
+        ?>
+    </td>
+    <td align="right">
+        <b><?php print_string('confignumsumslabels', 'block_dashboard'); ?>:</b>
+    </td>
+    <td>
+        <?php 
+            $numsumlabels = '';
+            if (isset($theBlock->config) && isset($theBlock->config->numsumlabels)) {
+                $numsumlabels = $theBlock->config->numsumlabels;
+            }
+            echo '<textarea name="numsumlabels" cols="30" rows="5" >'.$numsumlabels.'</textarea>';
+        ?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-tablecolormapping" class="dashboardsettings-panel off">
+<legend><?php print_string('tablecolormapping', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="center">
+        <?php print_string('configcolors', 'block_dashboard'); ?>
+        <br/><textarea cols="20" rows="10" name="colors" ><?php echo @$theBlock->config->colors ?></textarea>
+    </td>
+    <td align="center">
+        <b><?php print_string('configcolorfield', 'block_dashboard'); ?>:</b>
+        <br/><input type="text" name="colorfield" value="<?php echo @$theBlock->config->colorfield ?>" size="20" />
+    </td>
+    <td align="center">
+        <?php print_string('configcoloredvalues', 'block_dashboard'); ?>
+        <br/><textarea cols="20" rows="10" name="coloredvalues" ><?php echo @$theBlock->config->coloredvalues ?></textarea>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-datarefresh" class="dashboardsettings-panel off">
+<legend><?php print_string('datarefresh', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configcronmode', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configdelayedefresh', 'block_dashboard') ?></b><br/>
+    </td>
+    <td>
+        <?php 
+            $cronmode = '';
+            if (isset($theBlock->config) && isset($theBlock->config->cronmode)) {
+                $cronmode = $theBlock->config->cronmode;
+            } else {
+            	$cronmode = 'norefresh';
+            }
+            
+            $modes['norefresh'] = get_string('norefresh', 'block_dashboard');
+            $modes['global'] = get_string('globalcron', 'block_dashboard');
+            $modes['instance'] = get_string('instancecron', 'block_dashboard');
+            echo html_writer::select($modes, 'cronmode', $cronmode);
+        ?>
+    </td>
+    <td align="right" style="line-height:1.5em">
+        <b><?php print_string('configcrontime', 'block_dashboard'); ?>: </b><br/>
+        <b><?php print_string('configcronfrequency', 'block_dashboard'); ?>: </b>
+    </td>
+    <td>
+        <?php 
+            $cronhour = '';
+            if (isset($theBlock->config) && isset($theBlock->config->cronhour)) {
+                $cronhour = $theBlock->config->cronhour;
+            }
+            $cronmin = '';
+            if (isset($theBlock->config) && isset($theBlock->config->cronmin)) {
+                $cronmin = $theBlock->config->cronmin;
+            }
+            for($i = 0; $i < 24; $i++){
+	            $hours["$i"] = sprintf('%02d', $i);
+	        }
+			$mins['00'] = '00';
+			$mins['15'] = '15';
+			$mins['30'] = '30';
+			$mins['45'] = '45';
+            echo html_writer::select($hours, 'cronhour', $cronhour);
+            print_string('hours', 'block_dashboard');
+            echo ' ';
+            echo html_writer::select($mins, 'cronmin', $cronmin);
+            print_string('mins', 'block_dashboard');
+            
+            $cronfrequency = '';
+            if (isset($theBlock->config) && isset($theBlock->config->cronfrequency)) {
+                $cronfrequency = $theBlock->config->cronfrequency;
+            } else {
+            	$cronfrequency = 'daily';
+            }
+
+			$freq['daily'] = get_string('daily', 'block_dashboard');
+			$freq['0'] = get_string('sunday', 'block_dashboard');
+			$freq['1'] = get_string('monday', 'block_dashboard');
+			$freq['2'] = get_string('tuesday', 'block_dashboard');
+			$freq['3'] = get_string('wednesday', 'block_dashboard');
+			$freq['4'] = get_string('thursday', 'block_dashboard');
+			$freq['5'] = get_string('friday', 'block_dashboard');
+			$freq['6'] = get_string('saturday', 'block_dashboard');
+			echo '<br/>';
+            echo html_writer::select($freq, 'cronfrequency', $cronfrequency, '');
+        ?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<fieldset id="dashboardsettings-panel-fileoutput" class="dashboardsettings-panel off">
+<legend><?php print_string('fileoutput', 'block_dashboard') ?></legend>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr valign="top">
+    <td align="right" style="line-height:1.5">
+        <b><?php print_string('configmakefile', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configdelayedefresh', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfileoutput', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfileoutput', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfileoutputformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfileformat', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfileoutput', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfilesqlouttable', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilesqlouttable', 'block_dashboard') ?></b><br/>
+    </td>
+    <td style="line-height:1.5">
+        <?php 
+            $makefile = '';
+            if (isset($theBlock->config) && isset($theBlock->config->makefile)) {
+                $makefile = $theBlock->config->makefile;
+            } else {
+            	$theBlock->config->makefile = 0;
+            }
+            $checked1 = ( $makefile == 0 ) ? 'checked ="checked"' : '' ;
+            $checked2 = ( $makefile == 1 ) ? 'checked ="checked"' : '' ;
+            echo '<input type="radio" name="makefile" value="0" '.$checked1.' /> '.get_string('no');
+			echo ' - <input type="radio" name="makefile" value="1" '.$checked2.' />  '.get_string('yes');
+
+            $fileoutput = '';
+            if (isset($theBlock->config) && isset($theBlock->config->fileoutput)) {
+                $fileoutput = $theBlock->config->fileoutput;
+            }
+            echo '<br/><input type="text" name="fileoutput" value="'.$fileoutput.'" />';
+
+            $fileoutputformats = '';
+            if (isset($theBlock->config) && isset($theBlock->config->fileoutputformats)) {
+                $fileoutputformats = $theBlock->config->fileoutputformats;
+            }
+            echo '<br/><input type="text" name="fileoutputformats" value="'.$fileoutputformats.'" />';
+
+            $fileformat = 'CSV';
+            if (isset($theBlock->config) && isset($theBlock->config->fileformat)) {
+                $fileformat = $theBlock->config->fileformat;
+            }
+            $fileformats = array(
+            	'CSV' => get_string('csv', 'block_dashboard'),
+            	'CSVWH' => get_string('csvwithoutheader', 'block_dashboard'),
+            	'SQL' => get_string('sqlinserts', 'block_dashboard'));
+            echo '<br/>';
+            echo html_writer::select($fileformats, 'fileformat', $fileformat);
+
+            $filesqlouttable = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filesqlouttable)) {
+                $filesqlouttable = $theBlock->config->filesqlouttable;
+            }
+            echo '<br/><input type="text" name="filesqlouttable" value="'.$filesqlouttable.'" />';
+        ?>
+    </td>
+    <td align="right">
+        <b><?php print_string('configfilelocation', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilelocation', 'block_dashboard') ?></b><br/>
+		<?php
+		if (has_capability('moodle/site:doanything', get_context_instance(CONTEXT_SYSTEM))){
+        	echo '<b>';
+        	print_string('configfilepathadminoverride', 'block_dashboard'); 
+        	echo ' : ';
+        	helpbutton('filelocationadmin', get_string('configfilepathadminoverride', 'block_dashboard'), 'block_dashboard');
+        	echo '</b>';
+        }
+		?>
+    </td>
+    <td>
+        <?php 
+            $filelocation = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filelocation)) {
+                $filelocation = $theBlock->config->filelocation;
+            }
+            echo '<input type="text" name="filelocation" size="30" value="'.$filelocation.'" />';
+            $filepathadminoverride = '';
+            if (isset($theBlock->config) && isset($theBlock->config->filepathadminoverride)) {
+                $filepathadminoverride = $theBlock->config->filepathadminoverride;
+            }
+            echo '<br/><input type="text" name="filepathadminoverride" size="30" value="'.$filepathadminoverride.'" />';
+        ?>
+    </td>
+</tr>
+</table>
+</fieldset>
+
+<?php global $COURSE ?>
+<table width="100%" cellpadding="5" cellspacing="0">
+<tr>
+    <td colspan="3" align="center">
+      <input type="submit" name="submit" value="<?php print_string("savechanges") ?>" />
+      <input type="submit" name="submitandreturn" value="<?php print_string('savechangesandreturn', 'block_dashboard') ?>" /><br/>
+	  <a href="<?php echo $CFG->wwwroot."/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$theBlock->instance->id}" ?>&amp;what=upload"><?php print_string('importconfig', 'block_dashboard') ?></a> - 
+      <a href="<?php echo $CFG->wwwroot."/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$theBlock->instance->id}" ?>&amp;what=get" target="_blank"><?php print_string('exportconfig', 'block_dashboard') ?></a> - 
+    </td>
+</tr>
+</table>
