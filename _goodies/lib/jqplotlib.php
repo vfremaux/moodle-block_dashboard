@@ -10,7 +10,7 @@ function require_jqplot_libs($libroot){
 	
 	if ($jqplotloaded) return;
 
-	$PAGE->requires->js($libroot.'/jqplot/jquery-1.4.4.min.js', true);
+	block_dashboard::check_jquery();
 	$PAGE->requires->js($libroot.'/jqplot/jquery.jqplot.js', true);
 	$PAGE->requires->js($libroot.'/jqplot/excanvas.js', true);
 	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.dateAxisRenderer.js', true);

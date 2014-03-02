@@ -130,14 +130,13 @@
 		}
 
 		$str = print_cross_table_csv($theBlock, $m, $hcols, true);		
-					
+
 		if ($theBlock->config->exportcharset == 'utf8'){
-			echo utf8_decode($str); 
-		} else {
-			echo $str; 
+			$str = utf8_decode($str); 
 		}
-		
-		echo $CFG->dashboard_csv_line_separator;
+
+		dashboard_output_file($theBlock, $str);
+							
 	} else {
 		echo "No results. Empty file";
 	}

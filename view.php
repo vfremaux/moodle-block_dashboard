@@ -19,7 +19,9 @@
 	$context = context_block::instance($theBlock->instance->id);	
 
 	$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
-	$PAGE->navbar->add(@$theBlock->config->title, NULL);
+	if (!empty($theBlock->config->title)){
+		$PAGE->navbar->add($theBlock->config->title, NULL);
+	}
 	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid);
 	$PAGE->set_title($SITE->shortname);
 	$PAGE->set_heading($SITE->shortname);

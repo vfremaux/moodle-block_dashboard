@@ -21,12 +21,9 @@ $string['configcopy'] = 'Importer la configuration d\'un tableau de bord';
 $string['configcronfrequency'] = 'Fréquence';
 $string['configcronmode'] = 'Mode de programmation du raffraichissement';
 $string['configcrontime'] = 'Heure';
+$string['configdashboardparams'] = 'Paramètres du tableau de bord';
 $string['configdata'] = 'Données GoogleMaps';
-$string['configdahsboardparams'] = 'Paramètres du tableau de bord';
-$string['generalparams'] = 'Accéder à la définition du tableau de bord';
 $string['configdisplay'] = 'Eléments d\'affichage';
-$string['invalidorobsoletequery'] = 'Requête obsolete ou invalide : {$a}';
-$string['invalidorobsoletefilterquery'] = 'Requête de filtre obsolete ou invalide';
 $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
 $string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
@@ -48,6 +45,7 @@ $string['confighorizformat'] = 'Formatage des clefs  horizontales';
 $string['confighorizkey'] = 'Clef  horizontale';
 $string['confighorizlabel'] = 'Label de la série horizontale';
 $string['configimportexport'] = 'Import/Export de la configuration';
+$string['confighorodatefiles'] = 'Horodater les fichiers';
 $string['configlat'] = 'Latitude';
 $string['configlayout'] = 'Publier les données dans le bloc ';
 $string['configlocation'] = 'Emplacement';
@@ -76,6 +74,7 @@ $string['configsortable'] = 'Table triable';
 $string['configspliton'] = 'Dissocier la table sur la série';
 $string['configsplitsumsonsort'] = 'Colonne de séparation de sous-totaux';
 $string['configtabletype'] = 'Type de table';
+$string['configtablesplit_help'] = 'Si défini, les valeurs différentes de cette série de données sépareront les résultats en tables différentes';
 $string['configtarget'] = 'Système cible';
 $string['configtickspacing'] = 'Espacement entre marques';
 $string['configtitle'] = 'Titre du bloc';
@@ -116,6 +115,8 @@ $string['dashboard_output_field_separator'] = 'Séparateur de champs de sortie '
 $string['dashboard_output_line_separator'] = 'Séparateur de lignes de sortie ';
 $string['dashboardlayout'] = 'Mise en page du tableau de bord';
 $string['dashboards'] = 'Tableaux de bord';
+$string['dashboardstoragearea'] = 'Zone de fichiers du tableau de bord';
+$string['cleararea'] = 'Vider la zone de fichiers';
 $string['datalocations'] = 'Géolocaliseurs';
 $string['datarefresh'] = 'Raffraichissement de données';
 $string['datatitles'] = 'Titre des marques';
@@ -136,8 +137,12 @@ $string['exportdataastable'] = 'Exporter les données en tableau';
 $string['exportfiltered'] = 'Exporter les données filtrées';
 $string['extradbparams'] = 'Paramètres de la connexion accessoire';
 $string['fileoutput'] = 'Sortie sur fichier';
+$string['filesview'] = 'Voir la zone de fichiers';
+$string['filegenerated'] = 'Le fichier a été généré';
+$string['generatedexports'] = 'Exports générés';
 $string['friday'] = 'Vendredi';
 $string['from'] = 'de';
+$string['generalparams'] = 'Accéder à la définition du tableau de bord';
 $string['globalcron'] = 'Paramètres globaux de cron';
 $string['googlemap'] = 'Carte Google';
 $string['googlemap'] = 'Google Map';
@@ -147,6 +152,8 @@ $string['hour'] = 'Heure';
 $string['hours'] = 'heure';
 $string['importconfig'] = 'Importer la configuration';
 $string['instancecron'] = 'Paramètres d\'instance';
+$string['invalidorobsoletefilterquery'] = 'Requête de filtre obsolete ou invalide.';
+$string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
 $string['log'] = 'Logarithmique';
@@ -160,21 +167,22 @@ $string['month'] = 'Mois';
 $string['noquerystored'] = 'Pas de requête enregistrée';
 $string['norefresh'] = 'Pas de raffraichissement';
 $string['notretrievable'] = 'Les données ne peuvent être affichées. Vous êtes probablement en mode édition et il n\'existe aucun cache de données disponible. Cette situation est forcée afin de prévenir une perte de contrôle sur le paramétrage du tableau de bord en cas de requête erronée.';
+$string['obsoletequery'] = 'Cette requête semble être écrite pour Moodel 1.9 et est incompatible avec la base de donnée actuelle.';
 $string['ofbiz_dashboard'] = 'Tableaux de bord Ofbiz';
 $string['outputfilegeneration'] = 'Extraction de données';
+$string['outputfiltered'] = 'Générer le fichier de sortie (filtré)';
 $string['outputparams'] = 'Configuration des données de sorties';
-$string['obsoletequery'] = 'Cette requête semble être écrite pour Moodel 1.9 et est incompatible avec la base de donnée actuelle.';
 $string['pie'] = 'Camenberts';
+$string['pluginname'] = 'Tableau de bord';
 $string['publishinblock'] = 'Dans l\'espace du bloc';
 $string['publishinpage'] = 'Dans une page séparée';
-$string['pluginname'] = 'Tableaux de bord';
 $string['querydesc'] = 'Définition de requête';
 $string['queryparams'] = 'Paramêtres utilisateur';
 $string['saturday'] = 'Samedi';
+$string['setup'] = 'Configuration';
 $string['securityparams'] = 'Paramètres de sécurité et de performance';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
 $string['subtotal'] = 'Sous-total';
-$string['savechangesandreturn'] = 'Enregistrer et revenir au cours';
 $string['summatorsparams'] = 'Configuration des sommateurs';
 $string['sunday'] = 'Dimanche';
 $string['tablecolormapping'] = 'Colorisation des lignes de table ';
@@ -194,6 +202,29 @@ $string['viewdashboard'] = 'Voir le tableau de bord';
 $string['wednesday'] = 'Mercredi';
 $string['week'] = 'Semaine';
 $string['year'] = 'Année';
+
+$string['configdelayedrefresh'] = 'Raffraichissement différé des données de tableau de bord.';
+
+$string['configdelayedrefresh_help'] = '
+<p>Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
+<p>Vous pouvez choisir de sortir les données selon le réglage général de la fonction cron des tableaux de bord, ou 
+choisir un autre moment particulier pour cette instance.</p>
+';
+
+$string['configmakefile_help'] = '
+<p>Lorsque le cache est régénéré, vous pouvez choisir de sortir également les données vers un fichier.</p>
+';
+
+$string['configfileoutput_help'] = '
+<p>La sortie sur fichier peut être alimentée par d\'autres champs que ceux utilisés pour l\'affichage. </p>
+';
+
+$string['configfilesqlouttable_help'] = '
+<p>Dans le cas où vous choisissez de sortir des instructions SQL, vous devez mentionner le nom de la table d\'arrivée pour les insertions. </p>
+';
+
+$string['configfilepathadminoverride'] = 'Only administrators can choose where to put the file.';
+$string['configfilepathadminoverride_help'] = 'Les administrateurs peuvent avoir besoin de générer les fichiers de sortie dans des chemins non contrôllés par Moodle';
 
 $string['configformatting_help'] = '
 <p>Ces champs permettent de reformater les données en sorties, selon des masques compatibles
@@ -557,3 +588,5 @@ $string['configfilelocationadmin_help'] = '
 	à l\'administrateur de générer les sortes dans des répertoires non directement accessibles par 
     les environnements de cours.</p>
 ';
+
+$string['confighorodatefiles_help'] = 'Si actif, chaque fichier généré sera complété par un horodatage';

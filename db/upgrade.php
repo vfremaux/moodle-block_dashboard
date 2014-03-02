@@ -1,4 +1,4 @@
-<?php  //$Id: upgrade.php,v 1.2 2011-11-05 19:13:07 vf Exp $
+<?php
 
 // This file keeps track of upgrades to 
 // the dashboard block
