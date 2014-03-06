@@ -764,7 +764,7 @@ function dashboard_render_params(&$theBlock, &$javascripthandler){
 	
 	$str .= '<div class="dashboard-sql-params">';
 	foreach($theBlock->params as $key => $param){
-		$htmlkey = preg_replace('/[.() *]/', '', $key);
+		$htmlkey = preg_replace('/[.() *]/', '', $key).'_'.$theBlock->instance->id;
 		switch($param->type){
 			case 'choice':
 				$values = explode("\n", $param->values);
@@ -955,6 +955,8 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
 }
 
 function dashboard_output_file($theBlock, $str){
+	global $CFG;
+	
 	if (!empty($theBlock->config->filepathadminoverride)){
 		// an admin has configured, can be anywhere in moodledata so be carefull !
 		$outputfile = $CFG->dataroot.'/'.$theBlock->config->filepathadminoverride.'/'.$theBlock->config->filelocation;

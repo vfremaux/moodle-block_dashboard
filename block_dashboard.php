@@ -148,11 +148,9 @@ class block_dashboard extends block_base {
     function print_dashboard(){
     	global $CFG, $EXTRADBCONNECT, $COURSE, $DB, $OUTPUT;
 
-		/*
 		$text = '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css" />';
-		*/
 
-		$text = '<div class="dashboard-panel">';
+		$text .= '<div class="dashboard-panel">';
 		$text .= '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css" />';
 		
 		if (!isset($this->config)){
@@ -625,7 +623,9 @@ class block_dashboard extends block_base {
 					if ($filterquerystring){
 						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredexportstr</a>";
 					}
-					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
 					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
 					$text .= "</div>";
 				} elseif (@$this->config->tabletype == 'tabular') {
@@ -634,13 +634,17 @@ class block_dashboard extends block_base {
 					$text .= '<div style="text-align:right">';
 					$text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
 					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv_tabular.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$tableexportstr</a>";
-					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
 					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
 					$text .= '</div>';
 				} else {
 					$text .= dashboard_print_tree_view($this, $treedata, $this->treeoutput, $this->output, $this->outputf, $this->colourcoding, true);					
 					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
-					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
 					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_cvs.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
 					$text .= '</div>';
 				}
@@ -1270,9 +1274,9 @@ class block_dashboard extends block_base {
     				if (debugging(DEBUG_DEVELOPER)){
 	    				mtrace("Day check : Now ".$nowdt['yday']." > Last ".$lastdate['yday'].' ');
 	    			}
-    				if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug){
+    				if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug || ($nowdt['yday'] == 0)){
     					// we wait the programmed time is passed, and check we are an allowed day to run and no query is already running
-    					if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug){
+    					if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug || ($nowdt['yday'] == 0)){
 		    				if (($nowdt['hours'] >= $chour && $nowdt['minutes'] > $cmin && !@$instance->config->isrunning) || $crondebug){
 		    					$instance->config->isrunning = true;
 		    					$instance->config->lastcron = $now;
@@ -1365,6 +1369,10 @@ class block_dashboard extends block_base {
     *
     */
     function prepare_config(){
+
+		if (empty($this->config)) return;
+		if (empty($this->config->query)) return;
+
 		$this->sql = $this->config->query;
 		
 		if (empty($this->config->exportcharset)) $this->config->exportcharset = 'utf8';
@@ -1490,7 +1498,7 @@ class block_dashboard extends block_base {
     	$paramsurlvalues = array();
     	foreach($this->params as $key => $param){
     		$sqlkey = $key;
-			$key = preg_replace('/[.() *]/', '', $key);
+			$key = preg_replace('/[.() *]/', '', $key).'_'.$this->instance->id;
     		switch($param->type){
     			case ('choice'):
     			case ('list'):
