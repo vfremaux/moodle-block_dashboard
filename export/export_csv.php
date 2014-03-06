@@ -41,7 +41,7 @@
 	$theBlock = block_instance('dashboard', $instance);
 
 	$theBlock->prepare_config();
-	$theBlock->prepare_filters();
+	// $theBlock->prepare_filters();
 	$theBlock->prepare_params();
 
 	/// fetch data
@@ -88,7 +88,7 @@
 		}
 
 		if (!$debug) ob_end_clean();		
-		if (!empty($CFG->latinexcelexport)){
+		if ($theBlock->config->exportcharset == 'utf8'){
 			echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $headrow)); 
 		} else {
 			echo implode($CFG->dashboard_csv_field_separator, $headrow); 
@@ -114,7 +114,7 @@
 				}
 				$row[] = $datum;
 			}
-			if (!empty($CFG->latinexcelexport)){
+			if ($theBlock->config->exportcharset == 'utf8'){
 				echo utf8_decode(implode($CFG->dashboard_csv_field_separator, $row)); 
 			} else {
 				echo implode($CFG->dashboard_csv_field_separator, $row); 
@@ -124,6 +124,3 @@
 	} else {
 		echo "No results. Empty file";
 	}
-
-
-?>

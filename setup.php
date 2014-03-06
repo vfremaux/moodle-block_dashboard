@@ -1,8 +1,9 @@
 <?php
 
 	include '../../config.php';
-	
-	$PAGE->requires->js('/blocks/dashboard/js/jquery-1.8.2.min.js', true);
+
+	require_once $CFG->dirroot.'/blocks/dashboard/block_dashboard.php';	
+	block_dashboard::check_jquery();
 	$PAGE->requires->js('/blocks/dashboard/js/module.js', true);
 
 	$courseid = required_param('id', PARAM_INT);
@@ -23,12 +24,14 @@
 
 	require_capability('block/dashboard:configure', $context);
 
-	if (($submit = optional_param('submit','', PARAM_TEXT)) || ($submitandreturn = optional_param('submitandreturn','', PARAM_TEXT))){
+	if (optional_param('submit','', PARAM_TEXT)){
 		include 'setup.controller.php';
 	}
 	
 	$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
-	$PAGE->navbar->add(@$theBlock->config->title, NULL);
+	$blocktitle = (empty($theBlock->config->title)) ? get_string('pluginname', 'block_dashboard') : $theBlock->config->title ;
+	$PAGE->navbar->add($blocktitle);
+	$PAGE->navbar->add(get_string('setup', 'block_dashboard'));
 	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid);
 	$PAGE->set_title($SITE->shortname);
 	$PAGE->set_heading($SITE->shortname);

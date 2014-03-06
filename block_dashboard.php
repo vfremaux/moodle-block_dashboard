@@ -6,12 +6,14 @@
  * @category blocks
  * @author Valery Fremaux (valery@club-internet.fr)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.x
+ * @version Moodle 1.9
  */
 
 
+require_once $CFG->dirroot.'/blocks/moodleblock.class.php';
 require_once $CFG->dirroot.'/blocks/dashboard/lib.php';
 require_once $CFG->dirroot.'/blocks/dashboard/extradblib.php';
+
 if (file_exists($CFG->libdir.'/jqplotlib.php')){
 	$graphlibs = $CFG->libdir;
 	$graphwww = '/lib';
@@ -19,17 +21,12 @@ if (file_exists($CFG->libdir.'/jqplotlib.php')){
 	$graphlibs = '_goodies/lib';
 	$graphwww = '/blocks/dashboard/_goodies/lib';
 }
-require_once $graphlibs.'/jqplotlib.php';
-require_once $graphlibs.'/googleplotlib.php';
-require_once $graphlibs.'/timelinelib.php';
-include_once $CFG->libdir.'/tablelib.php';
-require_jqplot_libs($graphwww);
-timeline_require_js($graphwww);
 
 global $PAGE;
-$PAGE->requires->js('/blocks/dashboard/js/module.js');
-$PAGE->requires->js('/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css');
-$PAGE->requires->js('/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css');
+$PAGE->requires->js('/blocks/dashboard/js/module.js', true);
+$PAGE->requires->js('/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.js', true);
+$PAGE->requires->js('/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar_locales.js', true);
+// $PAGE->requires->css('/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css');
 
 class block_dashboard extends block_base {
 	
@@ -98,6 +95,10 @@ class block_dashboard extends block_base {
 		$data->sqlparams = @$_POST['sqlparams'];
 		
 		// print_object($data);
+
+		// reset cron activation internal switches		
+		$data->isrunning = 0;
+		$data->lastcron = 0;
 				
     	return parent::instance_config_save($data, $notused);
     }
@@ -111,14 +112,16 @@ class block_dashboard extends block_base {
     function get_content() {
         global $EXTRADBCONNECT, $CFG, $COURSE;
                 
-        @raise_memory_limit('256M');
+        @raise_memory_limit('512M');
 
 		// special patch for 1.9 queries
-		if (preg_match('/block_instance\b/', @$this->config->query)){
-			$this->content = new StdClass;
-			$this->content->text = get_string('obsoletequery', 'block_dashboard');
-			$this->content->footer = '';
-			return $this->content;
+		if (!empty($this->config->query)){
+			if (preg_match('/block_instance\b/', $this->config->query)){
+				$this->content = new StdClass;
+				$this->content->text = get_string('obsoletequery', 'block_dashboard');
+				$this->content->footer = '';
+				return $this->content;
+			}
 		}
 
         if ($this->content !== NULL) {
@@ -129,7 +132,6 @@ class block_dashboard extends block_base {
 
 		if (@$this->config->inblocklayout){
 	        $this->content->text = $this->print_dashboard();
-	        $this->content->text = '';
 	    } else {
 	    	$viewdashboardstr = get_string('viewdashboard', 'block_dashboard');
 	    	$this->content->text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/view.php?id={$COURSE->id}&amp;blockid={$this->instance->id}\">$viewdashboardstr</a>";
@@ -146,12 +148,11 @@ class block_dashboard extends block_base {
     function print_dashboard(){
     	global $CFG, $EXTRADBCONNECT, $COURSE, $DB, $OUTPUT;
 
-		/*
 		$text = '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css" />';
-		$text .= '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css" />';
-		*/
-		$text = '';
 
+		$text .= '<div class="dashboard-panel">';
+		$text .= '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css" />';
+		
 		if (!isset($this->config)){
 	    	$this->config = new StdClass;
 	    }
@@ -219,9 +220,15 @@ class block_dashboard extends block_base {
 				$filterquerystring = $this->prepare_filters();
 			} catch (Exception $e) {
 				if (debugging()){
-					echo $e->error;
+					echo @$e->error;
 				}
-				return get_string('invalidorobsoletefilterquery', 'block_dashboard');
+		    	if (!empty($this->config->showfilterqueries)){
+		    		if (isset($printoutbuffer)){
+	    				$filtersql = $this->filteredsql;
+		    			$text .= "<div class=\"dashboard-filter-query\" style=\"padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace\"><b>FILTER :</b> $filtersql</div>";
+					}
+		    	}
+				return $text . get_string('invalidorobsoletefilterquery', 'block_dashboard');
 			}
 		} else {
 			$this->filteredsql = str_replace('<%%FILTERS%%>', '', $this->sql);
@@ -245,8 +252,12 @@ class block_dashboard extends block_base {
 		$this->filteredsql = $this->protect($this->filteredsql);
 		
 		// ######### GETTING RESULTS
-				
-		$countres = $this->count_records($error);
+		
+		try{
+			$countres = $this->count_records($error);
+		} catch (Exception $e){
+			$countres = 0;
+		}
 		
 		// if too many results, we force paging mode
 		if (empty($this->config->pagesize) && ($countres > $CFG->block_dashboard_big_result_threshold) && !empty($this->config->bigresult)){
@@ -262,60 +273,54 @@ class block_dashboard extends block_base {
 		} else {
 			$offset = '';
 		}
-
-		try {
-			$results = $this->fetch_dashboard_data($this->filteredsql, @$this->config->pagesize, $offset);
+		
+		try{
+			$results = @$this->fetch_dashboard_data($this->filteredsql, @$this->config->pagesize, $offset);
 		} catch (Exception $e){
-			return get_string('invalidorobsoletequery', 'block_dashboard', $this->config->query);
+		// showing query
+			if (@$this->config->showquery){
+				$text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+				$text .= '<pre>'.$this->filteredsql.'</pre>';
+				$text .= '</div>';
+			}
+			return $text . get_string('invalidorobsoletequery', 'block_dashboard');
 		}
 		
 		if ($results){
 			
-			$table = new flexible_table('mod-dashboard'.$this->instance->id);
-
-			$instancecontrolvars = array(
-				TABLE_VAR_PAGE => 'rpage'.$this->instance->id, 
-				TABLE_VAR_SORT => 'tsort'.$this->instance->id,
-				TABLE_VAR_HIDE => 'thide'.$this->instance->id,
-				TABLE_VAR_SHOW => 'tshow'.$this->instance->id,
-			);
-
-			$table->set_control_variables($instancecontrolvars); // use full not to collide with flexipage paging
+			$table = new html_table();
+			$table->id = 'mod-dashboard'.$this->instance->id;
 			
-			$tablecolumns = array();
-			$tableheaders = array();
+			// $tablecolumns = array();
+			$table->head = array();
+			
+			$numcols = count($this->output);
 
 			foreach($this->output as $field => $label){
-				$tablecolumns[] = $field;
-				$tableheaders[] = $label;
-			}
-
-			$table->define_columns($tablecolumns);
-			$table->define_headers($tableheaders);
+				// $tablecolumns[] = $field;
+				$table->head[$field] = $label;
+				$table->size[$field] = (100 / $numcols).'%';
+			}			
 			
 			$filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '' ;
 
 			if (@$this->config->inblocklayout){
-				$table->define_baseurl($CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd);
+				$baseurl = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd;
 			} else {
-				$table->define_baseurl($CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$this->instance->id.$coursepage.$filterquerystringadd);
+				$baseurl = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$this->instance->id.$coursepage.$filterquerystringadd;
 			}
 			
-			if (!empty($this->config->sortable)) $table->sortable(true, $this->config->xaxisfield, SORT_DESC); //sorted by xaxisfield by default
-			$table->collapsible(true);
-			$table->initialbars(true);
+			if (!empty($this->config->sortable)) {
+				// $table->sortable(true, $this->config->xaxisfield, SORT_DESC); //sorted by xaxisfield by default
+			}
 
-			$table->set_attribute('cellspacing', '0');
-			$table->set_attribute('id', 'dashboard'.$this->instance->id);
-			$table->set_attribute('class', 'dashboard');
-			$table->set_attribute('width', '100%');
+			$table->class = 'dashboard';
+			$table->width = '100%';
 			
 			foreach($this->output as $field => $label){
-				$table->column_class($field, $field);
+				$table->colclasses[$field] = "$field";
 			}
-							
-			$table->setup();
-
+										
 			/*			
 			$where = $table->get_sql_where();
 			$sortsql = $table->get_sql_sort();
@@ -332,6 +337,7 @@ class block_dashboard extends block_base {
 			$lastvalue = array();
 			$hcols = array();
 			$splitnumsonsort = @$this->config->splitsumsonsort;
+
 			foreach($results as $result){
 
 				// prepare for subsums
@@ -354,7 +360,7 @@ class block_dashboard extends block_base {
 						}
 					}
 				}
-
+								
 				if (!empty($splitnumsonsort) && @$this->config->tabletype == 'linear' && (preg_match("/\\b$splitnumsonsort\\b/", $sort))){
 					if ($orderkeyed != $oldorderkeyed){ // when range changes
 						$k = 0;
@@ -372,12 +378,12 @@ class block_dashboard extends block_base {
 							$k++;
 						}
 						if (!is_null($tabledata)){
-							$table->add_data($tabledata);
+							$table->data[] = $tabledata;
 						}
 						$oldorderkeyed = $orderkeyed;
 					}
 				}
-				
+
 				// Print data in results
 				if (!empty($this->config->showdata)){
 					if (empty($this->config->tabletype) || $this->config->tabletype == 'linear'){
@@ -414,7 +420,7 @@ class block_dashboard extends block_base {
 								$tabledata[] = $datum;
 							}
 						}
-						$table->add_data($tabledata);
+						$table->data[] = $tabledata;
 					} else if ($this->config->tabletype == 'tabular') {
 						// this is a tabular table
 						/* in a tabular table, data can be placed :
@@ -445,6 +451,7 @@ class block_dashboard extends block_base {
 								$cumulativeix = $this->instance->id.'_'.$field;
 							}
 
+							// try to defer this formating as post formatting in cross table print
 							if (!empty($this->outputf[$field])){
 								$datum = dashboard_format_data($this->outputf[$field], $result->$field, $cumulativeix);
 							} else {
@@ -455,8 +462,7 @@ class block_dashboard extends block_base {
 							}
 							$outvalues[] = str_replace("\"", "\\\"", $datum);
 						}
-						$matrixst .= ' = "'.implode(' ',$outvalues).'"';
-						
+						$matrixst .= ' = "'.implode(' ',$outvalues).'";';
 						// make the matrix in memory
 						eval($matrixst.";");
 					} else {
@@ -571,11 +577,11 @@ class block_dashboard extends block_base {
 					}
 					$oldorderkeyed = $orderkeyed;
 					if (!is_null($tabledata)){
-						$table->add_data($tabledata);
+						$table->data[] = $tabledata;
 					}
 				}
 			}
-
+			
 			//************ Starting outputing data ************************//
 
 			// if treeview, need to post process waiting nodes
@@ -591,6 +597,8 @@ class block_dashboard extends block_base {
 				}
 			}
 
+			// if (!empty($debug)) print_object($treedata);
+
 			if (@$this->config->inblocklayout){												
 				$url = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
 			} else {
@@ -603,26 +611,42 @@ class block_dashboard extends block_base {
 				$allexportstr = get_string('exportall', 'block_dashboard');
 				$tableexportstr = get_string('exportdataastable', 'block_dashboard');
 				$filteredexportstr = get_string('exportfiltered', 'block_dashboard');
+				$filteredoutputstr = get_string('outputfiltered', 'block_dashboard');
+				$filesviewstr = get_string('filesview', 'block_dashboard');
 				$filterquerystring = (!empty($filterquerystring)) ? '&'.$filterquerystring : '' ;
 				if (empty($this->config->tabletype) || @$this->config->tabletype == 'linear'){
-					ob_start();
-					$table->print_html();
-					$text .= ob_get_clean();
+
+					$text .= html_writer::table($table);
 	
 					$text .= "<div style=\"text-align:right\">";
 					$text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
 					if ($filterquerystring){
 						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredexportstr</a>";
 					}
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
+					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
 					$text .= "</div>";
 				} elseif (@$this->config->tabletype == 'tabular') {
 					// forget table and use $m matrix for making display
 					$text .= print_cross_table($this, $m, $hcols, $this->config->horizkey, $this->vertkeys, $this->config->horizlabel, true);					
-					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a></div>";
-					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv_tabular.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$tableexportstr</a></div>";
+					$text .= '<div style="text-align:right">';
+					$text .= "<a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
+					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv_tabular.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$tableexportstr</a>";
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
+					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_csv.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
+					$text .= '</div>';
 				} else {
 					$text .= dashboard_print_tree_view($this, $treedata, $this->treeoutput, $this->output, $this->outputf, $this->colourcoding, true);					
-					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a></div>";
+					$text .= "<div style=\"text-align:right\"><a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_csv.php?id={$COURSE->id}&amp;instance={$this->instance->id}&amp;tsort{$this->instance->id}={$sort}&amp;alldata=1\">$allexportstr</a>";
+					if (empty($this->config->filepathadminoverride)){
+						$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/filearea.php?id={$COURSE->id}&instance={$this->instance->id}\">$filesviewstr</a>";
+					}
+					$text .= " - <a href=\"{$CFG->wwwroot}/blocks/dashboard/export/export_output_cvs.php?id={$COURSE->id}&instance={$this->instance->id}&tsort{$this->instance->id}={$sort}{$filterquerystring}\">$filteredoutputstr</a>";
+					$text .= '</div>';
 				}
 			} else {
 				$text .= '';
@@ -681,7 +705,8 @@ class block_dashboard extends block_base {
 			$text .= '</table>';
 			$text .= '</div>';
 		}
-		
+		$text .= '</div>'; // closing dashboard-panel
+				
 		return $text;
     }
     
@@ -1031,7 +1056,7 @@ class block_dashboard extends block_base {
 			switch ($specialvalue) {
 				case 'LAST' :
 				    $values = array_values($FILTERSET[$fielddef]);
-					$result = end()->$fieldname;
+					$result = end($values)->$fieldname;
 					return (!empty($FILTERSET[$fielddef])) ? $result : false ;
 				case 'FIRST' :
 					$values = array_values($FILTERSET[$fielddef]);
@@ -1052,6 +1077,7 @@ class block_dashboard extends block_base {
 	*/    
     function fetch_dashboard_data($sql, $limit = '', $offset = '', $forcereload = false, $tracing = false){
     	global $extra_db_CNX, $CFG, $DB, $PAGE;
+
     	$sqlrad = preg_replace('/LIMIT.*/si', '', $sql);
     	$sqlkey = md5($sql);
 		
@@ -1096,18 +1122,21 @@ class block_dashboard extends block_base {
 			        }
 					$rs->next();
 		        }
+		        $rs->close();
 
 				if ($limit){
-					$rs = get_recordset_sql($sql, $offset, $limit);
-			        while($rec = rs_fetch_next_record($rs)){
+					$rs = $DB->get_recordset_sql($sql, $offset, $limit);
+		        	while($rs->valid()){
+						$rec = $rs->current();
 			        	$recarr = array_values((array)$rec);
 						$results[$recarr[0]] = $rec;
+						$rs->next();
 			        }
+			        $rs->close();
 			    } else {
 			    	$results = $allresults;
 			    }
 
-				$rs->close();
 				if (@$this->config->showbenches){
 					$bench->end = time();
 					$this->benches[] = $bench;
@@ -1198,6 +1227,8 @@ class block_dashboard extends block_base {
 				$this->content->text .= "<div class=\"dashboard-special\">$notretrievablestr</div>";
 			}
     	}
+    	
+    	// print_object($result);
 
 		return $results;
     }
@@ -1207,20 +1238,26 @@ class block_dashboard extends block_base {
 	*/
     function cron(){
     	global $CFG, $DB;
-
-		mtrace('Dashboard cron...');
     	
     	if (!empty($CFG->block_dashboard_cron_enabled)){
-    		$block = $DB->get_record('block', array('name' => 'dashboard'));
-    		if($alldashboards = $DB->get_records('block_instances', array('blockid' => $block->id))){
+			mtrace("\nDashboard cron... enabled ");
+    		if($alldashboards = $DB->get_records('block_instances', array('blockname' => 'dashboard'))){
 	    		foreach($alldashboards as $dsh){
-	    			$config = unserialize(base64_decode($dsh->configdata));
+	    			$instance = block_instance('dashboard', $dsh);
+	    			$instance->prepare_config();
+	    			$context = context_block::instance($dsh->id);
 
-	    			if (empty($config->cronmode) or (@$config->cronmode == 'norefresh')) continue;
-	    			if (!@$config->uselocalcaching) continue;
+	    			if (empty($instance->config->cronmode) or (@$instance->config->cronmode == 'norefresh')) {
+						mtrace("$dsh->id Skipping norefresh");
+	    				continue;
+	    			}
+	    			if (!@$instance->config->uselocalcaching) {
+						mtrace("$dsh->id Skipping no cache ");
+	    				continue;
+	    			}
 
 					$needscron = false;
-					if ($config->cronmode == 'global'){
+					if ($instance->config->cronmode == 'global'){
 						$chour = 0 + @$CFG->block_dashboard_cron_hour;
 						$cmin = 0 + @$CFG->block_dashboard_cron_min;
 						$cfreq = @$CFG->block_dashboard_cron_freq;
@@ -1231,123 +1268,44 @@ class block_dashboard extends block_base {
 					}
     				$now = time();
     				$nowdt = getdate($now);
-    				$lastdate = getdate(0 + @$config->lastcron);
+    				$lastdate = getdate(0 + @$instance->config->lastcron);
     				$crondebug = optional_param('crondebug', false, PARAM_BOOL);
-    				// first check we did nt already refreshed it today (or a new year is starting)
-    				if (($nowdt['yday'] > $lastdate['yday']) || ($nowdt['yday'] == 0) || $crondebug){
+    				// first check we did'nt already refreshed it today (or a new year is starting)
+    				if (debugging(DEBUG_DEVELOPER)){
+	    				mtrace("Day check : Now ".$nowdt['yday']." > Last ".$lastdate['yday'].' ');
+	    			}
+    				if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug || ($nowdt['yday'] == 0)){
     					// we wait the programmed time is passed, and check we are an allowed day to run and no query is already running
-    					if ($cfreq == 'daily' || ($nowdt['wday'] == $cfreq)){
-		    				if (($nowdt['hours'] >= $chour && $nowdt['minutes'] > $cmin && !@$config->isrunning) || $crondebug){
-		    					$config->isrunning = true;
-		    					$config->lastcron = $now;
-		    					$DB->set_field('block_instances', 'configdata', base64_encode(serialize($config)), array('id' => $dsh->id)); // Save config
+    					if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug || ($nowdt['yday'] == 0)){
+		    				if (($nowdt['hours'] >= $chour && $nowdt['minutes'] > $cmin && !@$instance->config->isrunning) || $crondebug){
+		    					$instance->config->isrunning = true;
+		    					$instance->config->lastcron = $now;
+		    					$DB->set_field('block_instances', 'configdata', base64_encode(serialize($instance->config)), array('id' => $dsh->id)); // Save config
 								
 		    					// process data caching
-		    					$dshobj = new block_dashboard();
-		    					$dshobj->config = $config;
 		    					$limit = '';
 		    					$offset = '';
 		    					
 		    					// TODO : compute correct values for $limit and $offset
-		    					$sql = str_replace('<%%FILTERS%%>', '', $config->query);
+
+		    					// We cannot here rely on any filtering or params given by the interactive GUI.
+		    					$sql = str_replace('<%%FILTERS%%>', '', $instance->config->query);
+		    					$sql = str_replace('<%%PARAMS%%>', '', $sql);
+
 		    					mtrace('   ... refreshing for instance '.$dsh->id);
-		    					$results = $dshobj->fetch_dashboard_data($sql, $limit, $offset, true, true /* with mtracing */);
+		    					$results = $instance->fetch_dashboard_data($sql, $limit, $offset, true, true /* with mtracing */);
 		    					
 		    					if (empty($results)){
 		    						mtrace('Empty result on query : '.$sql);
 		    					}
 	
-								// generate output file if required    	
-						    	if (!empty($config->makefile) && !empty($results)){
-	
-									if (!empty($config->filepathadminoverride)){
-										// an admin has configured, can be anywhere in moodledata
-							    		$outputfile = $CFG->dataroot.'/'.$config->filepathadminoverride.'/'.$config->filelocation;
-									} else {
-										// needs being in course files
-							    		$outputfile = $CFG->dataroot.'/'.$dsh->pageid.'/'.$config->filelocation;
-									}
-						    		
-						    		if (!isset($CFG->block_dashboard_output_field_separator)) $CFG->block_dashboard_output_field_separator = ';';
-						    		if (!isset($CFG->block_dashboard_output_line_separator)) $CFG->block_dashboard_output_line_separator = 'LF';
-						    		$FIELDSEPARATORS = array(':' => ':', ";" => ";", "TAB" => "\t");
-						    		$LINESEPARATORS = array('LF' => "\n", 'CR' => "\r", "CRLF" => "\n\r");
+								// generate output file if required
+								$instance->generate_output_file($results);
 
-									// output from query
-									if (!empty($config->fileoutput)){
-										$outputfields = explode(';', $config->fileoutput);
-										$outputformats = explode(';', $config->fileoutputformats);
-									} else {
-										$outputfields = explode(';', $config->outputfields);
-										$outputformats = explode(';', $config->outputformats);
-									}
-									dashboard_normalize($outputfields, $outputformats); // normalizes labels to keys
-									$this->outputf = array_combine($outputfields, $outputformats);
-									
-		    						mtrace('   ... generating file for instance '.$dsh->id.' in format '.$config->fileformat);
-		    						if (!empty($this->outputf)){
-							    		$FILE = fopen($outputfile, 'wb');
-
-										if ($config->fileformat == 'CSV'){
-											// print col names
-							    			$rarr = array();
-							    			foreach($this->outputf as $key => $format){
-								    			$rarr[] = $key;
-							    			}
-							    			fputs($FILE, implode($FIELDSEPARATORS[$CFG->block_dashboard_output_field_separator], $rarr));
-							    			fputs($FILE, $LINESEPARATORS[$CFG->block_dashboard_output_line_separator]);
-							    		}
-
-										if ($config->fileformat == 'CSV' || $config->fileformat == 'CSVWH'){
-											// print effective records	
-											$reccount = 0;
-								    		foreach($results as $result){
-								    			$rarr = array();
-								    			foreach($this->outputf as $key => $format){
-								    				if (empty($format)){
-										    			$rarr[] = @$result->$key;
-										    		} else {
-										    			$rarr[] = dashboard_format_data($format, @$result->$key);
-										    		}
-								    			}
-								    			fputs($FILE, implode($FIELDSEPARATORS[$CFG->block_dashboard_output_field_separator], $rarr));
-								    			fputs($FILE, $LINESEPARATORS[$CFG->block_dashboard_output_line_separator]);
-								    			$reccount++;
-								    		}
-								    		mtrace ($reccount.' processed');
-								    	}
-
-										if ($config->fileformat == 'SQL'){
-											if (empty($config->filesqlouttable)){
-												mtrace('SQL required for output but no SQL table name given');
-												continue;
-											}
-							    			$colnames = array();
-							    			foreach($this->outputf as $key => $format){
-							    				$colnames[] = $key;
-							    			}
-
-								    		foreach($results as $result){
-								    			$values = array();
-								    			foreach($this->outputf as $key => $format){
-								    				if (empty($format)){
-								    					$format = 'TEXT';
-										    		}
-									    			$values[] = dashboard_format_data($format, str_replace("'", "''", $result->$key));
-								    			}
-									    		$valuegroup = implode(",", $values);
-									    		$colgroup = implode(",", $colnames);
-									    		$statement = "INSERT INTO {$config->filesqlouttable}($colgroup) VALUES ($valuegroup);\n";										    		
-							    				fputs($FILE, $statement);
-								    		}
-										}
-								    	
-							    		fclose($FILE);
-							    	}
-						    	}
-	
-		    					$config->isrunning = false;
-		    					$DB->set_field('block_instances', 'configdata', base64_encode(serialize($config)), array('id' => $dsh->id)); // Save config
+								// ugly way to do it....	
+								$blockconfig = unserialize(base64_decode($DB->get_field('block_instances', 'configdata', array('id' => $dsh->id))));
+		    					$blockconfig->isrunning = false;
+		    					$DB->set_field('block_instances', 'configdata', base64_encode(serialize($blockconfig)), array('id' => $dsh->id)); // Save config
 		    				} else {
 								mtrace('   waiting for valid time for instance '.$dsh->id);
 		    				}
@@ -1412,7 +1370,12 @@ class block_dashboard extends block_base {
     */
     function prepare_config(){
 
+		if (empty($this->config)) return;
+		if (empty($this->config->query)) return;
+
 		$this->sql = $this->config->query;
+		
+		if (empty($this->config->exportcharset)) $this->config->exportcharset = 'utf8';
     	
 		// output from query
 		$outputfields = explode(';', @$this->config->outputfields);
@@ -1535,7 +1498,7 @@ class block_dashboard extends block_base {
     	$paramsurlvalues = array();
     	foreach($this->params as $key => $param){
     		$sqlkey = $key;
-			$key = preg_replace('/[.() *]/', '', $key);
+			$key = preg_replace('/[.() *]/', '', $key).'_'.$this->instance->id;
     		switch($param->type){
     			case ('choice'):
     			case ('list'):
@@ -1576,8 +1539,16 @@ class block_dashboard extends block_base {
 		    		$this->params[$sqlkey]->originalvaluefrom = $valuefrom;
 		    		$this->params[$sqlkey]->originalvalueto = $valueto;
 		    		if ($param->type == 'daterange'){
-		    			$valuefrom = strtotime($valuefrom);
-		    			$valueto = strtotime($valueto);
+		    			if (!is_numeric($valuefrom)){
+			    			$valuefrom = strtotime($valuefrom);
+			    		} else {
+			    			// already in timestamp
+			    		}
+		    			if (!is_numeric($valueto)){
+			    			$valueto = strtotime($valueto);
+			    		} else {
+			    			// already in timestamp
+			    		}
 		    		}
 		    		if ($valuefrom || $valueto){
 			    		$sqlarr = array();
@@ -1631,6 +1602,11 @@ class block_dashboard extends block_base {
     	return '';
     }
     
+    /**
+    * This function prepares all data related to applying filters from $_GET entry
+    * and applying configured defaults
+    *
+    */
     function prepare_filters(){
 
     	// capture filters
@@ -1706,6 +1682,116 @@ class block_dashboard extends block_base {
 	    
 	    return $filterquerystring;   
 	}
+
+	function generate_output_file($results){
+		global $CFG;
+		
+    	if (!empty($this->config->makefile) && !empty($results)){
+	    		
+    		if (!isset($CFG->block_dashboard_output_field_separator)) $CFG->block_dashboard_output_field_separator = ';';
+    		if (!isset($CFG->block_dashboard_output_line_separator)) $CFG->block_dashboard_output_line_separator = 'LF';
+    		$FIELDSEPARATORS = array(':' => ':', ";" => ";", "TAB" => "\t");
+    		$LINESEPARATORS = array('LF' => "\n", 'CR' => "\r", "CRLF" => "\n\r");
+
+			// output from query
+			if (!empty($this->config->fileoutput)){
+				$outputfields = explode(';', $this->config->fileoutput);
+				$outputformats = explode(';', $this->config->fileoutputformats);
+			} else {
+				$outputfields = explode(';', $this->config->outputfields);
+				$outputformats = explode(';', $this->config->outputformats);
+			}
+			dashboard_normalize($outputfields, $outputformats); // normalizes labels to keys
+			$this->outputf = array_combine($outputfields, $outputformats);
+			
+			mtrace('   ... generating file for instance '.$this->instance->id.' in format '.$this->config->fileformat);
+			if (!empty($this->outputf)){
+	    		
+	    		$filestr = '';
+
+				if ($this->config->fileformat == 'CSV'){
+					// print col names
+	    			$rarr = array();
+	    			foreach($this->outputf as $key => $format){
+		    			$rarr[] = $key;
+	    			}
+	    			$filestr .= implode($FIELDSEPARATORS[$CFG->block_dashboard_output_field_separator], $rarr);
+	    			$filestr .= $LINESEPARATORS[$CFG->block_dashboard_output_line_separator];
+	    		}
+
+				if ($this->config->fileformat == 'CSV' || $this->config->fileformat == 'CSVWH'){
+					// print effective records	
+					$reccount = 0;
+		    		foreach($results as $result){
+		    			$rarr = array();
+		    			foreach($this->outputf as $key => $format){
+		    				if (empty($format)){
+				    			$rarr[] = @$result->$key;
+				    		} else {
+				    			$rarr[] = dashboard_format_data($format, @$result->$key);
+				    		}
+		    			}
+		    			$filestr .= implode($FIELDSEPARATORS[$CFG->block_dashboard_output_field_separator], $rarr);
+		    			$filestr .= $LINESEPARATORS[$CFG->block_dashboard_output_line_separator];
+		    			$reccount++;
+		    		}
+		    		mtrace ($reccount.' processed');
+		    	}
+
+				if ($this->config->fileformat == 'SQL'){
+					if (empty($this->config->filesqlouttable)){
+						mtrace('SQL required for output but no SQL table name given');
+						continue;
+					}
+	    			$colnames = array();
+	    			foreach($this->outputf as $key => $format){
+	    				$colnames[] = $key;
+	    			}
+
+		    		foreach($results as $result){
+		    			$values = array();
+		    			foreach($this->outputf as $key => $format){
+		    				if (empty($format)){
+		    					$format = 'TEXT';
+				    		}
+			    			$values[] = dashboard_format_data($format, str_replace("'", "''", $result->$key));
+		    			}
+			    		$valuegroup = implode(",", $values);
+			    		$colgroup = implode(",", $colnames);
+			    		$statement = "INSERT INTO {$this->config->filesqlouttable}($colgroup) VALUES ($valuegroup);\n";										    		
+	    				$filestr .= $statement;
+		    		}
+				}
+
+				dashboard_output_file($this, $filestr);
+	    	}
+    	}
+	}
+
+	static function check_jquery(){
+		global $CFG, $PAGE, $OUTPUT;
+		
+		if ($CFG->version >= 2013051400) return; // Moodle 2.5 natively loads JQuery
+
+		$current = '1.8.2';
+		
+		if (empty($OUTPUT->jqueryversion)){
+			$OUTPUT->jqueryversion = '1.8.2';
+			$PAGE->requires->js('/blocks/dashboard/js/jquery-'.$current.'.min.js', true);
+		} else {
+			if ($OUTPUT->jqueryversion < $current){
+				debugging('the previously loaded version of jquery is lower than required. This may cause issues to dashboard. Programmers might consider upgrading JQuery version in the component that preloads JQuery library.', DEBUG_DEVELOPER, array('notrace'));
+			}
+		}
+		
+	}
 }
 
-?>
+require_once $graphlibs.'/jqplotlib.php';
+require_once $graphlibs.'/googleplotlib.php';
+require_once $graphlibs.'/timelinelib.php';
+include_once $CFG->libdir.'/tablelib.php';
+block_dashboard::check_jquery();
+require_jqplot_libs($graphwww);
+timeline_require_js($graphwww);
+

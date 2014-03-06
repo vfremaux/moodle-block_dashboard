@@ -7,8 +7,10 @@
  * @category blocks
  * @author Valery Fremaux (valery@club-internet.fr)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.2
+ * @version Moodle 2.4
  */
+
+if (!isset($theBlock->config)) $theBlock->config = new StdClass();
  
 if (!isset($theBlock->config->target)) $theBlock->config->target = 'moodle';
 if (!isset($theBlock->config->hidetitle)) $theBlock->config->hidetitle = 0;
@@ -142,16 +144,16 @@ dashboard_print_setting_tabs($theBlock->config);
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">    	
+    <td align="right" width="25%" style="line-height:1.5em">    	
         <b><?php print_string('sqlparamvar', 'block_dashboard'); ?></b>
     </td>
-    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+    <td align="right" width="25%" style="line-height:1.5em">
         <b><?php print_string('sqlparamlabel', 'block_dashboard'); ?></b>
     </td>
-    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+    <td align="right" width="25%" style="line-height:1.5em">
         <b><?php print_string('sqlparamtype', 'block_dashboard'); ?></b>
     </td>
-    <td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">
+    <td align="right" width="25%" style="line-height:1.5em">
         <b><?php print_string('sqlparamvalues', 'block_dashboard'); ?></b>
     </td>
 </tr>
@@ -162,13 +164,13 @@ for($i = 1 ; $i < 5 ; $i ++){
 	$typekey = 'sqlparamtype'.$i;
 	$valueskey = 'sqlparamvalues'.$i;
 	echo '<tr valign="top">';
-    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo '<td align="right" width="25%" style="line-height:1.5em">';
     echo "<input type=\"text\" size=\"20\" name=\"$varkey\" value=\"".@$theBlock->config->$varkey."\" />";
     echo '</td>';
-    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo '<td align="right" width="25%" style="line-height:1.5em">';
     echo "<input type=\"text\" size=\"20\" name=\"$labelkey\" value=\"".@$theBlock->config->$labelkey."\" />";
     echo '</td>';
-    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo '<td align="right" width="25%" style="line-height:1.5em">';
 	$typeopts = array('choice' => get_string('choicevalue', 'block_dashboard'),
 					  'text' => get_string('textvalue', 'block_dashboard'),
 					  'select' => get_string('listvalue', 'block_dashboard'),
@@ -178,7 +180,7 @@ for($i = 1 ; $i < 5 ; $i ++){
 					  );
 	echo html_writer::select($typeopts, $typekey, @$theBlock->config->$typekey, '');
     echo '</td>';
-    echo '<td align="right" width="25%" style="line-height:1.5em;font-size:0.85em">';
+    echo '<td align="right" width="25%" style="line-height:1.5em">';
     echo "<textarea name=\"$valueskey\" rows=\"5\" cols=\"30\">".@$theBlock->config->$valueskey.'</textarea>';
     echo '</td>';
 	echo '</tr>';
@@ -189,14 +191,14 @@ for($i = 1 ; $i < 5 ; $i ++){
 
 <fieldset id="dashboardsettings-panel-outputparams" class="dashboardsettings-panel off">
 <legend><?php print_string('outputparams', 'block_dashboard') ?></legend>
-<table width="100%" cellpadding="5" cellspacing="0">
+<table width="100%" cellpadding="5" cellspacing="0" class="generaltable">
 <tr valign="top">
     <td align="center" colspan="4">
         <?php print_string('configreminderonsep', 'block_dashboard'); ?>
     </td>
 </tr>
 <tr valign="top">
-    <td align="right" width="50%" style="line-height:1.5em;font-size:0.85em" colspan="2">
+    <td align="right" width="50%" style="line-height:1.5em" colspan="2">
     	<table width="100%">
     		<tr valign="top">
         		<td width="50%" align="right"><b><?php print_string('configoutputfields', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configoutputfields', 'block_dashboard') ?></b> </td>
@@ -937,7 +939,7 @@ for($i = 1 ; $i < 5 ; $i ++){
 <table width="100%" cellpadding="5" cellspacing="0">
 <tr valign="top">
     <td align="right" style="line-height:1.5em">
-        <b><?php print_string('configcronmode', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configdelayedefresh', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configcronmode', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configdelayedrefresh', 'block_dashboard') ?></b><br/>
     </td>
     <td>
         <?php 
@@ -1009,10 +1011,10 @@ for($i = 1 ; $i < 5 ; $i ++){
 <table width="100%" cellpadding="5" cellspacing="0">
 <tr valign="top">
     <td align="right" style="line-height:1.5">
-        <b><?php print_string('configmakefile', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configdelayedefresh', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configmakefile', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configmakefile', 'block_dashboard') ?></b><br/>
         <b><?php print_string('configfileoutput', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfileoutput', 'block_dashboard') ?></b><br/>
         <b><?php print_string('configfileoutputformats', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configformatting', 'block_dashboard') ?></b><br/>
-        <b><?php print_string('configfileformat', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfileoutput', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('configfileformat', 'block_dashboard'); ?>:</b><br/>
         <b><?php print_string('configfilesqlouttable', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilesqlouttable', 'block_dashboard') ?></b><br/>
     </td>
     <td style="line-height:1.5">
@@ -1060,12 +1062,13 @@ for($i = 1 ; $i < 5 ; $i ++){
     </td>
     <td align="right">
         <b><?php print_string('configfilelocation', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('configfilelocation', 'block_dashboard') ?></b><br/>
+        <b><?php print_string('confighorodatefiles', 'block_dashboard'); ?>: <?php echo $OUTPUT->help_icon('confighorodatefiles', 'block_dashboard') ?></b><br/>
 		<?php
-		if (has_capability('moodle/site:doanything', get_context_instance(CONTEXT_SYSTEM))){
+		if (has_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM))){
         	echo '<b>';
         	print_string('configfilepathadminoverride', 'block_dashboard'); 
         	echo ' : ';
-        	helpbutton('filelocationadmin', get_string('configfilepathadminoverride', 'block_dashboard'), 'block_dashboard');
+        	echo $OUTPUT->help_icon('configfilepathadminoverride', 'block_dashboard');
         	echo '</b>';
         }
 		?>
@@ -1077,6 +1080,8 @@ for($i = 1 ; $i < 5 ; $i ++){
                 $filelocation = $theBlock->config->filelocation;
             }
             echo '<input type="text" name="filelocation" size="30" value="'.$filelocation.'" />';
+            $checked = (@$theBlock->config->horodatefiles) ? 'checked="checked"' : '' ;
+            echo '<br/><input type="checkbox" name="horodatefiles" value="1" '.$checked.' />';
             $filepathadminoverride = '';
             if (isset($theBlock->config) && isset($theBlock->config->filepathadminoverride)) {
                 $filepathadminoverride = $theBlock->config->filepathadminoverride;
@@ -1092,10 +1097,9 @@ for($i = 1 ; $i < 5 ; $i ++){
 <table width="100%" cellpadding="5" cellspacing="0">
 <tr>
     <td colspan="3" align="center">
-      <input type="submit" name="submit" value="<?php print_string("savechanges") ?>" />
-      <input type="submit" name="submitandreturn" value="<?php print_string('savechangesandreturn', 'block_dashboard') ?>" /><br/>
-	  <a href="<?php echo $CFG->wwwroot."/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$theBlock->instance->id}" ?>&amp;what=upload"><?php print_string('importconfig', 'block_dashboard') ?></a> - 
+      <a href="<?php echo $CFG->wwwroot."/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$theBlock->instance->id}" ?>&amp;what=upload"><?php print_string('importconfig', 'block_dashboard') ?></a> - 
       <a href="<?php echo $CFG->wwwroot."/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$theBlock->instance->id}" ?>&amp;what=get" target="_blank"><?php print_string('exportconfig', 'block_dashboard') ?></a> - 
+      <input type="submit" name="submit" value="<?php print_string("savechanges") ?>" />
     </td>
 </tr>
 </table>
