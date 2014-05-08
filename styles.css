@@ -46,22 +46,50 @@ table.dashboard-table td{
 }
 
 .dashboard-table .vkey.c0{
-   background-color:#8B87BE;
+   background-color:#48447D;
    color:white;
    font-weight:bolder;
    font-size:1.1em;
 }
 
 .dashboard-table .vkey.c1{
-   background-color:#9F9BCA;
+   background-color:#5B56A3;
    color:#F0F0F7;
    font-weight:bolder;
    font-size:1.1em;
 }
 
 .dashboard-table .vkey.c2{
+   background-color:#746CB3;
+   color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c3{
+   background-color:#948EC4;
+   color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c4{
    background-color:#9D98C9;
    color:white;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c5{
+   background-color:#AFABD3;
+   color:black;
+   font-weight:bolder;
+   font-size:1.1em;
+}
+
+.dashboard-table .vkey.c6{
+   background-color:#BEBBDB;
+   color:black;
    font-weight:bolder;
    font-size:1.1em;
 }
@@ -125,4 +153,31 @@ div.dashboard-special{
 
 .jqplot-yaxis-label{
    left:-40px !important;
+}
+
+.off{
+	display:none !important;
+}
+
+.on{
+	display:block;
+}
+
+.dashboard-sql-params{
+    margin-top:2px;
+	font-size:0.75em;
+	display:inline;
+}
+
+#dashboardsettings-menu LI{
+	line-height:1.7em;
+}
+
+.block-dashboard-entrylist{
+	padding:20px;
+}
+
+.dashboard-panel{
+	overflow:scroll;
+	font-size:0.9em;
 }

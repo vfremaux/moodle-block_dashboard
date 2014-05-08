@@ -20,3 +20,18 @@ function showmoreoptions(selectobj){
 	}
 	
 }
+
+function open_panel(panelid){	
+	$('.dashboardsettings-panel').attr('class', 'dashboardsettings-panel off');			
+	$('#dashboardsettings-panel-'+panelid).attr('class', 'dashboardsettings-panel on');
+	$('.setting-tab').removeClass('here');
+	$('#setting-tab-'+panelid).addClass('here');
+}
+
+var autosubmit = 1;
+
+function submitdashboardfilter(instance){
+	if (autosubmit){
+		document.forms[instance].submit();
+	}
+}

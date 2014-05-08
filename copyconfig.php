@@ -20,9 +20,9 @@
 	if (!$course = $DB->get_record('course', array('id' => "$id"))){
 		print_error('invalidcourseid');
 	}
-
+	
 	if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))){
-	    print_error('badblockinstance', 'block_dashboard');
+		print_error('badblockinstance', 'block_dashboard');
 	}
 	
 	$theBlock = block_instance('dashboard', $instance);
@@ -54,7 +54,7 @@
 	}
 	
 	if ($data = $mform->get_data()){
-		$DB->set_field('block_instance', 'configdata', $data->configdata, array('id' => "$instanceid"));
+		$DB->set_field('block_instances', 'configdata', $data->configdata, array('id' => "$instanceid"));
 		redirect($CFG->wwwroot."/course/view.php?id={$id}&bui_edit={$instanceid}&sesskey=".sesskey());
 	}
 	

@@ -10,7 +10,7 @@ function require_jqplot_libs($libroot){
 	
 	if ($jqplotloaded) return;
 
-	$PAGE->requires->js($libroot.'/jqplot/jquery-1.4.4.min.js', true);
+	block_dashboard::check_jquery();
 	$PAGE->requires->js($libroot.'/jqplot/jquery.jqplot.js', true);
 	$PAGE->requires->js($libroot.'/jqplot/excanvas.js', true);
 	$PAGE->requires->js($libroot.'/jqplot/plugins/jqplot.dateAxisRenderer.js', true);
@@ -91,7 +91,7 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
 	
 	$title = addslashes($title);
 
-	$answeredarr = array($data->serie1, $data->aanswered, $data->canswered);
+	$answeredarr = array($data->answered, $data->aanswered, $data->canswered);
 	$matchedarr = array($data->matched, $data->amatched, $data->cmatched);
 	$hitratioarr = array($data->hitratio * 100, $data->ahitratio * 100, $data->chitratio * 100);
 
