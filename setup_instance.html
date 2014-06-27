@@ -11,7 +11,6 @@
  */
 
 if (!isset($theBlock->config)) $theBlock->config = new StdClass();
- 
 if (!isset($theBlock->config->target)) $theBlock->config->target = 'moodle';
 if (!isset($theBlock->config->hidetitle)) $theBlock->config->hidetitle = 0;
 if (!isset($theBlock->config->showdata)) $theBlock->config->showdata = 1;
@@ -1127,7 +1126,7 @@ for($i = 1 ; $i < 5 ; $i ++){
     </td>
 </tr>
 <?php 
-if (has_capability('moodle/site:config', get_context_instance(CONTEXT_SYSTEM))){
+if (has_capability('moodle/site:config', context_system::instance())){
 
     $filepathadminoverride = '';
     if (isset($theBlock->config) && isset($theBlock->config->filepathadminoverride)) {

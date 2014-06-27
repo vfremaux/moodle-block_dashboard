@@ -95,7 +95,7 @@ $string['configspliton'] = 'Split table on serie';
 $string['configsplitsumsonsort'] = 'Split-sums column';
 $string['configsplitsumsonsort_help'] = '';
 $string['configsums'] = 'Local sums settings';
-$string['configsummators'] = 'Summarizers';
+$string['configsummators'] = 'Series for generate a global sum';
 $string['configtable'] = 'Table settings';
 $string['configtabletype'] = 'Data table type';
 $string['configtablesplit'] = 'Data table split field';
@@ -215,6 +215,7 @@ $string['month'] = 'Month';
 $string['noquerystored'] = 'No query stored';
 $string['norefresh'] = 'No refresh';
 $string['notretrievable'] = 'No data retrievable. You may be in editing mode and no previous data has been cached. This mode is forced to prevent loosing control of dashboard setup on strangling queries.';
+$string['newdashboard'] = 'New dashboard';
 $string['obsoletequery'] = 'Query seems being written for old Moodle 1.9 database.';
 $string['outputfilegeneration'] = 'Output file generation';
 $string['outputfiltered'] = 'Generate output file (filtered)';
@@ -284,9 +285,9 @@ $string['configfilepathadminoverride_help'] = 'Administrators may need to genera
 
 $string['configformatting_help'] = '
 <p>This parameters allow to give a formatting instruction to data, based on the typical "sprintf"
-	syntax.</p>
+    syntax.</p>
 <p>When formatting a semi-column separated list, the formatting list should present an identical number
-	of formatting statements. An empty formatting string will pass through the original information.</p> 
+    of formatting statements. An empty formatting string will pass through the original information.</p> 
 
 <h4>Example:</h4>
 <p>Using a query that defines a frequentation ratio</p>
@@ -311,12 +312,12 @@ clause</p>
 <p>Using the query</p>
 
 <pre>
-	SELECT
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
-	   count(l.id) as queries
-	FROM
-		mdl_log l
+    SELECT
+       DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
+       DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
+       count(l.id) as queries
+    FROM
+        mdl_log l
     GROUP BY
         year,month
 </pre>
@@ -334,41 +335,41 @@ clause</p>
 <p>Filters operate on query results depending on a  "&lt;%%FILTERS%%&gt;" marker that can complete or replace a WHERE clause.</p>
 <p><u>Valid location samples:</u></p>
 <pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
+    SELECT 
+      data1,data2
+    FROM
+       table1 t1,
+       table2 t2
+       <span style="color:green">&lt;%%FILTERS%%&gt;</span>
+    ORDER BY
+       data1
+</pre>       
 <pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	WHERE
-		t1.id = t2.t1key
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
+    SELECT 
+      data1,data2
+    FROM
+       table1 t1,
+       table2 t2
+    WHERE
+        t1.id = t2.t1key
+       <span style="color:green">&lt;%%FILTERS%%&gt;</span>
+    ORDER BY
+       data1
+</pre>       
 
 <p><u>Invalid location samples:</u></p>
 <pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	GROUP BY
-	    data2
-	   <span style="color:red">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
+    SELECT 
+      data1,data2
+    FROM
+       table1 t1,
+       table2 t2
+    GROUP BY
+        data2
+       <span style="color:red">&lt;%%FILTERS%%&gt;</span>
+    ORDER BY
+       data1
+</pre>
 ';
 
 $string['configfilterdefaults_help'] = '
@@ -390,9 +391,17 @@ avoid to browse back to the "all data" situation.</p>
 
 <p>Some values allow having a dynamic effect in defaults:</p> 
 <ul>
-	<li>"LAST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for most recent).</li>
-	<li>"FIRST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for oldest).</li>
-</ul>                                                           
+    <li>"LAST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for most recent).</li>
+    <li>"FIRST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for oldest).</li>
+</ul>
+';
+
+$string['configsummators_help'] = '
+<p>Series on which calculate a global sum</p>
+';
+
+$string['configxaxis_help'] = '
+    Defines serie for Xaxis
 ';
 
 $string['configfilteroptions_help'] = '
@@ -400,10 +409,10 @@ $string['configfilteroptions_help'] = '
 <p>Some special options can help to enrich or solved query struture isues. Each option string is a string with one char enablers that may be present (enabled) or absent (disabled).</p>
 <h4>Values</h4>
 <ul>
-	<li><b>m</b> : (multiple) makes the selector multiple so that set of possible values or ranges can be asked for.</li>
-	<li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined. Un filtre en mode "s" exclut le précédent.</li>
-	<li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values. You may try to disable this processing with the "x" option on. Sometimes it works.</li>
-</ul>                                                           
+    <li><b>m</b> : (multiple) makes the selector multiple so that set of possible values or ranges can be asked for.</li>
+    <li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined. Un filtre en mode "s" exclut le précédent.</li>
+    <li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values. You may try to disable this processing with the "x" option on. Sometimes it works.</li>
+</ul>
 
 <h4>Several filters</h4>
 
@@ -426,8 +435,8 @@ $string['configgmdata_help'] = '
 <h3>Geolocated information</h3>
 
 <p>PLotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
-	or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
-	coordinate and will cache this information.</p>
+    or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
+    coordinate and will cache this information.</p>
 <p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Geocoding API of Google</a> for more information.</p>
 
 <h4>Geographic data settings</h4>
@@ -448,7 +457,7 @@ $string['configgmdata_help'] = '
 <li><i>Post code</i>: Official post or zip code</li>
 <li><i>City</i>: City name</li>
 <li><i>Marker Class</i>: A classname, that will bind to a graphical icon</li>
-</ul>	
+</ul>
 
 <p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or more field (or alias) names separated by semicolons (";").</p>
 <ul>
@@ -461,7 +470,7 @@ $string['configgmdata_help'] = '
 </li>
 <li><i>Marker type input</i>: The query output fieldname that provides a class label</li>
 </ul>
-	
+
 <p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
 <pre>address;cp;city;"GB"</pre>
 <p>will always provide the value "GB" as region code.</p>
@@ -498,10 +507,10 @@ $string['configquery_help'] = '
 <p>Dashboard will produce a vue based on a data query submitted to the database.</p>
 <p>This query:</p>
 <ul>
-	<li>needs define output fields (using AS aliasing)</li>
-	<li>can use JOIN or complex UNIONs in some cases</li>
-	<li>can use aggregating operators and GROUP BY clauses</li>
-	<li>should NOT have an ORDER BY if data is intended to be displayed in data tables</li>
+    <li>needs define output fields (using AS aliasing)</li>
+    <li>can use JOIN or complex UNIONs in some cases</li>
+    <li>can use aggregating operators and GROUP BY clauses</li>
+    <li>should NOT have an ORDER BY if data is intended to be displayed in data tables</li>
 </ul>
 
 <h3>Placeholder for filters</h3>
@@ -512,7 +521,7 @@ $string['configsplitsumonsort_help'] = '
 <h3>Subsums on data tables</h3>
 
 <p>When data can be sorted,  one column can serve as criteria for subsplitting summators. Each summator will have
-	a subtotal calculated and displayed in an intermediate row in the table when separation value changes.</p>
+    a subtotal calculated and displayed in an intermediate row in the table when separation value changes.</p>
 <p>The criteria must be an output column alias.</p>
 <p>Note that only linear table can use this feature.</p>
 ';
@@ -523,13 +532,13 @@ $string['configtabletype_help'] = '
 <p>This selector allows choosing the type of table that will be used for presenting data :</p>
 <ul><li><b>Linear</b>: Data re linearily displayed as records</li>
 <ul><li><b>Tabular</b>: data are presented within bidimensional tabular array. Extra params will need setup: 
-	<ul><li>the unique column driving horizontal dimension</li>
-		<li>Colomuns driving the vertical dimension.</li>
-		<li>Data used for filling cells</li>
-	</ul>
-	</li>
-	<li><b>Tree view</b>: If data have a hierachical organisation embedd (id,parent)
-	this mode draws a hierarchical tree representation of records.</li>
+    <ul><li>the unique column driving horizontal dimension</li>
+        <li>Colomuns driving the vertical dimension.</li>
+        <li>Data used for filling cells</li>
+    </ul>
+    </li>
+    <li><b>Tree view</b>: If data have a hierachical organisation embedd (id,parent)
+    this mode draws a hierarchical tree representation of records.</li>
 </ul>
 ';
 
@@ -551,7 +560,7 @@ display. </p>
 $string['configbigresult_help'] = '
 <h3>Big results security bypass</h3>
 <p>Statistic queries may have dramatic performance impact moreover when having erroneous joins. To avoid GUI break when setting up queries,
-	a security was added to force result pagination and results size limiting in edition mode.</p>
+    a security was added to force result pagination and results size limiting in edition mode.</p>
 <p>This might be problematic in some extreme cases, f.e. when producing curves whit a lot of data. </p>
 
 <p>When enabled, the security is disengaged and big results an be produced for the dasboard layout.</p>
