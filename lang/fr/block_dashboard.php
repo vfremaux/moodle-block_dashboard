@@ -164,6 +164,7 @@ $string['maptypeterrain'] = 'Relief';
 $string['mins'] = 'minute(s)';
 $string['monday'] = 'Lundi';
 $string['month'] = 'Mois';
+$string['newdashboard'] = 'Nouveau tableau de bord';
 $string['noquerystored'] = 'Pas de requête enregistrée';
 $string['norefresh'] = 'Pas de raffraichissement';
 $string['notretrievable'] = 'Les données ne peuvent être affichées. Vous êtes probablement en mode édition et il n\'existe aucun cache de données disponible. Cette situation est forcée afin de prévenir une perte de contrôle sur le paramétrage du tableau de bord en cas de requête erronée.';

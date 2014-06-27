@@ -79,9 +79,7 @@
 		$theBlock->generate_output_file($results);
 		echo '</pre>';
 		echo $OUTPUT->notification(get_string('filegenerated', 'block_dashboard'));
-		if (empty($theBlock->config->filepathadminoverride)){
-			echo $OUTPUT->single_button($CFG->wwwroot.'/blocks/dashboard/export/filearea.php?id='.$courseid.'&instance='.$instanceid, get_string('filesview', 'block_dashboard'));
-		}
+		echo $OUTPUT->single_button($CFG->wwwroot.'/blocks/dashboard/export/filearea.php?id='.$courseid.'&instance='.$instanceid, get_string('filesview', 'block_dashboard'));
 		echo $OUTPUT->single_button($CFG->wwwroot.'/course/view.php?id='.$courseid, get_string('backtocourse', 'block_dashboard'));
 	} else {
 		echo "No results. Empty file";

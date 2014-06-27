@@ -1,6 +1,6 @@
 div.configure{
-	float:right;
-	width:100px;
+    float:right;
+    width:100px;
 }
 
 .dashboard-filters{
@@ -156,28 +156,44 @@ div.dashboard-special{
 }
 
 .off{
-	display:none !important;
+    display:none !important;
 }
 
 .on{
-	display:block;
+    display:block;
 }
 
 .dashboard-sql-params{
     margin-top:2px;
-	font-size:0.75em;
-	display:inline;
+    font-size:0.75em;
+    display:inline;
 }
 
 #dashboardsettings-menu LI{
-	line-height:1.7em;
+    line-height:1.7em;
 }
 
 .block-dashboard-entrylist{
-	padding:20px;
+    padding:20px;
 }
 
 .dashboard-panel{
-	overflow:scroll;
-	font-size:0.9em;
+    overflow:scroll;
+    font-size:0.9em;
+}
+
+.dashbobard-filter-query{
+    padding:1px;
+    border:1px solid #808080;
+    margin:2px;
+    font-size:0.75em;
+    font-family:monospace
+}
+
+.dashboard-query-box{
+    padding:1px;
+    border:1px solid #808080;
+    margin:2px;
+    font-size:0.75em;
+    font-family:monospace
 }

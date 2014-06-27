@@ -1,7 +1,5 @@
 <?php
 
-if (!defined('MOODLE_INTERNAL')) die ('Sorry, but you cannot use this script this way');
-
 if (array_key_exists('submit', $_POST)){
 	$data = $_POST;
 	

@@ -169,3 +169,5 @@ function extra_db_query($sql, $renew = false, $return = false, &$error){
 		}
 	}
 }
+
+?>

@@ -955,8 +955,6 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
 }
 
 function dashboard_output_file($theBlock, $str){
-	global $CFG;
-	
 	if (!empty($theBlock->config->filepathadminoverride)){
 		// an admin has configured, can be anywhere in moodledata so be carefull !
 		$outputfile = $CFG->dataroot.'/'.$theBlock->config->filepathadminoverride.'/'.$theBlock->config->filelocation;

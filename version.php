@@ -26,7 +26,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2013042501;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011120500;        // Requires this Moodle version
+$plugin->requires  = 2014042900;        // Requires this Moodle version
 $plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.2.0 (build 2013042501)'; 
+$plugin->cron = 1;
+$plugin->release = '2.7.0 (build 2013042501)'; 
 $plugin->maturity = MATURITY_BETA;

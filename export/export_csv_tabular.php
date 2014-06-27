@@ -120,9 +120,7 @@
 					$datum = dashboard_colour_code($theBlock, $datum, $colorcoding);
 				}
 				*/
-				if (!empty($datum)){
-					$outvalues[] = str_replace('"', '\\"', $datum);
-				}
+				$outvalues[] = str_replace('"', '\\"', $datum);
 			}
 			$matrixst .= ' = "'.implode(' ',$outvalues).'"';
 			
