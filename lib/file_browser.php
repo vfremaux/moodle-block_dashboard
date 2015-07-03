@@ -112,8 +112,8 @@ class dashboard_file_browser extends file_browser {
 
         static $cachedmodules = array();
 
-    	$blockrec = $DB->get_record('block_instances', array('id' => $context->instanceid));
-    	$blockname = $blockrec->blockname;
+        $blockrec = $DB->get_record('block_instances', array('id' => $context->instanceid));
+        $blockname = $blockrec->blockname;
 
         if (!array_key_exists($context->instanceid, $cachedmodules)) {
             $cachedmodules[$context->instanceid] = block_instance($blockrec->blockname, $blockrec);
@@ -123,7 +123,7 @@ class dashboard_file_browser extends file_browser {
             return null;
         }
 
-		$coursecontext = $DB->get_record('context', array('id' => $blockrec->parentcontextid));
+        $coursecontext = $DB->get_record('context', array('id' => $blockrec->parentcontextid));
         if ($coursecontext->instanceid == $COURSE->id) {
             $course = $COURSE;
         }

@@ -95,7 +95,7 @@ $string['configspliton'] = 'Split table on serie';
 $string['configsplitsumsonsort'] = 'Split-sums column';
 $string['configsplitsumsonsort_help'] = '';
 $string['configsums'] = 'Local sums settings';
-$string['configsummators'] = 'Series for generate a global sum';
+$string['configsummators'] = 'Summators columns';
 $string['configtable'] = 'Table settings';
 $string['configtabletype'] = 'Data table type';
 $string['configtablesplit'] = 'Data table split field';
@@ -115,9 +115,8 @@ $string['configure'] = 'Configure';
 $string['configverticalformats'] = 'Vertical keys formatting';
 $string['configverticalkeys'] = 'Vertical keys';
 $string['configverticallabels'] = 'Vertical labels';
+$string['configxaxis'] = 'X axis serie';
 $string['configxaxisfield'] = 'X axis ticks serie';
-$string['configxaxis'] = 'X axis ticks serie';
-$string['configxaxis_help'] = 'choose the output field that will represent the X axis ticks serie';
 $string['configxaxislabel'] = 'X axis label';
 $string['configyaxisbounds'] = 'Y Axis bounds (min, max)';
 $string['configyaxislabel'] = 'Y axis label';
@@ -272,6 +271,10 @@ $string['configmakefile_help'] = '
 <p>When data is refreshed in cache, you can choose or not to generate an output file with refreshed data</p>
 ';
 
+$string['configsummators_help'] = '
+<p>Series on which calculate a global sum</p>
+';
+
 $string['configfileoutput_help'] = '
 <p>File can use a distinct set of output field than what is required for display. </p>
 ';
@@ -343,7 +346,7 @@ clause</p>
        <span style="color:green">&lt;%%FILTERS%%&gt;</span>
     ORDER BY
        data1
-</pre>       
+</pre>
 <pre>
     SELECT 
       data1,data2
@@ -355,7 +358,7 @@ clause</p>
        <span style="color:green">&lt;%%FILTERS%%&gt;</span>
     ORDER BY
        data1
-</pre>       
+</pre>
 
 <p><u>Invalid location samples:</u></p>
 <pre>
@@ -394,10 +397,6 @@ avoid to browse back to the "all data" situation.</p>
     <li>"LAST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for most recent).</li>
     <li>"FIRST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for oldest).</li>
 </ul>
-';
-
-$string['configsummators_help'] = '
-<p>Series on which calculate a global sum</p>
 ';
 
 $string['configxaxis_help'] = '
@@ -663,5 +662,3 @@ $string['configfilelocationadmin_help'] = '
 This allows to add a special path start from dataroot in order to store the genrated file in a non standard location in moodledata.</p> ';
 
 $string['confighorodatefiles_help'] = 'When enabled, a timestamp will be added at the end of each generated filename';
-
-$string['configsummators_help'] = 'Summators are additional sums that will use some columns, summing values on all results.';
