@@ -12,12 +12,13 @@ $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
+$string['cleararea'] = 'Clear all file area';
+$string['configbands'] = 'Hide show time bands';
 $string['configbigresult'] = '<span style="font-size:0.8em">Enable Big Result option</span>';
 $string['configcache'] = 'Result Cache Settings';
 $string['configcaching'] = 'Cache enabling';
 $string['configcachingttl'] = 'Cache TTL';
 $string['configcharset'] = 'Charset';
-$string['configexportcharset'] = 'Charset for CSV exports';
 $string['configcleandisplay'] = 'Clean table display';
 $string['configcoloredvalues'] = 'Color control values';
 $string['configcolorfield'] = 'Color control field';
@@ -29,10 +30,8 @@ $string['configcronhour'] = 'Hour';
 $string['configcronmin'] = 'Minutes';
 $string['configcronmode'] = 'Cron refresh mode';
 $string['configcrontime'] = 'Hour';
-$string['configdashboardparams'] = 'Dashboard data settings';
 $string['configdashboardcron'] = 'Dashboard cron status';
-$string['configlastcron'] = 'Last cron stamp ';
-$string['configisrunning'] = 'Cron is running ? ';
+$string['configdashboardparams'] = 'Dashboard data settings';
 $string['configdata'] = 'GoogleMaps Markers Data';
 $string['configdatatitles'] = 'Data titles';
 $string['configdatatypes'] = 'Data types';
@@ -41,6 +40,7 @@ $string['configenablehorizsums'] = 'Enable horiz sums';
 $string['configenablevertsums'] = 'Enable vertical sums';
 $string['configeventmapping'] = 'Data mapping for events';
 $string['configexplicitscaling'] = 'Explicit scaling';
+$string['configexportcharset'] = 'Charset for CSV exports';
 $string['configfileformat'] = 'File format';
 $string['configfilelocation'] = 'Generated file location';
 $string['configfilelocationadmin'] = 'Generated file location admin extension';
@@ -61,8 +61,10 @@ $string['confighidetitle'] = 'Hide block\'s title';
 $string['confighorizformat'] = 'Horiz keys formatting';
 $string['confighorizkey'] = 'Horiz key';
 $string['confighorizlabel'] = 'Horizontal labels';
-$string['configimportexport'] = 'configuration import/export';
 $string['confighorodatefiles'] = 'Horodate files';
+$string['configimportexport'] = 'configuration import/export';
+$string['configisrunning'] = 'Cron is running ? ';
+$string['configlastcron'] = 'Last cron stamp ';
 $string['configlat'] = 'Latitude';
 $string['configlayout'] = 'Publish data ';
 $string['configlineartable'] = 'Linear table settings';
@@ -94,17 +96,18 @@ $string['configsortable'] = 'Sortable table';
 $string['configspliton'] = 'Split table on serie';
 $string['configsplitsumsonsort'] = 'Split-sums column';
 $string['configsplitsumsonsort_help'] = '';
+$string['configsummators'] = 'Summarizers';
 $string['configsums'] = 'Local sums settings';
-$string['configsummators'] = 'Summators columns';
 $string['configtable'] = 'Table settings';
-$string['configtabletype'] = 'Data table type';
 $string['configtablesplit'] = 'Data table split field';
 $string['configtablesplit_help'] = 'If set, distinct values of this field will make separate subtables';
+$string['configtabletype'] = 'Data table type';
 $string['configtabular'] = 'Tabular layout extra settings';
 $string['configtabulartable'] = 'Tabular table settings';
 $string['configtarget'] = 'Target db';
 $string['configtickspacing'] = 'Y tick spacing';
 $string['configtimelinecolouring'] = 'Time line items colouring';
+$string['configtimeunits'] = 'Time units';
 $string['configtitle'] = 'Bloc title';
 $string['configtreeoutput'] = 'Tree output series';
 $string['configtreeoutputformats'] = 'Tree output series formatting';
@@ -159,7 +162,6 @@ $string['dashboard_output_line_separator'] = 'Output line separator';
 $string['dashboardlayout'] = 'Dashboard layout';
 $string['dashboards'] = 'Dashboards';
 $string['dashboardstoragearea'] = 'Dashboard File Storage Area';
-$string['cleararea'] = 'Clear all file area';
 $string['datalocations'] = 'Geo Locations';
 $string['datarefresh'] = 'Data refresh settings';
 $string['datatitles'] = 'Marker titles';
@@ -181,13 +183,13 @@ $string['exportconfig'] = 'Get the current config';
 $string['exportdataastable'] = 'Export data as table';
 $string['exportfiltered'] = 'Export filtered data';
 $string['extradbparams'] = 'Extra DB parameters';
+$string['filegenerated'] = 'File has been successfully generated';
 $string['fileoutput'] = 'Data Export settings';
 $string['filesview'] = 'View filearea content';
-$string['filegenerated'] = 'File has been successfully generated';
-$string['generatedexports'] = 'Generated exports';
 $string['friday'] = 'Friday';
 $string['from'] = 'from';
 $string['generalparams'] = 'Access to dashboard settings';
+$string['generatedexports'] = 'Generated exports';
 $string['globalcron'] = 'Global cron settings';
 $string['googlelocationerror'] = 'Google location error';
 $string['googlemap'] = 'Google Map';
@@ -211,10 +213,10 @@ $string['maptypeterrain'] = 'Terrain';
 $string['mins'] = 'Min';
 $string['monday'] = 'Monday';
 $string['month'] = 'Month';
+$string['newdashboard'] = 'New dashboard';
 $string['noquerystored'] = 'No query stored';
 $string['norefresh'] = 'No refresh';
 $string['notretrievable'] = 'No data retrievable. You may be in editing mode and no previous data has been cached. This mode is forced to prevent loosing control of dashboard setup on strangling queries.';
-$string['newdashboard'] = 'New dashboard';
 $string['obsoletequery'] = 'Query seems being written for old Moodle 1.9 database.';
 $string['outputfilegeneration'] = 'Output file generation';
 $string['outputfiltered'] = 'Generate output file (filtered)';
@@ -242,6 +244,7 @@ $string['sunday'] = 'Sunday';
 $string['tablecolormapping'] = 'Output table color mapping';
 $string['tabular'] = 'Tabular';
 $string['tabularparams'] = 'Tabular layout extra settings';
+$string['task_exportdata'] = 'Data automated export';
 $string['textvalue'] = 'Text';
 $string['thursday'] = 'Thursday';
 $string['timegraph'] = 'Time curves';
@@ -258,6 +261,9 @@ $string['viewdashboard'] = 'View dashboard';
 $string['wednesday'] = 'Wednesday';
 $string['week'] = 'Week';
 $string['year'] = 'Year';
+
+$string['configbands_help'] = 'A time line graph has two timebands one over the other. The second timeband has more precision.';
+$string['configtimeunits_help'] = 'Setup the time units and scale for each band.';
 
 $string['configdelayedrefresh'] = 'Delayed refresh for dashboard data';
 
@@ -346,7 +352,7 @@ clause</p>
        <span style="color:green">&lt;%%FILTERS%%&gt;</span>
     ORDER BY
        data1
-</pre>       
+</pre>
 <pre>
     SELECT 
       data1,data2
@@ -358,7 +364,7 @@ clause</p>
        <span style="color:green">&lt;%%FILTERS%%&gt;</span>
     ORDER BY
        data1
-</pre>       
+</pre>
 
 <p><u>Invalid location samples:</u></p>
 <pre>
@@ -372,7 +378,7 @@ clause</p>
        <span style="color:red">&lt;%%FILTERS%%&gt;</span>
     ORDER BY
        data1
-</pre>       
+</pre>
 ';
 
 $string['configfilterdefaults_help'] = '

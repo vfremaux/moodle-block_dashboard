@@ -189,6 +189,7 @@ $string['sunday'] = 'Dimanche';
 $string['tablecolormapping'] = 'Colorisation des lignes de table ';
 $string['tabular'] = 'Table croisée';
 $string['tabularparams'] = 'Paramètres supplémentaires affichage croisé';
+$string['task_exportdata'] = 'Export automatisé de données';
 $string['thursday'] = 'Jeudi';
 $string['timegraph'] = 'Courbes temporelle';
 $string['timeline'] = 'Données temporelle';

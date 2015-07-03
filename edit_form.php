@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -52,38 +51,40 @@ class block_dashboard_edit_form extends block_edit_form {
 
         $mform->addElement('header', 'configheader20', get_string('configdashboardparams', 'block_dashboard'));
         $generalparamsconfigstr = get_string('generalparams', 'block_dashboard');
-        $generalparamslink = "<a href=\"{$CFG->wwwroot}/blocks/dashboard/setup.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}\">$generalparamsconfigstr</a>";
+        $generalparmsurl = new moodle_url('/blocks/dashboard/setup.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id));
+        $generalparamslink = '<a href="'.$generalparmsurl.'">'.$generalparamsconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $generalparamslink);
 
         $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
         $importconfigstr = get_string('importconfig', 'block_dashboard');
         $exportconfigstr = get_string('exportconfig', 'block_dashboard');
-        $import_export = "<a href=\"{$CFG->wwwroot}/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}&amp;what=upload\">$importconfigstr</a> - 
-          <a href=\"{$CFG->wwwroot}/blocks/dashboard/copyconfig.php?id={$COURSE->id}&amp;instance={$this->block->instance->id}&amp;what=get\" target=\"_blank\">$exportconfigstr</a>";
+        $copyconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload'));
+        $import_export = '<a href="'.$copyconfigurl.'">'.$importconfigstr.'</a> - ';
+        $exportconfigurm = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get'));
+        $import_export .= '<a href="'.$exportconfigurl.'" target="_blank">'.$exportconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $import_export);
 
         $mform->addElement('header', 'configheader195', get_string('configcharset', 'block_dashboard'));
         $charsetopt['utf8'] = 'Utf-8';
         $charsetopt['iso'] = 'ISO 8859-1';
-        $mform->addElement('select', 'configexportcharset', get_string('configexportcharset', 'block_dashboard'), $charsetopt);
+        $mform->addElement('select', 'config_exportcharset', get_string('configexportcharset', 'block_dashboard'), $charsetopt);
 
         if (debugging()) {
             $mform->addElement('header', 'configheader20', get_string('configdashboardcron', 'block_dashboard'));
-    
+
             $mform->addElement('text', 'config_lastcron', get_string('configlastcron', 'block_dashboard'));
             $mform->setType('config_lastcron', PARAM_INT);
 
             $mform->addElement('checkbox', 'config_isrunning', get_string('configisrunning', 'block_dashboard'));
         }
-    }    
-    
-    function set_data($defaults){
-        if (!empty($this->block->config)){
-            if (!empty($this->block->config->sqlparams)){
-                foreach($this->block->config->sqlparams as $paramid => $paramdef){
-                    // print_object($paramdef);
+    }
+
+    public function set_data($defaults) {
+        if (!empty($this->block->config)) {
+            if (!empty($this->block->config->sqlparams)) {
+                foreach ($this->block->config->sqlparams as $paramid => $paramdef) {
                     $varkey = "config_sqlparams[$paramid][sqlparamvar]";
                     $defaults->$varkey = $paramdef['sqlparamvar'];
                 }

@@ -59,14 +59,14 @@ class file_info_context_block extends file_info {
         parent::__construct($browser, $context);
         $this->course  = $course;
         $this->instance = $instance;
-        $this->nonemptychildren = null;        
+        $this->nonemptychildren = null;
         $this->blockname = $blockname;
 
-        include_once("$CFG->dirroot/blocks/$blockname/lib.php");
+        include_once($CFG->dirroot.'/blocks/'.$blockname.'/lib.php');
 
         //find out all supported areas
-        $functionname     = 'block_'.$blockname.'_get_file_areas';
-        $functionname_old     = $blockname.'_get_file_areas';
+        $functionname = 'block_'.$blockname.'_get_file_areas';
+        $functionname_old = $blockname.'_get_file_areas';
 
         if (function_exists($functionname)) {
             $this->areas = $functionname($course, $instance, $context);
@@ -88,14 +88,14 @@ class file_info_context_block extends file_info {
      * @return file_info|null
      */
     public function get_file_info($component, $filearea, $itemid, $filepath, $filename) {
-    	global $CFG;
-    	
+        global $CFG;
+
         // try to emulate require_login() tests here
         if (!isloggedin()) {
             return null;
         }
 
-        $coursecontext = get_course_context($this->context);
+        $coursecontext = context_course::instance($this->course->id);
         if (!$this->course->visible and !has_capability('moodle/course:viewhiddencourses', $coursecontext)) {
             return null;
         }
@@ -109,7 +109,7 @@ class file_info_context_block extends file_info {
             return $this;
         }
 
-		require_once $CFG->dirroot.'/blocks/'.$this->blockname.'/lib.php';
+        require_once $CFG->dirroot.'/blocks/'.$this->blockname.'/lib.php';
         $functionname     = 'block_'.$this->blockname.'_get_file_info';
         $functionname_old = $this->blockname.'_get_file_info';
 
