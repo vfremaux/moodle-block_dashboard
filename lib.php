@@ -1,8 +1,23 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
- * 
- * @package block-dashboard
+ * @package block_dashboard
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
@@ -13,7 +28,7 @@
  * A low level utility to format data in a cell
  *
  */
-function dashboard_format_data($format, $data, $cumulativeix = null) {
+function dashboard_format_data($format, $data, $cumulativeix = null, &$record = null) {
     global $DASHBOARD_ACCUMULATORS;
 
     // Cumulates curve.
@@ -49,7 +64,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null) {
         }
 
         // Regexpfilter format.
-        if (preg_match('/%.+%/', $format)) {
+        if (preg_match('/%[^\{\}]+%/', $format)) {
             preg_match($format, $data, $matches);
             if (count($matches) == 1) {
                 $data = $matches[0];
@@ -82,7 +97,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null) {
 
         // Date value format.
         if ($format == '%D') {
-            $data = userdate($date);
+            $data = userdate($data);
             return $data;
         }
 
@@ -91,6 +106,16 @@ function dashboard_format_data($format, $data, $cumulativeix = null) {
             $format = strstr($format, 1);
         }
 
+        // replace some other data members
+        if (preg_match_all('/\\%\\{(.*?)\\}/', $format, $matches)) {
+            foreach($matches[1] as $m) {
+                if (isset($record->$m)) {
+                    $format = str_replace('%{'.$m.'}', $record->$m, $format);
+                }
+            }
+        }
+
+        // All other cases fallback to sprintf.
         $data = sprintf($format, $data);
 
         if ($negativeenhance && $data < 0) {
@@ -101,62 +126,6 @@ function dashboard_format_data($format, $data, $cumulativeix = null) {
     return $data;
 }
 
-/**
- * An HTML raster for a matrix cross table
- * printing raster uses a recursive cell drilldown over dynamic matrix dimension
- */
-function print_cross_table(&$theBlock, &$m, &$hcols, $hkey, &$vkeys, $hlabel, $return = false) {
-
-    $str = '';
-
-    dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, @$theBlock->config->horizsums);
-
-    // Print flipped array.
-    $path = array();
-
-    $subsums = new StdClass;
-    $subsums->subs = array();
-    $subsums->all = array();
-
-    table_explore_rec($theBlock, $str, $path, $hcols, $m, $vkeys, $hlabel, count($vkeys->formats), $subsums);
-
-    if (!empty($theBlock->config->vertsums)) {
-
-        // If vertsums are enabled, print vertsubs.
-
-        $str .= '<tr>';
-        $span = count($vkeys->labels);
-        $subtotalstr = get_string('subtotal', 'block_dashboard');
-        $str .= "<td colspan=\"{$span}\">$subtotalstr</td>";
-        foreach ($hcols as $col) {
-            $str.= "<td class=\"coltotal\">{$subsums->subs[$col]}</td>";
-        }
-        if (!empty($theBlock->config->horizsums)) {
-            $str .= '<td></td>';
-        }
-        $str .= '</tr>';
-
-        // Print big total.
-        $str .= '<tr>';
-        $span = count($vkeys->labels);
-        $subtotalstr = get_string('total', 'block_dashboard');
-        $str .= "<td colspan=\"{$span}\">$subtotalstr</td>";
-        foreach ($hcols as $col) {
-            $str.= "<td class=\"coltotal\"><b>{$subsums->all[$col]}</b></td>";
-        }
-        if (!empty($theBlock->config->horizsums)) {
-            $str .= '<td></td>';
-        }
-        $str .= '</tr>';
-    }
-
-    $str .= '</table>';
-
-    if ($return) {
-        return $str;
-    }
-    echo $str;
-}
 
 /**
 * Recursive worker for printing bidimensional table
@@ -238,7 +207,7 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
                 $c++;
             }
 
-            if (@$theBlock->config->horizsums){
+            if (@$theBlock->config->horizsums) {
                 $str .= "<td class=\"data rowtotal c{$c}\">$sum</td>";
             }
 
@@ -247,39 +216,6 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
         $level--;
         array_pop($pathstack);
     }
-}
-
-function dashboard_print_table_header(&$str, &$hcols, &$vkeys, $hlabel, $horizsums = false) {
-
-    $str .= '<table width="100%" class="dashboard-table"><tr>';
-
-    $vkc = 0;
-    foreach($vkeys->labels as $vk) {
-        $vkc++;
-    }
-    $str .= '<td colspan="'.$vkc.'"></td>';
-    $str .= '<td class="dashboard-horiz-serie" colspan="'.count($hcols).'">'.$hlabel.'</td>';
-
-    $str .= '</tr>';
-    $str .= '<tr>';
-
-    $vlabels = array_values($vkeys->labels);
-
-    foreach($vkeys->labels as $vk => $vlabel) {
-        $str .= '<td class="dashboard-vertical-series">'.$vlabel.'</td>';
-    }
-
-    foreach($hcols as $hc) {
-        $str .= "<td class=\"hkey\">$hc</td>";
-    }
-
-    if ($horizsums) {
-        $totalstr = get_string('total', 'block_dashboard');
-        $str .= "<td class=\"hkeytotal\">$totalstr</td>";
-    }
-
-    // close title line
-    $str .= '</tr>';
 }
 
 /**
@@ -442,67 +378,6 @@ function dashboard_print_table_header_csv(&$str, &$theBlock, &$hcols) {
 }
 
 /**
- * prints a smart tree with data
- * @param object $theBlock full block information
- * @param struct $tree the tree organized representation of records
- * @param array $treeoutput an array of pair column,format information for making the tree node name
- * @param array $outputfields an array of fields for tree node value information
- * @param array $outputformats formats for above
- * @param array $colourcoding an array of colour coding rules issued from table scope colourcoding settings
- */
-function dashboard_print_tree_view(&$theBlock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding, $return = false) {
-    static $level = 1;
-
-    $str = '';
-
-    asort($tree);
-
-    $str .= '<ul class="dashboard-tree'.$level.'">';
-    $level++;
-    foreach ($tree as $key => $node) {
-        $nodestrs = array();
-        foreach ($treeoutput as $field => $formatter) {
-            if (empty($field)) continue;
-            if (!empty($formatter)){
-                $datum = dashboard_format_data($formatter, $node->$field);
-            } else {
-                $datum = $node->$field;
-            }
-            if (!empty($theBlock->config->colorfield) && $theBlock->config->colorfield == $field){
-                // we probably prefer inline coloouring here, rather than div block.
-                $datum = dashboard_colour_code($theBlock, $datum, $colorcoding, true);
-            }
-            $nodestrs[] = $datum;
-        }
-        $nodecontent = implode(' ', $nodestrs);
-        $nodedata = array();
-        foreach ($outputformats as $field => $formatter) {
-            if (empty($field)) continue;
-            if (!empty($formatter)) {
-                $datum = dashboard_format_data($formatter, $node->$field);
-            } else {
-                $datum = $node->$field;
-            }
-            if (!empty($theBlock->config->colorfield) && $theBlock->config->colorfield == $field) {
-                // we probably prefer inline coloouring here, rather than div block.
-                $datum = dashboard_colour_code($theBlock, $datum, $colorcoding, true);
-            }
-            $nodedata[] = $datum;
-        }
-        $nodedatastr = implode(' ', $nodedata);
-        $str .= "<li>$nodecontent <div style=\"float:right\">$nodedatastr</div></li>";
-        if (!empty($node->childs)) {
-            $str .= dashboard_print_tree_view($theBlock, $node->childs, $treeoutput, $outputfields, $outputformats, $colorcoding, true);
-        }
-    }
-    $level--;
-    $str .= '</ul>';    
-
-    if ($return) return $str;
-    echo $str;
-}
-
-/**
  * processes given colour coding to a datum
  * @param object $theBlock full block information
  *
@@ -556,127 +431,6 @@ function dashboard_prepare_colourcoding(&$config) {
     return $colorcoding;
 }
 
-function dashboard_print_setting_tabs($config) {
-    $tabs = array(
-        array('querydesc', get_string('querydesc', 'block_dashboard'), true),
-        array('queryparams', get_string('queryparams', 'block_dashboard'), true),
-        array('outputparams', get_string('outputparams', 'block_dashboard'), true),
-        array('tabularparams', get_string('tabularparams', 'block_dashboard'), (!empty($config->tabletype) && $config->tabletype == 'tabular') ? true : false ),
-        array('treeviewparams', get_string('treeviewparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'treeview') ? true : false ),
-        array('graphparams', get_string('graphparams', 'block_dashboard'), true),
-        array('googleparams', get_string('googleparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'googlemap') ? true : false ),
-        array('timelineparams', get_string('timelineparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'timeline') ? true : false ),
-        array('summatorsparams', get_string('summatorsparams', 'block_dashboard'), true),
-        array('tablecolormapping', get_string('tablecolormapping', 'block_dashboard'), true),
-        array('datarefresh', get_string('datarefresh', 'block_dashboard'), true),
-        array('fileoutput', get_string('fileoutput', 'block_dashboard'), true),
-    );
-
-    echo '<div id="dashboardsettings-menu" class="tabtree">';
-    echo '<ul class="nav nav-tabs">';
-    foreach($tabs as $tabarr) {
-        list($tabkey, $tabname, $visible) = $tabarr;
-        $class = ($tabkey == 'querydesc') ? 'active ' : '';
-        $class .= ($visible) ? "on" : "off" ;
-        $tabname = str_replace(' ', '&nbsp;', $tabname);
-        echo '<li id="setting-tab-'.$tabkey.'" class="'.$class.'"><a href="Javascript:open_panel(\''.$tabkey.'\')"><span>'.$tabname.'</span></a></li> ';
-    }
-    echo '</ul>';
-}
-
-function dashboard_render_googlemaps_data(&$theBlock, &$data, &$graphdesc) {
-    if (!empty($config->datalocations)) {
-        // data comes from query and locating information from datalocations field mapping
-        $googlelocs = explode(";", $theBlock->config->datalocations);
-        if (!empty($data)) {
-            foreach($data as $d) {
-                $t = $d->{$theBlock->config->datatitles};
-                if (count($googlelocs) == 1) {
-                    list($lat,$lng) = explode(',', $d->{$theBlock->config->datalocations});
-                    $type = $d->{$theBlock->config->datatypes};
-                    $gmdata[] = array('title' => $t, 'lat' => 0 + $lat, 'lng' => 0 + $lng, 'markerclass' => $type);
-                } elseif (count($googlelocs) == 4) {
-                    // we expect an address,postcode,city,region field list. If some data is quoted, take it as "constant"
-                    $addresselms = explode(';', $theBlock->config->datalocations);
-                    $addressfield = trim($addresselms[0]);
-                    $postcodefield = trim($addresselms[1]);
-                    $cityfield = trim($addresselms[2]);
-                    $regionfield = trim($addresselms[3]);
-                    $address = $d->{$addressfield};
-                    if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $postcodefield, $matches)) {
-                        $postcode = $matches[1];
-                    } else {
-                        $postcode = $d->{$postcodefield};
-                    }
-                    if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $cityfield, $matches)) {
-                        $city = $matches[1];
-                    } else {
-                        $city = preg_replace('/cedex.*/i', '', $d->{$cityfield}); // remove postal alterations
-                    }
-                    if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $regionfield, $matches)) {
-                        $region = $matches[1];
-                    } else {
-                        $region = $d->{$regionfield};
-                    }
-                    $googleerrors = array();
-                    if ($location = googlemaps_get_geolocation($region, $address, $postcode, $city, $googleerrors)) {
-                        list($lat,$lng) = explode(',', $location);
-                        $type = $d->{$theBlock->config->datatypes};
-                        $gmdata[] = array('title' => $t, 'lat' => $lat, 'lng' => $lng, 'markerclass' => $type);
-                    }
-                } else {
-                    $text .= '<span class="error">'.get_string('googlelocationerror', 'block_dashboard').'</span>';
-                    break;
-                }
-            }
-        }
-    } else {
-        $text .= " This is a demo set !! ";
-        /**
-        demo
-        */
-        $gmdata = array(
-            array('lat' => 48.020587,
-                  'lng' => 0.151405,
-                  'markerclass' => 'certiffoad',
-                  'title' => 'Via formation'),
-            array('lat' => 47.894823,
-                  'lng' => 1.904798,
-                  'markerclass' => 'certiffoad',
-                  'title' => 'FormaSanté'),
-            array('lat' => 48.091582,
-                  'lng' => -1.789484,
-                  'markerclass' => 'hq',
-                  'title' => 'CLPS Siege'),
-            array('lat' => 48.392852,
-                  'lng' => -4.444313,
-                  'markerclass' => 'fcfoad',
-                  'title' => 'CLPS Brest'),
-            array('lat' => 47.663075,
-                  'lng' => -2.711906,
-                  'markerclass' => 'fcfoad',
-                  'title' => 'CLPS Vannes'),
-            array('lat' => 47.093953,
-                  'lng' => 5.497713,
-                  'markerclass' => 'fcfoad',
-                  'title' => 'INFA Franche-Comte'),
-            array('lat' => 48.565703,
-                  'lng' => 7.734375,
-                  'markerclass' => 'fc',
-                  'title' => 'INFA Alsace'),
-            array('lat' => 49.274973,
-                  'lng' => 2.444458,
-                  'markerclass' => 'fc',
-                  'title' => 'INFA Picardie'),
-        );
-    }
-
-    $text .= googlemaps_embed_graph('dashboard'.$theBlock->instance->id, @$theBlock->config->lat, @$theBlock->config->lng, @$theBlock->config->graphwidth, $this->config->graphheight, $graphdesc, $gmdata, true);
-
-    if (!empty($googleerrors)) {
-        // print_object($googleerrors);
-    }
-}
 
 /**
  * Renders each declared sum as HTML
@@ -702,138 +456,8 @@ function dashboard_render_numsums(&$theBlock, &$aggr) {
 }
 
 /**
- * get value range, print and sets up data filters
- * @param object $theBlock instance of a dashboard block
- * @param javascripthandler if empty, no onchange handler is required. Filter change
- * is triggered by an explicit button.
- *
- * Javascript handler is provided when preparing form overrounding.
- *
- */
-function dashboard_render_filters(&$theBlock, $javascripthandler) {
-
-    $str = '';
-
-    $alllabels = array_keys($theBlock->filterfields->labels);
-
-    foreach ($alllabels as $afield) {
-
-        if (empty($afield)) continue; // protects against empty filterset
-
-        $fieldname = (isset($theBlock->filterfields->translations[$afield])) ? $theBlock->filterfields->translations[$afield] : $afield ;
-
-        // $filterresults = $theBlock->filter_get_results($theBlock->sql, $afield, $fieldname, false, false, $str);
-        $filterresults = $theBlock->filter_get_results($afield, $fieldname, false, false, $str);
-
-        if ($filterresults) {
-            $filterset = array();
-            if (!$theBlock->is_filter_single($afield)) $filterset['0'] = '*';
-            foreach (array_values($filterresults) as $value) {
-                $radical = preg_replace('/^.*\./', '', $fieldname); // removes table scope explicitators
-                $filterset[$value->$radical] = $value->$radical;
-            }
-            $str .= '<span class="dashboard-filter">'.$theBlock->filterfields->labels[$afield].':</span>';
-            $multiple = (strstr($theBlock->filterfields->options[$afield], 'm') === false) ? false : true ; 
-            $arrayform = ($multiple) ? '[]' : '' ;
-
-            if (!is_array(@$theBlock->filtervalues[$radical])) {
-                $unslashedvalue = stripslashes(@$theBlock->filtervalues[$radical]);
-            } else {
-                $unslashedvalue = $theBlock->filtervalues[$radical];
-            }
-
-            // build the select options
-            $selectoptions = array();
- 
-            if (!empty($javascripthandler)) {
-                $selectoptions['onchange'] = $javascripthandler;
-            }
-
-            if ($multiple) {
-                $selectoptions['multiple'] = 1;
-                $selectoptions['size'] = 5;
-            }
-
-            if ($theBlock->is_filter_global($afield)) {
-                $str .= html_writer::select($filterset, "filter0_{$radical}{$arrayform}", $unslashedvalue, array('' => 'choosedots'), $selectoptions);
-            } else {
-                $str .= html_writer::select($filterset, "filter{$theBlock->instance->id}_{$radical}{$arrayform}", $unslashedvalue, array('' => 'choosedots'), $selectoptions);
-            }
-            $str .= "&nbsp;&nbsp;";
-        }
-    }
-
-    return $str;
-}
-
-/**
- * if there are some user params, print widgets for them. If one of them is a daterange, 
- * then cancel the javascripthandler as we will need to explictely submit.
- *
- */
-function dashboard_render_params(&$theBlock, &$javascripthandler) {
-
-    $str = '';
-
-    $str .= '<div class="dashboard-sql-params">';
-    foreach ($theBlock->params as $key => $param) {
-        $htmlkey = preg_replace('/[.() *]/', '', $key).'_'.$theBlock->instance->id;
-        switch ($param->type) {
-
-            case 'choice':
-                $values = explode("\n", $param->values);
-                $option1checked = ($param->value == $values[0]) ? 'checked="checked"' : '' ;
-                $option2checked = ($param->value == $values[1]) ? 'checked="checked"' : '' ;
-                $str .= ' '.$param->label.': <input type="radio" name="'.$htmlkey.'" value="'.htmlentities($values[0], ENT_QUOTES, 'UTF-8').'" '.$option1checked.' onchange="'.$javascripthandler.'" /> '.$values[0];
-                $str .= ' - <input type="radio" name="'.$key.'" value="'.htmlentities($values[1], ENT_QUOTES, 'UTF-8').'" '.$option2checked.'  onchange="'.$javascripthandler.'"/> '.$values[1].' &nbsp;&nbsp;';
-                break;
-
-            case 'text':
-                $str .= ' '.$param->label.': <input type="text" size="10" name="'.$htmlkey.'" value="'.htmlentities($param->value, ENT_QUOTES, 'UTF-8').'" onchange="'.$javascripthandler.'" /> ';
-                break;
-
-            case 'list':
-                $str .= ' '.$param->label.': <select name="'.$htmlkey.'" >';
-                foreach($param->values as $v) {
-                    $vselected = ($v == $param->value) ? ' selected="selected" ' : '' ;
-                    $str .= '<option value="'.$v.'" '.$vselected.'>'.$v.'</option>';
-                }
-                break;
-
-            case 'range':
-                $str .= ' '.$param->label.': '.get_string('from', 'block_dashboard').' <input type="text" size="10" name="'.$htmlkey.'_from" value="'.htmlentities($param->valuefrom, ENT_QUOTES, 'UTF-8').'"  /> ';
-                $str .= ' '.get_string('to', 'block_dashboard').' <input type="text" size="10" name="'.$htmlkey.'_to" value="'.htmlentities($param->valueto, ENT_QUOTES, 'UTF-8').'"  /> ';
-                $javascripthandler = '';  // cancel the autosubmit possibility
-                break;
-
-            case 'date':
-                $str .= ' '.$param->label.': <input type="text" size="10"  id="date-'.$htmlkey.'" name="'.$htmlkey.'" value="'.$param->originalvalue.'"  onchange="'.$javascripthandler.'" />';
-                $str .= '<script type="text/javascript">'."\n";
-                $str .= 'var '.$htmlkey.'Cal = new dhtmlXCalendarObject(["date-'.$htmlkey.'"]);'."\n";
-                $str .= $htmlkey.'Cal.loadUserLanguage(\''.current_language().'_utf8\');'."\n";
-                $str .= '</script>'."\n";
-                break;
-
-            case 'daterange':
-                $str .= ' '.$param->label.': '.get_string('from', 'block_dashboard').' <input type="text" size="10"  id="date-'.$htmlkey.'_from" name="'.$htmlkey.'_from" value="'.$param->originalvaluefrom.'" />';
-                $str .= ' '.get_string('to', 'block_dashboard').' <input type="text" size="10"  id="date-'.$htmlkey.'_to" name="'.$htmlkey.'_to" value="'.$param->originalvalueto.'" />';
-                $str .= '<script type="text/javascript">'."\n";
-                $str .= 'var '.$htmlkey.'fromCal = new dhtmlXCalendarObject([\'date-'.$htmlkey.'_from\', \'date-'.$htmlkey.'_to\']);'."\n";
-                $str .= $htmlkey.'fromCal.loadUserLanguage(\''.current_language().'_utf8\');'."\n";
-                $str .= $htmlkey.'fromCal.setSkin(\'dhx_web\');';
-                $str .= '</script>'."\n";
-                $javascripthandler = ''; // cancel the autosubmit possibility
-                break;
-        }
-    }
-
-    $str .= '</div>';
-    return $str;
-}
-
-
-/**
- * utility to pad two distinct size arrays
+ * utility to pad two distinct size arrays. Smaller array is padded 
+ * with empty string elements to reach latter size.
  */
 function dashboard_normalize(&$arr1, &$arr2) {
     $size1 = count($arr1);
@@ -861,56 +485,12 @@ function dashboard_guess_is_alias(&$theBlock, $key) {
 }
 
 /**
- *
- *
- *
+ * provides all internally used fileareas
+ * @param object $course unused
+ * @param object $instance unused
+ * @param object $context unused
+ * @todo : cleanup extra unused params
  */
-function dashboard_render_filters_and_params_form(&$theBlock, $sort) {
-    global $COURSE;
-
-    $text = '';
-
-    if (!empty($theBlock->config->filters) || !empty($theBlock->params)) {
-        $text .= '<form class="dashboard-filters" name="dashboardform'.$theBlock->instance->id.'" method="GET">';
-        $text .= '<input type="hidden" name="id" value="'.s($COURSE->id).'" />';
-        if (!@$theBlock->config->inblocklayout){
-            $text .= '<input type="hidden" name="blockid" value="'.s($theBlock->instance->id).'" />';
-        }
-        if ($COURSE->format == 'page') {
-            if (!empty($coursepage)){
-                $text .= '<input type="hidden" name="page" value="'.$flexpage->id.'" />';
-            }
-        }
-        if ($sort == 'id DESC') {
-            $sort = '';
-        }
-        $text .= '<input type="hidden" name="tsort'.$theBlock->instance->id.'" value="'.$sort.'" />';
-
-        $autosubmit = (count(array_keys($theBlock->filters)) + count(array_keys($theBlock->params))) <= 1;
-        $javascripthandler = '';
-        if ($autosubmit) {
-            $javascripthandler = "submitdashboardfilter('dashboardform{$theBlock->instance->id}')";
-        }
-
-        if (!empty($theBlock->config->filters)) {
-            $text .= dashboard_render_filters($theBlock, $javascripthandler);
-        }
-        if (!empty($theBlock->params)) {
-            $text .= dashboard_render_params($theBlock, $javascripthandler);
-        }
-
-        if (!$javascripthandler) {
-            // has been emptied, then no autocommit
-            $strdofilter = get_string('dofilter', 'block_dashboard');
-            $text .= "&nbsp;&nbsp;<input type=\"button\" onclick=\"autosubmit = 1; submitdashboardfilter('dashboardform{$theBlock->instance->id}')\" value=\"$strdofilter\" />";
-            $text .= '<script type="text/javascript"> autosubmit = 0; </script>'; // post inhibits the submit function as result of filtering construction
-        }
-        $text .= '</form>';
-    }
-
-    return $text;
-}
-
 function dashboard_get_file_areas($course, $instance, $context) {
     return array('generated' => get_string('generatedexports', 'block_dashboard'));
 }
@@ -976,7 +556,7 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
     send_stored_file($file, 0, 0, false); // download MUST be forced - security!
 }
 
-function dashboard_output_file($theBlock, $str) {
+function dashboard_output_file(&$theBlock, $str) {
     global $CFG;
 
     if (!empty($theBlock->config->filepathadminoverride)) {

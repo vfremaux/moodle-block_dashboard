@@ -16,13 +16,23 @@
 // The commands in here will all be database-neutral,
 // using the functions defined in lib/ddllib.php
 
-function xmldb_block_dashboard_upgrade($oldversion=0) {
+/**
+ * Definition of block dashboard scheduled tasks.
+ *
+ * @package   block_dashboard
+ * @category  blocks
+ * @author    Valery Fremaux <valery.fremaux@gmail.com>, <valery@edunao.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
-    global $CFG, $THEME, $DB;
+defined('MOODLE_INTERNAL') || die();
+
+function xmldb_block_dashboard_upgrade($oldversion=0) {
+    global $CFG, $DB;
 
     $result = true;
 
-	// Moodle 2.0 break line
-    
+    // Moodle 2.0 break line
+
     return $result;
 }

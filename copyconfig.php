@@ -15,15 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * 
- * @package block-dashboard
+ * @package block_dashboard
  * @category blocks
  * @author Valery Fremaux (valery@club-internet.fr)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 2.2
  */
 ob_start();
-include '../../config.php';
+require('../../config.php');
 
 // Setting contexts.
 

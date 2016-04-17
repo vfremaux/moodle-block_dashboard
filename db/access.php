@@ -30,6 +30,8 @@
 //
 // For the core capabilities, the variable is $moodle_capabilities.
 
+defined('MOODLE_INTERNAL') || die();
+
 $capabilities = array(
 
     'block/dashboard:addinstance' => array(

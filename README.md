@@ -59,7 +59,7 @@ Given a full query, the dashboard block mashes up :
 
 1. Deploy the block in Moodle/blocks as usual
 
-2. Activate notifications to isntall the data model
+2. Activate notifications to install the data model
 
 3. Create a course, better a flexipage or paged format course if available
 
@@ -67,8 +67,19 @@ Given a full query, the dashboard block mashes up :
 
 5. Define output fields, output modes, output labels... and discover features....
 
+# Library locations
+########################################
+
+Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_27_STABLE.zip
+and add the ocntent to the moodle/local directory
+
+Those libs are NOT moodle libs but additional public opensource libraries i use in several components as
+extra framework. 
+
 # Install additive for running timelines
 ========================================
+
+@TODO : Review this with better JS provisioning calls
 
 Timeline needs to be post page loading activated. We got some issue to stack onload events
 on body element. The solution is till now to add a late call to initialisation in footer :

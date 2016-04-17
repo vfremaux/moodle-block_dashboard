@@ -15,19 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Definition of block dashboard scheduled tasks.
  *
- * @package    block_dashboard
- * @category   blocks
- * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   block_dashboard
+ * @category  blocks
+ * @author    Valery Fremaux <valery.fremaux@gmail.com>, <valery@edunao.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015100900;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014042900;        // Requires this Moodle version
-$plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.7.0 (build 2015100900)';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = array('local_vflibs' => '*');
+$tasks = array(
+    array(
+        'classname' => 'block_dashboard\task\export_task',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 1,
+    )
+);

@@ -1,4 +1,4 @@
-<?php // $Id: block_dashboard.php,v 1.2 2012-09-12 20:23:38 vf Exp $
+<?php
 
 // Capabilities
 $string['dashboard:addinstance'] = 'Peut ajouter une instance';
@@ -41,6 +41,7 @@ $string['configgraphheight'] = 'Hauteur du graphe';
 $string['configgraphtype'] = 'Type de graphe';
 $string['configgraphwidth'] = 'Largeur du graphe';
 $string['confighidetitle'] = 'Cacher le titre du bloc';
+$string['confighierarchic'] = 'Affichage de données hiérarchiques';
 $string['confighorizformat'] = 'Formatage des clefs  horizontales';
 $string['confighorizkey'] = 'Clef  horizontale';
 $string['confighorizlabel'] = 'Label de la série horizontale';
@@ -62,6 +63,7 @@ $string['configpagesize'] = 'Taille de pagination';
 $string['configparent'] = 'Série de la liaison hiérarchique';
 $string['configquery'] = 'Requête';
 $string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Ne pas oublier que le séparateur est <b>nécessairement</b> un ;</span>';
+$string['configsendadminnotification'] = 'Envoyer des notifications administrateur sur cron';
 $string['configserieslabels'] = 'Titre des séries';
 $string['configshowdata'] = 'Montrer les données';
 $string['configshowfilterqueries'] = 'Montrer les requêtes des filtres (debug)';
@@ -130,6 +132,7 @@ $string['eventdesc'] = 'Série des descriptions d\'événement';
 $string['eventend'] = 'Série des fins de plage';
 $string['eventlink'] = 'Série des cibles de liens';
 $string['eventstart'] = 'Série des débuts de plage';
+$string['eventtaskprocessed'] = 'Tâche de tableau de bord exécutée';
 $string['eventtitles'] = 'Série des titres';
 $string['exportall'] = 'Exporter toutes les données';
 $string['exportconfig'] = 'Obtenir la configuration';
@@ -139,6 +142,7 @@ $string['extradbparams'] = 'Paramètres de la connexion accessoire';
 $string['fileoutput'] = 'Sortie sur fichier';
 $string['filesview'] = 'Voir la zone de fichiers';
 $string['filegenerated'] = 'Le fichier a été généré';
+$string['filters'] = 'Filtres';
 $string['generatedexports'] = 'Exports générés';
 $string['friday'] = 'Vendredi';
 $string['from'] = 'de';
@@ -180,6 +184,8 @@ $string['publishinpage'] = 'Dans une page séparée';
 $string['querydesc'] = 'Définition de requête';
 $string['queryparams'] = 'Paramêtres utilisateur';
 $string['saturday'] = 'Samedi';
+$string['savechangesandconfig'] = 'Enregistrer et continuer la configuration';
+$string['savechangesandview'] = 'Enregistrer et afficher';
 $string['setup'] = 'Configuration';
 $string['securityparams'] = 'Paramètres de sécurité et de performance';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
@@ -455,8 +461,8 @@ source.</p>
 <h3>Introduction des filtres</h3>
 <p>Si des filtres doivent être définis sur les données, alors il est nécessaire
 	d\'insérer une balise <%%FILTERS%%> dans la requête à la place ou pour compléter
-une claise WHERE</p>
-<p>Notez qu\'il n\'est pas possible </p>
+une clause WHERE</p>
+<p>Notez qu\'il n\'est pas possible d\'utiliser des requêtes imbriquées.</p>
 ';
 
 $string['configsplitsumonsort_help'] = '
@@ -479,6 +485,10 @@ $string['configtabletype_help'] = '
 </ul>
 ';
 
+$string['confighierarchic_help'] = '
+Affichage hiérarchique
+';
+
 $string['configyseries_help'] = '
 <p>Les séries de données sont les données graphées. Suivant le type de graphe il est possible de définir une ou plusieurs séries à afficher.
 Les séries de données doivent êtres de noms de colonnes de sortie (ou leurs alias) et doivent être séparées par des ";".</p>
@@ -491,14 +501,14 @@ dans l\'ordre d\'affichage de la sortie. </p>
 ';
 
 $string['configbigresult_help'] = '
-<p>Les séries de données sont les données graphées. Suivant le type de graphe il est possible de définir une ou plusieurs séries à afficher.
-Les séries de données doivent êtres de noms de colonnes de sortie (ou leurs alias) et doivent être séparées par des ";".</p>
-<p>Les noms des séries peuvent être définies dans la zone de texte à droite (Titre des séries) sous forme d\'une liste de mentions séparées par des ";".</p>
+<h3>Protection contre les résultats massifs</h3>
+<p>Les requêtes d\'extraction peuvent avoir des conséquences dramatiques sur les performances, et notamment au moment de la mise au point des jointures. 
+    Pour éviter que l\'interface ne se retrouve dans une situation irrécupérable,
+    une sécurité ajoute une pagination forcée sur les résultats en mode édition.</p>
+<p>Cette protection peut par contre poser des problèmes dans certains cas, par exemple lors de la production de courbes graphiques qui nécessitent beaucoup de données.</p>
 
-<h4>Fonctions spéciales sur les séries de sorties</h4>
-
-<p>Si une série de données est exprimée sous forme S(<i>nom_colonne</i>), alors les valeurs sont cumulées
-dans l\'ordre d\'affichage de la sortie. </p>
+<p>Lorsqu\'elle est désactivée, des résultars massifs sont effectivement produits et remontés dans le bloc pour rendu.</p>
+<p>Il est fortement conseillé d\'utiliser les caches de résultats pour ce type de requête.</p>
 ';
 
 $string['configcaching_help'] = '

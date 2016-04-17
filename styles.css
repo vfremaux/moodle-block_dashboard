@@ -3,9 +3,15 @@ div.configure{
     width:100px;
 }
 
-.dashboard-filters{
+form.dashboard-filters{
    margin:1px;
+   padding:2px 8px;
    border:solid 1px #9B5992;
+}
+
+form.dashboard-filters input{
+    margin:1px;
+    padding:1px;
 }
 
 div.dashboard-query-box{
@@ -165,7 +171,7 @@ div.dashboard-special{
 
 .dashboard-sql-params{
     margin-top:2px;
-    font-size:0.75em;
+    font-size:0.85em;
     display:inline;
 }
 
@@ -196,4 +202,20 @@ div.dashboard-special{
     margin:2px;
     font-size:0.75em;
     font-family:monospace
+}
+
+table.dashboard-setup {
+    width:  100%;
+}
+
+table.dashboard-setup td {
+    padding: 10px;
+}
+
+.dhtmlxcalendar_container {
+    background-color:#fdfdfd;
+    border:#fbfbfb solid 1px;
+    border-radius:3px;
+    box-shadow: 10px 10px 5px #888888;
+    font-size:1.05em;
 }

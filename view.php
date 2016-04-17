@@ -1,4 +1,25 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    block_dashboard
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require('../../config.php');
 
@@ -9,13 +30,15 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }
 
-require_login($course);
-
 if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))) {
     print_error('invalidblockid');
 }
 
+// Security.
+
+require_login($course);
 $theBlock = block_instance('dashboard', $instance);
+$theBlock->get_required_javascript();
 $context = context_block::instance($theBlock->instance->id);
 
 $PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
@@ -24,7 +47,7 @@ if (!empty($theBlock->config->title)) {
     $PAGE->navbar->add($theBlock->config->title, NULL);
 }
 
-$PAGE->set_url(new moodle_url('/bocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $blockid)));
+$PAGE->set_url(new moodle_url('/blocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $blockid)));
 $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
 echo $OUTPUT->header();
@@ -36,10 +59,9 @@ echo $theBlock->print_dashboard();
 if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()){
     $options = array();
     $options['id'] = $courseid;
-    $options['bui_editid'] = $blockid;
-    $options['sesskey'] = sesskey();
+    $options['instance'] = $blockid;
     echo '<div class="configure">';
-    echo $OUTPUT->single_button(new moodle_url('/course/view.php', $options), get_string('configure', 'block_dashboard'), 'get');
+    echo $OUTPUT->single_button(new moodle_url('/blocks/dashboard/setup.php', $options), get_string('configure', 'block_dashboard'), 'get');
     echo '</div>';
     echo "<br/>";
 }

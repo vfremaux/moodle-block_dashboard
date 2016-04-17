@@ -1,19 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * GoogleMap iframe wrapper
  * 
- * @package block-dashboard
+ * @package block_dashboard
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 1.9
  */
-
-include '../../config.php';
+require('../../config.php');
 
 $courseid = required_param('id', PARAM_INT);
 
+// Security.
 if ($courseid != SITEID) {
     if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
         print_error('invalidcourseid');
@@ -55,8 +69,8 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
 <?php
     $markerimages = glob ($CFG->dataroot.'/'.$course->id.'/blockdata/dashboard/all/mk_*.png');
     $hasshadow = array();
-    if (!empty($markerimages)){
-        foreach($markerimages as $im){
+    if (!empty($markerimages)) {
+        foreach ($markerimages as $im) {
             $imname = basename($im, '.png');
             $shadowimname = str_replace('mk_', 'sh_', $imname);
             $classname = str_replace('mk_', '', $imname);
@@ -67,6 +81,7 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
             $shadowimagepath = $CFG->dataroot."/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
             if (file_exists($shadowimagepath)){
                 $sizeinfo = getimagesize($shadowimagepath);
+                // Todo reform to new pluginfile.php file wrapper
                 $shadowfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
                 echo "var shadow{$classname} = new google.maps.MarkerImage(\"$shadowfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
                 $hasshadow[$classname] = true;
@@ -93,8 +108,8 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
     var mks = 0;
 
 <?php
-if (!empty($markers)){
-    foreach($markers as $amarker){
+if (!empty($markers)) {
+    foreach ($markers as $amarker) {
         $amarkerobj = json_decode(stripslashes(urldecode($amarker)));
 ?>
     // 48.020587,0.151405

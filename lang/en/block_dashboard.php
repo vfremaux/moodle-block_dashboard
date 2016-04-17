@@ -1,4 +1,4 @@
-<?php // $Id: block_dashboard.php,v 1.2 2012-09-12 20:23:37 vf Exp $
+<?php
 
 // Capabilitites
 $string['dashboard:addinstance'] = 'Can add an instance';
@@ -14,7 +14,7 @@ $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
 $string['cleararea'] = 'Clear all file area';
 $string['configbands'] = 'Hide show time bands';
-$string['configbigresult'] = '<span style="font-size:0.8em">Enable Big Result option</span>';
+$string['configbigresult'] = 'Enable Big Result option';
 $string['configcache'] = 'Result Cache Settings';
 $string['configcaching'] = 'Cache enabling';
 $string['configcachingttl'] = 'Cache TTL';
@@ -57,12 +57,13 @@ $string['configgmdata'] = 'GoogleMaps Data';
 $string['configgraphheight'] = 'Graph height';
 $string['configgraphtype'] = 'Graph type';
 $string['configgraphwidth'] = 'Graph Width';
-$string['confighidetitle'] = 'Hide block\'s title';
+$string['confighierarchic'] = 'Hierarchic rendering';
+$string['confighidetitle'] = 'Hide block title';
 $string['confighorizformat'] = 'Horiz keys formatting';
 $string['confighorizkey'] = 'Horiz key';
 $string['confighorizlabel'] = 'Horizontal labels';
 $string['confighorodatefiles'] = 'Horodate files';
-$string['configimportexport'] = 'configuration import/export';
+$string['configimportexport'] = 'Configuration import/export';
 $string['configisrunning'] = 'Cron is running ? ';
 $string['configlastcron'] = 'Last cron stamp ';
 $string['configlat'] = 'Latitude';
@@ -81,9 +82,11 @@ $string['configoutputfieldslabels'] = 'Output fields labels';
 $string['configoutputformats'] = 'Output data formatting';
 $string['configpagesize'] = 'Result paging size';
 $string['configparams'] = 'User param definitions';
+$string['configparent'] = 'Parent';
 $string['configparentserie'] = 'Parent serie';
 $string['configquery'] = 'Query';
 $string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Never forget the field separator is <b>necessarily</b> a ;</span>';
+$string['configsendadminnotification'] = 'Send admin notification on cron';
 $string['configserieslabels'] = 'Series labels';
 $string['configshowdata'] = 'Show data';
 $string['configshowfilterqueries'] = 'Show filter queries (debug)';
@@ -178,6 +181,7 @@ $string['eventend'] = 'Event end serie';
 $string['eventlink'] = 'Link series';
 $string['eventstart'] = 'Event start serie';
 $string['eventtitles'] = 'Title data serie';
+$string['eventtaskprocessed'] = 'Task processed event';
 $string['exportall'] = 'Export all data';
 $string['exportconfig'] = 'Get the current config';
 $string['exportdataastable'] = 'Export data as table';
@@ -185,6 +189,7 @@ $string['exportfiltered'] = 'Export filtered data';
 $string['extradbparams'] = 'Extra DB parameters';
 $string['filegenerated'] = 'File has been successfully generated';
 $string['fileoutput'] = 'Data Export settings';
+$string['filters'] = 'Filters';
 $string['filesview'] = 'View filearea content';
 $string['friday'] = 'Friday';
 $string['from'] = 'from';
@@ -231,6 +236,8 @@ $string['querydesc'] = 'Query definition';
 $string['queryparams'] = 'Query user parameters';
 $string['rangevalue'] = 'Range';
 $string['saturday'] = 'Saturday';
+$string['savechangesandconfig'] = 'Save and continue configuration';
+$string['savechangesandview'] = 'Save and view';
 $string['securityparams'] = 'Security and performance settings';
 $string['setup'] = 'Setup';
 $string['sqlinserts'] = 'SQL INSERTs';
@@ -479,6 +486,10 @@ $string['configgmdata_help'] = '
 <p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
 <pre>address;cp;city;"GB"</pre>
 <p>will always provide the value "GB" as region code.</p>
+';
+
+$string['confighierarchic_help'] = '
+Hierarchic rendering
 ';
 
 $string['configoutputfields_help'] = '

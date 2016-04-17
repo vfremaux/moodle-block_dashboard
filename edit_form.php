@@ -14,10 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Form for editing HTML block instances.
  *
  * @package   block_dashboard
+ * @category  blocks
  * @copyright 2012 Valery Fremaux
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,8 +28,6 @@
 /**
  * Form for editing dashboard block instances.
  *
- * @copyright 2012 Valery Fremaux
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_dashboard_edit_form extends block_edit_form {
 
@@ -55,13 +56,14 @@ class block_dashboard_edit_form extends block_edit_form {
         $generalparamslink = '<a href="'.$generalparmsurl.'">'.$generalparamsconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $generalparamslink);
+        $mform->setExpanded('configheader20');
 
         $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
         $importconfigstr = get_string('importconfig', 'block_dashboard');
         $exportconfigstr = get_string('exportconfig', 'block_dashboard');
         $copyconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload'));
         $import_export = '<a href="'.$copyconfigurl.'">'.$importconfigstr.'</a> - ';
-        $exportconfigurm = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get'));
+        $exportconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get'));
         $import_export .= '<a href="'.$exportconfigurl.'" target="_blank">'.$exportconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $import_export);

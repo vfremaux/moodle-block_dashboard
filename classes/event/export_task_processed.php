@@ -15,19 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * The block_dashboard event for logging dashboard export process
  *
  * @package    block_dashboard
  * @category   blocks
- * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace block_dashboard\event;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015100900;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2014042900;        // Requires this Moodle version
-$plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.7.0 (build 2015100900)';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = array('local_vflibs' => '*');
+/**
+ * The mod_chat course module viewed event class.
+ *
+ * @package    mod_chat
+ * @since      Moodle 2.7
+ * @copyright  2014 Petr Skoda
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class export_task_processed extends \core\event\base {
+    protected function init() {
+        $this->data['crud'] = 'r';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
+
+    /**
+     * Returns localised general event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('eventtaskprocessed', 'block_dashboard');
+    }
+
+}
