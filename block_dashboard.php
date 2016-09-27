@@ -672,7 +672,7 @@ class block_dashboard extends block_base {
 
                     $text .= html_writer::table($table);
 
-                    $text .= "<div style=\"text-align:right\">";
+                    $text .= '<div style="text-align:right">';
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
                     $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
@@ -697,7 +697,7 @@ class block_dashboard extends block_base {
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
-                    $text .= '<a href=\"'.$exporturl.'">'.$allexportstr.'</a>';
+                    $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv_tabular.php', $params);
@@ -1710,17 +1710,18 @@ class block_dashboard extends block_base {
         if (!empty($paramsql)) {
             $paramsql = " AND $paramsql ";
         }
+        $group = groups_get_course_group($COURSE);
         $this->sql = str_replace('<%%PARAMS%%>', $paramsql, $this->sql);
         $this->sql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->sql);
         $this->sql = str_replace('<%%CATID%%>', $COURSE->category, $this->sql);
         $this->sql = str_replace('<%%USERID%%>', $USER->id, $this->sql);
-        $this->sql = str_replace('<%%GROUPID%%>', $group->id, $this->sql);
+        $this->sql = str_replace('<%%GROUPID%%>', $group, $this->sql);
         $this->sql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->sql);
         $this->filteredsql = str_replace('<%%PARAMS%%>', $paramsql, $this->filteredsql);
         $this->filteredsql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->filteredsql);
         $this->filteredsql = str_replace('<%%CATID%%>', $COURSE->category, $this->filteredsql);
         $this->filteredsql = str_replace('<%%USERID%%>', $USER->id, $this->filteredsql);
-        $this->filteredsql = str_replace('<%%GROUPID%%>', $group->id, $this->filteredsql);
+        $this->filteredsql = str_replace('<%%GROUPID%%>', $group, $this->filteredsql);
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
 
         if (!empty($paramsurlvalues)) {
