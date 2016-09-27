@@ -56,3 +56,11 @@ $freq['6'] = get_string('saturday', 'block_dashboard');
 
 $settings->add(new admin_setting_configselect('block_dashboard/cron_freq', get_string('dashboard_cron_freq', 'block_dashboard'), get_string('dashboard_cron_freq_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_freq, $freq));
 
+$sepoptions = array(',' => '"," '.get_string('coma', 'block_dashboard'),
+                    ':' => '":" '.get_string('colon', 'block_dashboard'),
+                    ';' => '";" '.get_string('semicolon', 'block_dashboard'),
+                    "\t" => '[TAB] '.get_string('tab', 'block_dashboard'));
+$settings->add(new admin_setting_configselect('block_dashboard/csv_field_separator', get_string('csvfieldseparator', 'block_dashboard'), get_string('csvfieldseparator_desc', 'block_dashboard'), ';', $sepoptions));
+
+$seplineoptions = array("\n" => 'Linux [LF]', "\r\n" => 'Windows [CRLF]', "\r" => 'MACOS [CR]');
+$settings->add(new admin_setting_configselect('block_dashboard/csv_line_separator', get_string('csvlineseparator', 'block_dashboard'), get_string('csvfieldseparator_desc', 'block_dashboard'), "\n", $seplineoptions));

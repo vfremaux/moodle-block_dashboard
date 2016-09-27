@@ -352,7 +352,7 @@ function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, $re
 function dashboard_print_table_header_csv(&$str, &$theBlock, &$hcols) {
     global $CFG;
 
-    $config = get_data('block_dashboard');
+    $config = get_config('block_dashboard');
 
     $vlabels = array_values($theBlock->vertkeys->labels);
 

@@ -43,7 +43,7 @@ $limit = optional_param('limit', '', PARAM_INT);
 $offset = optional_param('offset', '', PARAM_INT); 
 $alldata = optional_param('alldata', '', PARAM_INT); 
 
-if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
+if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
     print_error('badcourseid');
 }
 
@@ -125,9 +125,9 @@ if ($results) {
             $row[] = $datum;
         }
         if ($theBlock->config->exportcharset == 'utf8') {
-            echo utf8_decode(implode($config->csv_field_separator, $row)); 
+            echo utf8_decode(implode($config->csv_field_separator, $row));
         } else {
-            echo implode($config->csv_field_separator, $row); 
+            echo implode($config->csv_field_separator, $row);
         }
         echo $config->csv_line_separator;
     }
