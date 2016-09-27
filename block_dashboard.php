@@ -23,7 +23,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 2.x
  */
-
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 require_once($CFG->dirroot.'/blocks/dashboard/extradblib.php');
@@ -91,8 +90,10 @@ class block_dashboard extends block_base {
     function instance_config_save($data, $notused = false) {
         global $USER;
 
-        // Check if curent user forcing a filelocationadminoverride can really do it.
-        // In case it seems to be forced, set it to empty anyway.
+        /*
+         * Check if curent user forcing a filelocationadminoverride can really do it.
+         * In case it seems to be forced, set it to empty anyway.
+         */
         if (!has_capability('block/dashboard:systempathaccess', context_system::instance())) {
             $data->filepathadminoverride = '';
         }
@@ -204,7 +205,8 @@ class block_dashboard extends block_base {
             $text = get_string('guestsnotallowed', 'block_dashboard');
 
             $loginstr = get_string('login');
-            $text .= "<a href=\"{$wwwroot}/login/index.php\">$loginstr</a>";
+            $loginurl = new moodle_url('/login/index.php');
+            $text .= '<a href="'.$loginurl.'">'.$loginstr.'</a>';
             return $text;
         }
 
@@ -251,7 +253,7 @@ class block_dashboard extends block_base {
                 if (!empty($this->config->showfilterqueries)) {
                     // if (isset($printoutbuffer)) {
                         $filtersql = $this->filteredsql;
-                        $text .= '<div class="dashboard-filter-query" style="padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace"><b>FILTER :</b> '.$filtersql.'</div>';
+                        $text .= '<div class="dashboard-filter-query"><b>FILTER :</b> '.$filtersql.'</div>';
                     // }
                 }
                 return $text . get_string('invalidorobsoletefilterquery', 'block_dashboard');
@@ -307,7 +309,7 @@ class block_dashboard extends block_base {
         } catch (Exception $e) {
             // Showing query.
             if (@$this->config->showquery) {
-                $text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+                $text .= '<div class="dashboard-query-box">';
                 $text .= '<pre>'.$this->filteredsql.'</pre>';
                 $text .= '</div>';
             }
@@ -348,8 +350,7 @@ class block_dashboard extends block_base {
             }
 
             if (!empty($this->config->pagesize)) {
-                $table->pagesize($this->config->pagesize, $countres); 
-                // No paginating at start.
+                $table->pagesize = min($this->config->pagesize, $countres); // No paginating at start.
             }
 
             $graphseries = array();
@@ -421,7 +422,7 @@ class block_dashboard extends block_base {
                     }
                 }
 
-                // Print data in results
+                // Print data in results.
                 if (!empty($this->config->showdata)) {
                     /*
                      * this is the most common case of a linear table
@@ -568,7 +569,7 @@ class block_dashboard extends block_base {
                                     continue;
                                 }
 
-                                // Did we ask for cumulative results ? 
+                                // Did we ask for cumulative results ?
                                 $cumulativeix = null;
                                 if (preg_match('/S\((.+?)\)/', $yserie, $matches)) {
                                     $yserie = $matches[1];
@@ -654,9 +655,9 @@ class block_dashboard extends block_base {
             // if (!empty($debug)) print_object($treedata);
 
             if (@$this->config->inblocklayout) {
-                $url = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id.$coursepage, 'tsort'.$this->instance->id => $sort));
             } else {
-                $url = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&blocksid='.$this->instance->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+                $url = new moodle_url('/blocks/dashboard/view.php', array('id' => $COURSE->id, 'blockid' => $this->instance->id.$coursepage, 'tsort'.$this->instance->id => $sort));
             }
 
             $text .= $renderer->filters_and_params_form($this, $sort);
@@ -672,7 +673,7 @@ class block_dashboard extends block_base {
 
                     $text .= html_writer::table($table);
 
-                    $text .= "<div style=\"text-align:right\">";
+                    $text .= '<div style="text-align:right">';
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
                     $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
@@ -697,7 +698,7 @@ class block_dashboard extends block_base {
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
-                    $text .= '<a href=\"'.$exporturl.'">'.$allexportstr.'</a>';
+                    $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv_tabular.php', $params);
@@ -764,14 +765,14 @@ class block_dashboard extends block_base {
 
         // Showing query.
         if (@$this->config->showquery) {
-            $text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+            $text .= '<div class="dashboard-query-box">';
             $text .= '<pre>'.$this->filteredsql.'</pre>';
             $text .= '</div>';
         }
 
         // Showing SQL benches.
         if (@$this->config->showbenches) {
-            $text .= '<div class="dashboard-benches-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+            $text .= '<div class="dashboard-benches-box">';
             $text .= '<table width="100%">';
             foreach ($this->benches as $bench) {
                 $value = $bench->end - $bench->start;
@@ -880,7 +881,6 @@ class block_dashboard extends block_base {
                 'highlighter' => array(
                     'useAxesFormatters' => false,
                 ),
-
             );
         } elseif ($this->config->graphtype == 'donut') {
             $jqplot = array(
@@ -963,7 +963,7 @@ class block_dashboard extends block_base {
         if (!empty($this->config->tickspacing)) {
             $jqplot['axes']['yaxis']['tickInterval'] = (integer)$this->config->tickspacing;
         }
-        
+
         return $jqplot;
     }
 
@@ -985,7 +985,12 @@ class block_dashboard extends block_base {
      *
      */
     function get_count_records_sql($sql) {
-        $sql = "SELECT COUNT(*) FROM ($sql) as fullrecs ";
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                ($sql) as fullrecs
+        ";
         // $sql = preg_replace('/^\s*SELECT(.*?)\sFROM\s/si', 'SELECT COUNT(*) FROM', $sql);
         // $sql = preg_replace('/\s*ORDER BY.*/si', '', $sql); // remove any ordering
         return $sql;
@@ -996,14 +1001,14 @@ class block_dashboard extends block_base {
      *
      */
     function filter_get_results($fielddef, $fieldname, $specialvalue = '', $forcereload = false, &$printoutbuffer = null) {
-        static $FILTERSETS;
+        static $FILTERSET;
         global $CFG, $DB, $PAGE;
 
         $config = get_config('block_dashboard');
 
         $tracing = 0;
 
-        // computes filter query
+        // Computes filter query.
 
         if (empty($this->filterfields->queries[$fielddef])) {
 
@@ -1016,7 +1021,7 @@ class block_dashboard extends block_base {
                 $sql = preg_replace('/MAX\(([^\(]+)\)/si', '$1', $sql);
                 $sql = preg_replace('/SUM\((.*?)\) AS/si', '$1 AS', $sql);
                 $sql = preg_replace('/COUNT\((?:DISTINCT)?([^\(]+)\)/si', '$1', $sql);
-        
+
                 // Purge from unwanted clauses.
                 if (preg_match('/\bGROUP BY\b/si', $sql)) {
                     $sql = preg_replace('/GROUP BY.*(?!GROUP BY).*$/si', '', $sql);
@@ -1039,13 +1044,13 @@ class block_dashboard extends block_base {
         $filtersql = $this->protect($filtersql);
 
         // Filter values return from cache.
-        if (isset($FILTERSETS) && array_key_exists($fielddef, $FILTERSETS) && empty($specialvalue)) {
+        if (isset($FILTERSET) && array_key_exists($fielddef, $FILTERSET) && empty($specialvalue)) {
             if (!empty($this->config->showfilterqueries)) {
                 if (!is_null($printoutbuffer)) {
                     $printoutbuffer .= "<div class=\"dashboard-filter-query\" style=\"padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace\"><b>STATIC CACHED DATA FILTER :</b> $filtersql</div>";
                 }
             }
-            return $FILTERSETS[$fielddef];
+            return $FILTERSET[$fielddef];
         }
 
         // Check DB cache.
@@ -1063,7 +1068,6 @@ class block_dashboard extends block_base {
 
         if ((!$PAGE->user_is_editing() || !@$config->enable_isediting_security) && (!@$this->config->uselocalcaching || !$cachefootprint || ($cachefootprint && $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) || $forcereload)) {
             $DB->delete_records('block_dashboard_filter_cache', array('querykey' => $sqlkey, 'access' => $this->config->target));
-    
             list($usec, $sec) = explode(' ', microtime());
             $t1 = (float)$usec + (float)$sec;
 
@@ -1170,7 +1174,7 @@ class block_dashboard extends block_base {
 
         $results = array();
 
-        /* 
+        /*
          * we can get real data : 
          * Only if we are NOT editing => secures acces in case of bad strangled query
          * If we have no cache footprint and are needing one (cache expired or using cache and having no footprint)
@@ -1234,12 +1238,14 @@ class block_dashboard extends block_base {
                 }
             } else {
                 // TODO : enhance performance by using recordsets
-                
+
                 if (empty($extra_db_CNX)) {
                     extra_db_connect(false, $error);
                 }
 
-                if ($tracing) mtrace('Getting data from DB');
+                if ($tracing) {
+                    mtrace('Getting data from DB');
+                }
 
                 if ($allresults = extra_db_query($sql, false, true, $error)) {
                     foreach ($allresults as $reckey => $rec) {
@@ -1438,32 +1444,32 @@ class block_dashboard extends block_base {
     }
 
     /**
-    * determines if filter is global
-    * a global filter will be catched by all dashboard instances in the same page
-    */
-    public function is_filter_global($filterkey) {
+     * determines if filter is global
+     * a global filter will be catched by all dashboard instances in the same page
+     */
+    function is_filter_global($filterkey) {
         return strstr($this->filterfields->options[$filterkey], 'g') !== false;
     }
 
     /**
-    * determines if filter is single
-    * a single filter can only be constraint by a single value
-    */
-    public function is_filter_single($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 's') !== false ;
+     * determines if filter is single
+     * a single filter can only be constraint by a single value
+     */
+    function is_filter_single($filterkey) {
+        return strstr($this->filterfields->options[$filterkey], 's') !== false;
     }
 
     /**
-    * determines if filter must desaggregate from original query
-    */
-    public function allow_filter_desaggregate($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 'x') === false ;
+     * determines if filter must desaggregate from original query
+     */
+    function allow_filter_desaggregate($filterkey) {
+        return strstr($this->filterfields->options[$filterkey], 'x') === false;
     }
 
     /**
-    *
-    */
-    public function user_can_edit() {
+     *
+     */
+    function user_can_edit() {
         global $CFG, $COURSE;
 
         $context = context_course::instance($COURSE->id);
@@ -1479,7 +1485,7 @@ class block_dashboard extends block_base {
      * Decodes and prepare all config structures
      *
      */
-    public function prepare_config() {
+    function prepare_config() {
 
         // Not setup blocks should not run.
         if (empty($this->config)) return false;
@@ -1489,7 +1495,9 @@ class block_dashboard extends block_base {
 
         $this->sql = $this->config->query;
 
-        if (empty($this->config->exportcharset)) $this->config->exportcharset = 'utf8';
+        if (empty($this->config->exportcharset)) {
+            $this->config->exportcharset = 'utf8';
+        }
 
         // Output from query.
         $outputfields = explode(';', @$this->config->outputfields);
@@ -1584,7 +1592,7 @@ class block_dashboard extends block_base {
         return true;
     }
 
-    public function count_records(&$error) {
+    function count_records(&$error) {
         global $DB;
 
         // Counting records to fetch.
@@ -1607,7 +1615,7 @@ class block_dashboard extends block_base {
      * Get all params from request and prepare them
      *
      */
-    public function prepare_params() {
+    function prepare_params() {
         global $COURSE, $USER, $CFG;
 
         $paramsqlarr = array();
@@ -1705,22 +1713,33 @@ class block_dashboard extends block_base {
         $this->sql .= $havingparamsql;
         $this->filteredsql .= $havingparamsql;
 
+        $paramsql = '';
+        $paramfilteredsql = '';
         // Integrates where filtering.
-        $paramsql = implode(' AND ', $paramsqlarr);
-        if (!empty($paramsql)) {
-            $paramsql = " AND $paramsql ";
+        if (!preg_match('/\bWHERE\b/si', $this->sql)) {
+            $paramsql = ' WHERE 1=1 ';
         }
+        if (!preg_match('/\bWHERE\b/si', $this->filteredsql)) {
+            $paramfilteredsql = ' WHERE 1=1 ';
+        }
+        $paramsqlparts = implode(' AND ', $paramsqlarr);
+        if (!empty($paramsqlparts)) {
+            $paramsql .= " AND $paramsqlparts ";
+            $paramfilteredsql .= " AND $paramsqlparts ";
+        }
+        $group = groups_get_course_group($COURSE);
+
         $this->sql = str_replace('<%%PARAMS%%>', $paramsql, $this->sql);
         $this->sql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->sql);
         $this->sql = str_replace('<%%CATID%%>', $COURSE->category, $this->sql);
         $this->sql = str_replace('<%%USERID%%>', $USER->id, $this->sql);
-        $this->sql = str_replace('<%%GROUPID%%>', $group->id, $this->sql);
+        $this->sql = str_replace('<%%GROUPID%%>', $group, $this->sql);
         $this->sql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->sql);
-        $this->filteredsql = str_replace('<%%PARAMS%%>', $paramsql, $this->filteredsql);
+        $this->filteredsql = str_replace('<%%PARAMS%%>', $paramfilteredsql, $this->filteredsql);
         $this->filteredsql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->filteredsql);
         $this->filteredsql = str_replace('<%%CATID%%>', $COURSE->category, $this->filteredsql);
         $this->filteredsql = str_replace('<%%USERID%%>', $USER->id, $this->filteredsql);
-        $this->filteredsql = str_replace('<%%GROUPID%%>', $group->id, $this->filteredsql);
+        $this->filteredsql = str_replace('<%%GROUPID%%>', $group, $this->filteredsql);
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
 
         if (!empty($paramsurlvalues)) {
@@ -1741,7 +1760,7 @@ class block_dashboard extends block_base {
      * @todo : examine potential security gaps due to direct processing of $_GET inputs. check how to secure 
      * from SQL injection.
      */
-    public function prepare_filters() {
+    function prepare_filters() {
 
         // Capture filters values in input.
         $filterclause = '';
@@ -1781,6 +1800,7 @@ class block_dashboard extends block_base {
                 $canonicalfilter = (array_key_exists($filter, $this->filterfields->translations)) ? $this->filterfields->translations[$filter] : $filter;
                 $voidstr = null;
                 $default = (preg_match('/LAST|FIRST/i', $default)) ? $this->filter_get_results($filter, $canonicalfilter, $default, false, $voidstr /* no print out */) : $default ;
+
                 if ($this->is_filter_global($filter)) {
                     if (!array_key_exists('filter0_'.$canonicalfilter, $filterinputs)) {
                         $filterinputs['filter0_'.$canonicalfilter] = $default;
@@ -1797,7 +1817,7 @@ class block_dashboard extends block_base {
             foreach ($filterinputs as $key => $value) {
                 $radical = preg_replace('/filter\d+_/','', $key);
                 $sqlfiltername = (isset($this->filterfields->filtercanonicalfield[$radical])) ? $this->filterfields->filtercanonicalfield[$radical] : $radical ;
-                if (!empty($value)) {
+                if ($value !== '' && !is_null($value)) {
                     if (!is_array($value)) {
                         $filters[] = " $sqlfiltername = '".str_replace("'", "''", $value)."' ";
                     } else {
@@ -1811,19 +1831,19 @@ class block_dashboard extends block_base {
         }
 
         // Build filtering SQL clause and insert it at placeholder.
-        if (!empty($filters)) {
-            if (!preg_match('/\bWHERE\b/si', $this->sql)) {
-                $filterclause = ' WHERE '.implode('AND', $filters);
-            } else {
-                $filterclause = ' AND '. implode('AND', $filters);
-            }
+        if (!preg_match('/\bWHERE\b/si', $this->sql)) {
+            $filterclause = ' WHERE 1=1 ';
         }
-        $this->filteredsql = str_replace('<%%FILTERS%%>', $filterclause, $this->sql); 
+        if (!empty($filters)) {
+            $filterclause .= ' AND '. implode('AND', $filters);
+        }
+
+        $this->filteredsql = str_replace('<%%FILTERS%%>', $filterclause, $this->sql);
 
         return $filterquerystring;
     }
 
-    public function generate_output_file($results) {
+    function generate_output_file($results) {
 
         $config = get_config('block_dashboard');
 

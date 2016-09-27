@@ -89,10 +89,10 @@ function jqplot_print_graph($htmlid, $graph, &$data, $width, $height, $addstyle 
 * TODO : unfinished
 *
 */
-function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
+function jqplot_print_vert_bar_graph(&$data, $title, $htmlid) {
     global $PLOTID;
     static $instance = 0;
-    
+
     $htmlid = $htmlid.'_'.$instance;
     $instance++;
 
@@ -101,7 +101,7 @@ function jqplot_print_vert_bar_graph(&$data, $title, $htmlid){
     echo "
         $.jqplot.config.enablePlugins = true;
     ";
-    
+
     $title = addslashes($title);
 
     $answeredarr = array($data->answered, $data->aanswered, $data->canswered);

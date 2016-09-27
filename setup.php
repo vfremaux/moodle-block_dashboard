@@ -29,7 +29,7 @@ $PAGE->requires->js('/blocks/dashboard/js/module.js', true);
 $courseid = required_param('id', PARAM_INT);
 $blockid = required_param('instance', PARAM_INT);
 
-if (!$course = $DB->get_record('course', array('id' => $courseid))){
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourseid');
 }
 

@@ -23,7 +23,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if ($submit) {
+if (array_key_exists('submit', $_POST)) {
     $data = $_POST;
 
     unset($data['submit']);

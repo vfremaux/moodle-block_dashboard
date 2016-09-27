@@ -23,11 +23,12 @@
  */
 ob_start();
 require('../../config.php');
+require_once($CFG->dirroot.'/blocks/dashboard/copyconfig_form.php');
 
 // Setting contexts.
 
-$id = required_param('id', PARAM_INT); // course id
-$instanceid = required_param('instance', PARAM_INT); // block instance id
+$id = required_param('id', PARAM_INT); // Course ID.
+$instanceid = required_param('instance', PARAM_INT); // Block instance ID.
 $action = optional_param('what', '', PARAM_TEXT);
 
 if (!$course = $DB->get_record('course', array('id' => "$id"))) {
@@ -56,8 +57,6 @@ if ($action == 'get') {
 
 // Process form.
 
-require_once($CFG->dirroot.'/blocks/dashboard/copyconfig_form.php');
-
 $url = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $course->id, 'instance' => $instanceid));
 
 $mform = new CopyConfig_Form($url);
@@ -74,7 +73,7 @@ if ($data = $mform->get_data()) {
 $PAGE->set_url($url);
 $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
-$OUTPUT->header();
+echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('configcopy', 'block_dashboard'));
 

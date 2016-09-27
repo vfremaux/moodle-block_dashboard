@@ -128,10 +128,10 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
 
 
 /**
-* Recursive worker for printing bidimensional table
-*
-*/
-function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null){
+ * Recursive worker for printing bidimensional table
+ *
+ */
+function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null) {
     static $level = 0;
     static $r = 0;
 
@@ -153,12 +153,12 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
                     $pathelm = dashboard_format_data($vformats[$c], $pathelm);
                 }
                 if (!empty($theBlock->config->cleandisplay)) {
-                    if ($pathelm != @$vkeys->mem[$c]){
+                    if ($pathelm != @$vkeys->mem[$c]) {
                         $pre .= "<td class=\"vkey c{$c}\">$pathelm</td>";
                         if (isset($vkeys->mem[$c]) && @$theBlock->config->spliton == $vcolumns[$c]) {
-                            // first split do not play
+                            // First split do not play.
 
-                            // if vertsums are enabled, print vertsubs
+                            // If vertsums are enabled, print vertsubs.
                             if ($theBlock->config->vertsums) {
                                 $str .= '<tr>';
                                 $span = count($vkeys->labels);
@@ -174,7 +174,7 @@ function table_explore_rec(&$theBlock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
                                 $str .= '</tr>';
                             }
 
-                            // then close previous table
+                            // Then close previous table
                             $str .= '</table>';
                             dashboard_print_table_header($str, $hcols, $vkeys, $hlabel, $theBlock->config->horizsums);
                         }
@@ -227,7 +227,7 @@ function print_cross_table_csv(&$theBlock, &$m, &$hcols, $return = false) {
     $str = '';
 
     dashboard_print_table_header_csv($str, $theBlock, $hcols);
-    // print flipped array
+    // Print flipped array.
     $path = array();
 
     $theBlock->subsums = new StdClass;
@@ -236,7 +236,9 @@ function print_cross_table_csv(&$theBlock, &$m, &$hcols, $return = false) {
 
     table_explore_rec_csv($theBlock, $str, $path, $hcols, $m, $return);
 
-    if ($return) return $str;
+    if ($return) {
+        return $str;
+    }
     echo $str;
 }
 
@@ -275,14 +277,13 @@ function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, $re
                     if ($pathelm != @$vkeys->mem[$c]) {
                         $pre .= "$pathelm".$config->csv_field_separator;
                         if (isset($vkeys->mem[$c]) && @$theBlock->config->spliton == $vcolumns[$c]) {
-                            // first split do not play
-
-                            // if vertsums are enabled, print vertsubs
+                            // First split do not play.
+                            // If vertsums are enabled, print vertsubs.
                             if ($theBlock->config->vertsums) {
                                 $span = count($pathstack);
                                 $subtotalstr = get_string('subtotal', 'block_dashboard');
                                 $str .= "$subtotalstr".$config->csv_field_separator;
-                                foreach($hcols as $col) {
+                                foreach ($hcols as $col) {
                                     $str .= $theBlock->subsumsf->subs[$col].$config->csv_field_separator;
                                     $theBlock->subsums->subs[$col] = 0;
                                 }
@@ -292,7 +293,7 @@ function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, $re
                                 $str .= $config->csv_line_separator;
                             }
 
-                            // then close previous table
+                            // Then close previous table.
                             dashboard_print_table_header_csv($str, $theBlock, $hcols);
                         }
                         $theBlock->vertkeys->mem[$c] = $pathelm;
@@ -308,7 +309,7 @@ function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, $re
             $str .= $pre;
 
             $sum = 0;
-            foreach($hcols as $col) {
+            foreach ($hcols as $col) {
                 if (array_key_exists($col, $v)) {
                     $str .= "{$v[$col]}".$config->csv_field_separator;
                 } else {
@@ -352,16 +353,16 @@ function table_explore_rec_csv(&$theBlock, &$str, &$pathstack, &$hcols, &$t, $re
 function dashboard_print_table_header_csv(&$str, &$theBlock, &$hcols) {
     global $CFG;
 
-    $config = get_data('block_dashboard');
+    $config = get_config('block_dashboard');
 
     $vlabels = array_values($theBlock->vertkeys->labels);
 
     $row = array();
-    foreach($theBlock->vertkeys->labels as $vk => $vlabel) {
+    foreach ($theBlock->vertkeys->labels as $vk => $vlabel) {
         $row[] = $vlabel;
     }
 
-    foreach($hcols as $hc) {
+    foreach ($hcols as $hc) {
         $row[] = $hc;
     }
 
@@ -408,7 +409,7 @@ function dashboard_colour_code(&$theBlock, $datum, &$colorcoding, $inline = fals
         } else {
             $res = false;
         }
-        if (@$res){
+        if (@$res) {
             if ($inline) {
                 $datum = '<span style="background-color:'.$colour.'">'.$datum.'</span>';
             } else {
@@ -441,7 +442,7 @@ function dashboard_render_numsums(&$theBlock, &$aggr) {
 
     $str = '';
 
-    $str .= $OUTPUT->box_start('dashboard-sumative-box');
+    $str .= $OUTPUT->box_start('dashboard-sumative-box', '', true);
     foreach (array_keys($theBlock->numsumsf) as $numsum) {
         if (!empty($theBlock->numsumsf[$numsum])) {
             $formattedsum = dashboard_format_data($theBlock->numsumsf[$numsum], @$aggr->$numsum);
@@ -450,7 +451,7 @@ function dashboard_render_numsums(&$theBlock, &$aggr) {
         }
         $str .= $theBlock->outputnumsums[$numsum].' : <b>'.$formattedsum.'</b>&nbsp;&nbsp;&nbsp;&nbsp;';
     }
-    $str .= $OUTPUT->box_end();
+    $str .= $OUTPUT->box_end(true);
 
     return $str;
 }
@@ -606,7 +607,7 @@ function dashboard_output_file(&$theBlock, $str) {
  *
  *
  */
-function dashboard_sum($v1, $v2){
+function dashboard_sum($v1, $v2) {
     if ((preg_match('/\d+:\d+:\d+/', $v1) || empty($v1)) && (preg_match('/\d+:\d+:\d+/', $v2) || empty($v2)) && !(empty($v1) && empty($v2))) {
         // %hms formatting
         // compatible time values

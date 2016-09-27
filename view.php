@@ -41,7 +41,7 @@ $theBlock = block_instance('dashboard', $instance);
 $theBlock->get_required_javascript();
 $context = context_block::instance($theBlock->instance->id);
 
-$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
+$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), null);
 
 if (!empty($theBlock->config->title)) {
     $PAGE->navbar->add($theBlock->config->title, NULL);

@@ -85,13 +85,13 @@ $filteredsql = $theBlock->protect($theBlock->filteredsql);
 $results = $theBlock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
 
 if ($results) {
-    // output csv file
+    // Output csv file.
     $exportname = (!empty($theBlock->config->title)) ? clean_filename($theBlock->config->title) : 'dashboard_export' ;
     header("Content-Type:text/csv\n\n");
     header("Content-Disposition:filename={$exportname}.csv\n\n");
 
     $hcols = array();
-    // print data
+    // Print data.
     foreach ($results as $r) {
         // this is a tabular table
         /* in a tabular table, data can be placed :
@@ -119,7 +119,7 @@ if ($results) {
             $hcols[] = $hkeyvalue;
         }
 
-        // now put the cell value in it
+        // Now put the cell value in it.
         $outvalues = array();
         foreach (array_keys($theBlock->outputf) as $field) {
 

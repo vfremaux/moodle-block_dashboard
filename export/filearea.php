@@ -126,7 +126,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
 
     echo '</div>';
 } else {
-    echo "<div class=\"block-dashboard-entrylist\">No files</div>";
+    echo '<div class="block-dashboard-entrylist">No files</div>';
 }
 
 if (($browsepath != '/') || $fileinfo){

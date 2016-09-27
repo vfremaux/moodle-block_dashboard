@@ -21,6 +21,8 @@
  * @category   blocks
  * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * VFLibs can be found at http://github.com/vfremaux/moodle-local_vflibs
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -31,3 +33,6 @@ $plugin->component = 'block_dashboard'; // Full name of the plugin (used for dia
 $plugin->release = '2.7.0 (build 2015100900)';
 $plugin->maturity = MATURITY_RC;
 $plugin->dependencies = array('local_vflibs' => '*');
+
+// Non moodle attributes.
+$plugin->codeincrement = '2.7.0000';

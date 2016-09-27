@@ -43,7 +43,9 @@ function extra_db_protect() {
     // TODO : implement environment dependant code here
 
     // example : Moodle 1.9 environement : simplest way, non internationalised
-    if (!defined('MOODLE_INTERNAL')) die ('You cannot use this library this way');    
+    if (!defined('MOODLE_INTERNAL')) {
+        die ('You cannot use this library this way');
+    }
 }
 
 function extra_db_debugging() {
@@ -56,22 +58,24 @@ function extra_db_debugging() {
 /**
  * wraps to environement fatal error reporting function
  */
-function extra_db_error($error, $return = false){
+function extra_db_error($error, $return = false) {
     // TODO : implement environment dependant code here
-    
+
     // example : Moodle 1.9 environement : simplest way, non internationalised
-    if ($return) return '<span class="error">'.$error.'</span>';
+    if ($return) {
+        return '<span class="error">'.$error.'</span>';
+    }
     echo($error);
 }
 
 /**
  * wraps to environement non fatal error reporting function (debugging)
  */
-function extra_db_notify($error){
+function extra_db_notify($error) {
     global $OUTPUT;
 
     // TODO : implement environment dependant code here
-    
+
     // example : Moodle 1.9 environement : simplest way, non internationalised
     $OUTPUT->notification($error);
 }
