@@ -1710,6 +1710,8 @@ class block_dashboard extends block_base {
         if (!empty($paramsql)) {
             $paramsql = " AND $paramsql ";
         }
+
+        $group = groups_get_course_group();
         $this->sql = str_replace('<%%PARAMS%%>', $paramsql, $this->sql);
         $this->sql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->sql);
         $this->sql = str_replace('<%%CATID%%>', $COURSE->category, $this->sql);
