@@ -56,7 +56,7 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
 </script>
 <script type="text/javascript">
 
-      function initialize() {
+    function initialize() {
         var latlng = new google.maps.LatLng(<?php echo $lat ?>, <?php echo $lng ?>);
         var myOptions = <?php echo $options ?>;
         var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
@@ -64,7 +64,7 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
         for (i = 0; i < mks ; i++){
             marker[i].setMap(map);
         }
-      }
+    }
 
 <?php
     $markerimages = glob ($CFG->dataroot.'/'.$course->id.'/blockdata/dashboard/all/mk_*.png');
@@ -79,7 +79,7 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
             echo "var image{$classname} = new google.maps.MarkerImage(\"$imfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
 
             $shadowimagepath = $CFG->dataroot."/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
-            if (file_exists($shadowimagepath)){
+            if (file_exists($shadowimagepath)) {
                 $sizeinfo = getimagesize($shadowimagepath);
                 // Todo reform to new pluginfile.php file wrapper
                 $shadowfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";

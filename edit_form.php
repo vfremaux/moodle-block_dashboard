@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Form for editing HTML block instances.
  *
@@ -24,6 +22,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2012 Valery Fremaux
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Form for editing dashboard block instances.
@@ -42,7 +41,7 @@ class block_dashboard_edit_form extends block_edit_form {
 
         $mform->addElement('checkbox', 'config_hidetitle', '', get_string('checktohide', 'block_dashboard'));
 
-        /** Layout settings **/
+        // Layout settings ---------------------------------------------------------------.
 
         $mform->addElement('header', 'configheader1', get_string('dashboardlayout', 'block_dashboard'));
 
@@ -61,9 +60,11 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
         $importconfigstr = get_string('importconfig', 'block_dashboard');
         $exportconfigstr = get_string('exportconfig', 'block_dashboard');
-        $copyconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload'));
+        $params = array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload');
+        $copyconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', $params);
         $import_export = '<a href="'.$copyconfigurl.'">'.$importconfigstr.'</a> - ';
-        $exportconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get'));
+        $params = array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get');
+        $exportconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', $params);
         $import_export .= '<a href="'.$exportconfigurl.'" target="_blank">'.$exportconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $import_export);

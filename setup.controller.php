@@ -14,22 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package    block_dashboard
  * @category   blocks
  * @author  Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
 
-if ($submit) {
+if (array_key_exists('submit', $_POST)) {
     $data = $_POST;
 
     unset($data['submit']);
 
-    $theBlock->config = (object) $data;
-    $theBlock->instance_config_save($theBlock->config);
+    $theblock->config = (object) $data;
+    $theblock->instance_config_save($theblock->config);
 
     redirect(new moodle_url('/course/view.php', array('id' => $COURSE->id)));
 }
@@ -39,8 +38,8 @@ if ($save) {
 
     unset($data['save']);
 
-    $theBlock->config = (object) $data;
-    $theBlock->instance_config_save($theBlock->config);
+    $theblock->config = (object) $data;
+    $theblock->instance_config_save($theblock->config);
 
     redirect(new moodle_url('/blocks/dashboard/setup.php', array('id' => $COURSE->id, 'instance' => $blockid)));
 }
@@ -50,8 +49,8 @@ if ($saveview) {
 
     unset($data['save']);
 
-    $theBlock->config = (object) $data;
-    $theBlock->instance_config_save($theBlock->config);
+    $theblock->config = (object) $data;
+    $theblock->instance_config_save($theblock->config);
 
     redirect(new moodle_url('/blocks/dashboard/view.php', array('id' => $COURSE->id, 'blockid' => $blockid)));
 }

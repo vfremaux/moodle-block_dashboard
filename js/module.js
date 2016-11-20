@@ -31,7 +31,7 @@ function open_panel(panelid) {
 
 var autosubmit = 1;
 
-function submitdashboardfilter(instance){
+function submitdashboardfilter(instance) {
     if (autosubmit){
         document.forms[instance].submit();
     }

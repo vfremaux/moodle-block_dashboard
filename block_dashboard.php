@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * @package block_dashboard
  * @category blocks
@@ -23,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 2.x
  */
+defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
@@ -31,27 +30,25 @@ require_once($CFG->dirroot.'/local/vflibs/jqplotlib.php');
 
 global $PAGE;
 
-// $PAGE->requires->css('/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css');
-
 class block_dashboard extends block_base {
 
-    var $devmode = true; // use local moodle database to develop virual tools. 
+    protected $devmode = true; // Use local moodle database to develop virual tools.
 
-    var $filtervalues; // collects effective filter values set by user
+    protected $filtervalues; // Collects effective filter values set by user.
 
-    var $paramvalues; // collects effective param values set by user
+    protected $paramvalues; // Collects effective param values set by user.
 
-    var $filters; // stores filter definitions
+    protected $filters; // Stores filter definitions.
 
-    var $params; // stores user parameter definitions
+    protected $params; // Stores user parameter definitions.
 
-    var $output; // stores output definition from query
+    protected $output; // Stores output definition from query.
 
-    var $outputf; // stores output formats specifiers from query
+    protected $outputf; // Stores output formats specifiers from query.
 
-    var $benches; // stores SQL bench info
+    protected $benches; // Stores SQL bench info.
 
-    function init() {
+    public function init() {
         $this->title = get_string('blockname', 'block_dashboard');
         $this->version = 2013032600;
 
@@ -63,36 +60,38 @@ class block_dashboard extends block_base {
         $this->outputf = array();
     }
 
-    function specialization() {
+    public function specialization() {
         if (!empty($this->config->title)) {
             $this->title = $this->config->title;
         }
     }
 
-    function hide_header() {
+    public function hide_header() {
         if (!isset($this->config->hidetitle)) {
             return false;
         }
         return $this->config->hidetitle;
     }
 
-    function has_config() {
+    public function has_config() {
         return true;
     }
 
-    function instance_allow_multiple() {
+    public function instance_allow_multiple() {
         return true;
     }
 
-    function instance_allow_config() {
+    public function instance_allow_config() {
         return true;
     }
 
-    function instance_config_save($data, $notused = false) {
+    public function instance_config_save($data, $notused = false) {
         global $USER;
 
-        // Check if curent user forcing a filelocationadminoverride can really do it.
-        // In case it seems to be forced, set it to empty anyway.
+        /*
+         * Check if curent user forcing a filelocationadminoverride can really do it.
+         * In case it seems to be forced, set it to empty anyway.
+         */
         if (!has_capability('block/dashboard:systempathaccess', context_system::instance())) {
             $data->filepathadminoverride = '';
         }
@@ -107,13 +106,13 @@ class block_dashboard extends block_base {
         return parent::instance_config_save($data, $notused);
     }
 
-    function applicable_formats() {
+    public function applicable_formats() {
         // Default case: the block can be used in all course types.
         return array('all' => true, 'site' => true);
     }
 
-    function get_content() {
-        global $EXTRADBCONNECT, $COURSE, $PAGE;
+    public function get_content() {
+        global $extradbcnx, $COURSE, $PAGE;
 
         $this->get_required_javascript();
 
@@ -141,9 +140,11 @@ class block_dashboard extends block_base {
             $this->content->text = $this->print_dashboard();
         } else {
             $viewdashboardstr = get_string('viewdashboard', 'block_dashboard');
-            $dashboardviewurl = new moodle_url('/blocks/dashboard/view.php', array('id' => $COURSE->id, 'blockid' => $this->instance->id));
+            $params = array('id' => $COURSE->id, 'blockid' => $this->instance->id);
+            $dashboardviewurl = new moodle_url('/blocks/dashboard/view.php', $params);
             $this->content->text = '<a href="'.$dashboardviewurl.'">'.$viewdashboardstr.'</a>';
         }
+
         if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()) {
             $params = array();
             $params['id'] = $COURSE->id;
@@ -161,18 +162,20 @@ class block_dashboard extends block_base {
 
     /**
      * Real raster that prints graphs and data
-     *
      */
-    function print_dashboard() {
-        global $CFG, $EXTRADBCONNECT, $COURSE, $DB, $OUTPUT, $PAGE;
+    public function print_dashboard() {
+        global $CFG, $extradbcnx, $COURSE, $DB, $OUTPUT, $PAGE;
 
         $config = get_config('block_dashboard');
         $renderer = $PAGE->get_renderer('block_dashboard');
 
-        $text = '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css" />';
+        $cssurl = $CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css';
+        $text = '<link type="text/css" rel="stylesheet" href="'.$cssurl.'" />';
 
         $text .= '<div class="dashboard-panel">';
-        $text .= '<link type="text/css" rel="stylesheet" href="'.$CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css" />';
+
+        $cssurl = $CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css';
+        $text .= '<link type="text/css" rel="stylesheet" href="'.$cssurl.'" />';
 
         if (!isset($this->config)) {
             $this->config = new StdClass;
@@ -182,7 +185,7 @@ class block_dashboard extends block_base {
         $coursepage = '';
         if ($COURSE->format == 'page') {
             include_once($CFG->dirroot.'/course/format/page/lib.php');
-            $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number
+            $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
             if (!$pageid) {
                 $flexpage = course_page::get_current_page($COURSE->id);
             } else {
@@ -192,7 +195,7 @@ class block_dashboard extends block_base {
             $coursepage = "&page=".$flexpage->id;
         }
 
-        $rpage = optional_param('rpage'.$this->instance->id, 0, PARAM_INT); // Result page
+        $rpage = optional_param('rpage'.$this->instance->id, 0, PARAM_INT); // Result page.
 
         if ($rpage < 0) {
             $rpage = 0;
@@ -204,7 +207,8 @@ class block_dashboard extends block_base {
             $text = get_string('guestsnotallowed', 'block_dashboard');
 
             $loginstr = get_string('login');
-            $text .= "<a href=\"{$wwwroot}/login/index.php\">$loginstr</a>";
+            $loginurl = new moodle_url('/login/index.php');
+            $text .= '<a href="'.$loginurl.'">'.$loginstr.'</a>';
             return $text;
         }
 
@@ -224,8 +228,8 @@ class block_dashboard extends block_base {
             // Already connected.
         } else {
             $error = '';
-            if (!isset($EXTRADBCONNECT)) {
-                $EXTRADBCONNECT = extra_db_connect(true, $error);
+            if (!isset($extradbcnx)) {
+                $extradbcnx = extra_db_connect(true, $error);
             }
             if ($error) {
                 $text = $error;
@@ -249,16 +253,15 @@ class block_dashboard extends block_base {
                     echo @$e->error;
                 }
                 if (!empty($this->config->showfilterqueries)) {
-                    // if (isset($printoutbuffer)) {
-                        $filtersql = $this->filteredsql;
-                        $text .= '<div class="dashboard-filter-query" style="padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace"><b>FILTER :</b> '.$filtersql.'</div>';
-                    // }
+                    $filtersql = $this->filteredsql;
+                    $text .= '<div class="dashboard-filter-query"><b>FILTER :</b> '.$filtersql.'</div>';
                 }
                 return $text . get_string('invalidorobsoletefilterquery', 'block_dashboard');
             }
         } else {
             $this->filteredsql = str_replace('<%%FILTERS%%>', '', $this->sql);
         }
+
         // Needed to prepare for filter range prefetch.
         $this->sql = str_replace('<%%FILTERS%%>', '', $this->sql);
 
@@ -279,7 +282,7 @@ class block_dashboard extends block_base {
 
         $this->filteredsql = $this->protect($this->filteredsql);
 
-        // ######### GETTING RESULTS
+        // GETTING RESULTS ---------------------------------------------------.
 
         try {
             $countres = $this->count_records($error);
@@ -307,7 +310,7 @@ class block_dashboard extends block_base {
         } catch (Exception $e) {
             // Showing query.
             if (@$this->config->showquery) {
-                $text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+                $text .= '<div class="dashboard-query-box">';
                 $text .= '<pre>'.$this->filteredsql.'</pre>';
                 $text .= '</div>';
             }
@@ -319,7 +322,6 @@ class block_dashboard extends block_base {
             $table = new html_table();
             $table->id = 'mod-dashboard'.$this->instance->id;
 
-            // $tablecolumns = array();
             $table->head = array();
 
             $numcols = count($this->output);
@@ -348,8 +350,7 @@ class block_dashboard extends block_base {
             }
 
             if (!empty($this->config->pagesize)) {
-                $table->pagesize($this->config->pagesize, $countres); 
-                // No paginating at start.
+                $table->pagesize = min($this->config->pagesize, $countres); // No paginating at start.
             }
 
             $graphseries = array();
@@ -406,7 +407,7 @@ class block_dashboard extends block_base {
                             if (in_array($field, array_keys($this->numsumsf))) {
                                 if (is_null($tabledata)) {
                                     $tabledata = array();
-                                    for ($j = 0 ; $j < $k ; $j++) {
+                                    for ($j = 0; $j < $k; $j++) {
                                         $tabledata[$j] = '';
                                     }
                                 }
@@ -421,19 +422,21 @@ class block_dashboard extends block_base {
                     }
                 }
 
-                // Print data in results
+                // Print data in results.
                 if (!empty($this->config->showdata)) {
                     /*
                      * this is the most common case of a linear table
                      */
                     if (empty($this->config->tabletype) || $this->config->tabletype == 'linear') {
                         $tabledata = array();
+
                         foreach (array_keys($this->output) as $field) {
                             if (empty($field)) {
                                 continue;
                             }
     
                             // Did we ask for cumulative results ?
+
                             $cumulativeix = null;
                             if (preg_match('/S\((.+?)\)/', $field, $matches)) {
                                 $field = $matches[1];
@@ -456,19 +459,22 @@ class block_dashboard extends block_base {
                                     $lastvalue[$field] = $datum;
                                     $tabledata[] = $datum;
                                 } else {
-                                    $tabledata[] = ''; // if same as above, add blanck
+                                    $tabledata[] = ''; // If same as above, add blanck.
                                 }
                             } else {
                                 $tabledata[] = $datum;
                             }
                         }
                         $table->data[] = $tabledata;
-                    } elseif ($this->config->tabletype == 'tabular') {
-                        // this is a tabular table
+                    } else if ($this->config->tabletype == 'tabular') {
+
+                        // This is a tabular table.
+
                         /* in a tabular table, data can be placed :
                         * - in first columns in order of vertical keys
                         * the results are grabbed sequentially and spread into the matrix 
                         */
+
                         $keystack = array();
                         $matrix = array();
                         foreach (array_keys($this->vertkeys->formats) as $vkey) {
@@ -520,7 +526,7 @@ class block_dashboard extends block_base {
                         $resultid = $resultarr[0];
                         if (!empty($parentserie)) {
                             if (!empty($result->$parentserie)) {
-                                // Non root node, attache to his parent if we found it
+                                // Non root node, attache to his parent if we found it.
                                 if (array_key_exists($result->$parentserie, $treekeys)) {
                                     if (!empty($debug)) {
                                         echo 'binding to '. $result->$parentserie.'. ';
@@ -557,7 +563,9 @@ class block_dashboard extends block_base {
 
                 // Prepare data for graphs.
                 if (!empty($this->config->showgraph)) {
-                    if (!empty($this->config->xaxisfield)  && $this->config->graphtype != 'googlemap' && $this->config->graphtype != 'timeline') {
+                    if (!empty($this->config->xaxisfield) &&
+                            $this->config->graphtype != 'googlemap' &&
+                                    $this->config->graphtype != 'timeline') {
                         $xaxisfield = $this->config->xaxisfield;
                         if ($this->config->graphtype != 'pie') {
                             // TODO : check if $this->config->xaxisfield exists really (misconfiguration).
@@ -568,13 +576,13 @@ class block_dashboard extends block_base {
                                     continue;
                                 }
 
-                                // Did we ask for cumulative results ? 
+                                // Did we ask for cumulative results ?
                                 $cumulativeix = null;
                                 if (preg_match('/S\((.+?)\)/', $yserie, $matches)) {
                                     $yserie = $matches[1];
                                     $cumulativeix = $this->instance->id.'_'.$yserie;
                                 }
-                                
+
                                 if ($this->config->graphtype != 'timegraph') {
                                     if (!empty($this->yseriesf[$yserie])) {
                                         $graphseries[$yserie][] = dashboard_format_data($this->yseriesf[$yserie], $result->$yserie, $cumulativeix, $result);
@@ -592,7 +600,7 @@ class block_dashboard extends block_base {
                                 }
                                 $ys++;
                             }
-                        } elseif ($this->config->graphtype == 'pie') {
+                        } else if ($this->config->graphtype == 'pie') {
                             foreach (array_keys($this->yseriesf) as $yserie) {
                                 if (empty($result->$xaxisfield)) $result->$xaxisfield = 'N.C.';
                                 if (!empty($this->yseriesf[$field])) {
@@ -609,7 +617,7 @@ class block_dashboard extends block_base {
                 $graphdata = array_values($graphseries);
             }
 
-            //************ post aggregating last subtotal *************//
+            // Post aggregating last subtotal ----------------------------------------.
 
             if (!empty($this->config->shownumsums) && $results) {
                 if (!empty($splitnumsonsort) && @$this->config->tabletype == 'linear' && (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
@@ -634,7 +642,7 @@ class block_dashboard extends block_base {
                 }
             }
 
-            //************ Starting outputing data ************************//
+            // Starting outputing data -------------------------------------------------.
 
             // If treeview, need to post process waiting nodes.
             if (@$this->config->tabletype == 'treeview') {
@@ -645,18 +653,16 @@ class block_dashboard extends block_base {
                                 echo ' postbinding to '. $wn->$parentserie.'. ';
                             }
                             $treekeys[$wn->$parentserie]->childs[$wnid] = $wn;
-                            unset($waitingnodes[$wnid]); // free some stuff
+                            unset($waitingnodes[$wnid]); // Free some stuff.
                         }
                     }
                 }
             }
 
-            // if (!empty($debug)) print_object($treedata);
-
             if (@$this->config->inblocklayout) {
-                $url = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+                $url = new moodle_url('/course/view.php', array('id' => $COURSE->id.$coursepage, 'tsort'.$this->instance->id => $sort));
             } else {
-                $url = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&blocksid='.$this->instance->id.$coursepage.'&tsort'.$this->instance->id.'='.$sort;
+                $url = new moodle_url('/blocks/dashboard/view.php', array('id' => $COURSE->id, 'blockid' => $this->instance->id.$coursepage, 'tsort'.$this->instance->id => $sort));
             }
 
             $text .= $renderer->filters_and_params_form($this, $sort);
@@ -672,12 +678,17 @@ class block_dashboard extends block_base {
 
                     $text .= html_writer::table($table);
 
-                    $text .= "<div style=\"text-align:right\">";
-                    $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
+                    $text .= '<div style="text-align:right">';
+                    $params = array('id' => $COURSE->id,
+                                    'instance' => $this->instance->id,
+                                    'tsort'.$this->instance->id => $sort,
+                                    'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
                     $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
                     if ($filterquerystring) {
-                        $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort);
+                        $params = array('id' => $COURSE->id,
+                                        'instance' => $this->instance->id,
+                                        'tsort'.$this->instance->id => $sort);
                         $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
                         $text .= ' - <a href="'.$exporturl.$filterquerystring.'">'.$filteredexportstr.'</a>';
                     }
@@ -697,7 +708,7 @@ class block_dashboard extends block_base {
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort, 'alldata' => 1);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
-                    $text .= '<a href=\"'.$exporturl.'">'.$allexportstr.'</a>';
+                    $text .= '<a href="'.$exporturl.'">'.$allexportstr.'</a>';
 
                     $params = array('id' => $COURSE->id, 'instance' => $this->instance->id, 'tsort'.$this->instance->id => $sort);
                     $exporturl = new moodle_url('/blocks/dashboard/export/export_csv_tabular.php', $params);
@@ -742,7 +753,9 @@ class block_dashboard extends block_base {
 
             if ($this->config->graphtype != 'googlemap' && $this->config->graphtype != 'timeline') {
                 $data = $graphdata;
-                $text .= local_vflibs_jqplot_print_graph('dashboard'.$this->instance->id, $graphdesc, $data, $this->config->graphwidth, $this->config->graphheight, '', true, $ticks);
+                $text .= local_vflibs_jqplot_print_graph('dashboard'.$this->instance->id, $graphdesc, $data,
+                                                         $this->config->graphwidth, $this->config->graphheight,
+                                                         '', true, $ticks);
             } elseif ($this->config->graphtype == 'googlemap') {
                 $text .= $renderer->googlemaps_data($this, $data, $graphdesc);
             } else {
@@ -751,7 +764,8 @@ class block_dashboard extends block_base {
                 if (empty($this->config->timelineeventstart) || empty($this->config->timelineeventend)) {
                     $text .= $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
                 } else {
-                    $text .= timeline_print_graph($this, 'dashboard'.$this->instance->id, $this->config->graphwidth, $this->config->graphheight, $data, true);
+                    $text .= timeline_print_graph($this, 'dashboard'.$this->instance->id, $this->config->graphwidth,
+                                                  $this->config->graphheight, $data, true);
                 }
             }
             $text .= $OUTPUT->box_end();
@@ -764,14 +778,14 @@ class block_dashboard extends block_base {
 
         // Showing query.
         if (@$this->config->showquery) {
-            $text .= '<div class="dashboard-query-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+            $text .= '<div class="dashboard-query-box">';
             $text .= '<pre>'.$this->filteredsql.'</pre>';
             $text .= '</div>';
         }
 
         // Showing SQL benches.
         if (@$this->config->showbenches) {
-            $text .= '<div class="dashboard-benches-box" style="padding:1px;border:1px solid #808080;margin:2px;font-size:0.75em;font-family:monospace">';
+            $text .= '<div class="dashboard-benches-box">';
             $text .= '<table width="100%">';
             foreach ($this->benches as $bench) {
                 $value = $bench->end - $bench->start;
@@ -780,7 +794,7 @@ class block_dashboard extends block_base {
             $text .= '</table>';
             $text .= '</div>';
         }
-        $text .= '</div>'; // closing dashboard-panel
+        $text .= '</div>'; // Closing dashboard-panel.
 
         return $text;
     }
@@ -789,7 +803,7 @@ class block_dashboard extends block_base {
      * build a graph descriptor, taking some defaults decisions
      *
      */
-    function dashboard_graph_properties() {
+    public function dashboard_graph_properties() {
 
         $jqplot = array();
 
@@ -830,7 +844,7 @@ class block_dashboard extends block_base {
                 $jqplot['axes']['yaxis']['rendererOptions'] = array('base' => 10, 'tickDistribution' => 'even');
             }
 
-        } elseif ($this->config->graphtype == 'bar') {
+        } else if ($this->config->graphtype == 'bar') {
             $jqplot = array(
 
                  'seriesDefaults' => array(
@@ -865,7 +879,7 @@ class block_dashboard extends block_base {
                 $jqplot['axes']['yaxis']['renderer'] = '$.jqplot.LogAxisRenderer';
             }
 
-        } elseif ($this->config->graphtype == 'pie') {
+        } else if ($this->config->graphtype == 'pie') {
             $jqplot = array(
                 'seriesDefaults' => array(
                     'renderer' => '$.jqplot.PieRenderer',
@@ -880,9 +894,8 @@ class block_dashboard extends block_base {
                 'highlighter' => array(
                     'useAxesFormatters' => false,
                 ),
-
             );
-        } elseif ($this->config->graphtype == 'donut') {
+        } else if ($this->config->graphtype == 'donut') {
             $jqplot = array(
                 'seriesDefaults' => array(
                     'renderer' => '$.jqplot.DonutRenderer',
@@ -898,7 +911,7 @@ class block_dashboard extends block_base {
                     'useAxesFormatters' => false,
                 ),
             );
-        } elseif ($this->config->graphtype == 'timegraph') {
+        } else if ($this->config->graphtype == 'timegraph') {
             $jqplot = array(
                 'axesDefaults' => array(
                     'labelRenderer' => '$.jqplot.CanvasAxisLabelRenderer'
@@ -926,7 +939,7 @@ class block_dashboard extends block_base {
                 $jqplot['axes']['yaxis']['renderer'] = '$.jqplot.LogAxisRenderer';
                 $jqplot['axes']['yaxis']['rendererOptions'] = array('base' => 10, 'tickDistribution' => 'even');
             }
-        } elseif ($this->config->graphtype == 'googlemap') {
+        } else if ($this->config->graphtype == 'googlemap') {
             if (empty($this->config->maptype)) {
                 $this->config->maptype = 'ROADMAP';
             }
@@ -963,7 +976,7 @@ class block_dashboard extends block_base {
         if (!empty($this->config->tickspacing)) {
             $jqplot['axes']['yaxis']['tickInterval'] = (integer)$this->config->tickspacing;
         }
-        
+
         return $jqplot;
     }
 
@@ -974,7 +987,7 @@ class block_dashboard extends block_base {
      * rule 1 : avoiding any SQL words that refer to a change. Will resul in syntax error
      * rule 2 : avoiding closing char ";" to appear so a query cannot close to start a new one
      */
-    function protect($sql) {
+    public function protect($sql) {
         $sql = preg_replace('/\b(UPDATE|ALTER|DELETE|INSERT|DROP|CREATE)\b/i', '', $sql);
         $sql = preg_replace('/;/', '', $sql);
         return $sql;
@@ -984,10 +997,13 @@ class block_dashboard extends block_base {
      *
      *
      */
-    function get_count_records_sql($sql) {
-        $sql = "SELECT COUNT(*) FROM ($sql) as fullrecs ";
-        // $sql = preg_replace('/^\s*SELECT(.*?)\sFROM\s/si', 'SELECT COUNT(*) FROM', $sql);
-        // $sql = preg_replace('/\s*ORDER BY.*/si', '', $sql); // remove any ordering
+    public function get_count_records_sql($sql) {
+        $sql = "
+            SELECT
+                COUNT(*)
+            FROM
+                ($sql) as fullrecs
+        ";
         return $sql;
     }
 
@@ -995,15 +1011,15 @@ class block_dashboard extends block_base {
      * provides constraint values from filters 
      *
      */
-    function filter_get_results($fielddef, $fieldname, $specialvalue = '', $forcereload = false, &$printoutbuffer = null) {
-        static $FILTERSETS;
+    public function filter_get_results($fielddef, $fieldname, $specialvalue = '', $forcereload = false, &$printoutbuffer = null) {
+        static $FILTERSET;
         global $CFG, $DB, $PAGE;
 
         $config = get_config('block_dashboard');
 
         $tracing = 0;
 
-        // computes filter query
+        // Computes filter query.
 
         if (empty($this->filterfields->queries[$fielddef])) {
 
@@ -1016,7 +1032,7 @@ class block_dashboard extends block_base {
                 $sql = preg_replace('/MAX\(([^\(]+)\)/si', '$1', $sql);
                 $sql = preg_replace('/SUM\((.*?)\) AS/si', '$1 AS', $sql);
                 $sql = preg_replace('/COUNT\((?:DISTINCT)?([^\(]+)\)/si', '$1', $sql);
-        
+
                 // Purge from unwanted clauses.
                 if (preg_match('/\bGROUP BY\b/si', $sql)) {
                     $sql = preg_replace('/GROUP BY.*(?!GROUP BY).*$/si', '', $sql);
@@ -1039,13 +1055,13 @@ class block_dashboard extends block_base {
         $filtersql = $this->protect($filtersql);
 
         // Filter values return from cache.
-        if (isset($FILTERSETS) && array_key_exists($fielddef, $FILTERSETS) && empty($specialvalue)) {
+        if (isset($FILTERSET) && array_key_exists($fielddef, $FILTERSET) && empty($specialvalue)) {
             if (!empty($this->config->showfilterqueries)) {
                 if (!is_null($printoutbuffer)) {
                     $printoutbuffer .= "<div class=\"dashboard-filter-query\" style=\"padding:1px;border:1px solid #808080;margin:2px;font-size;0.75em;font-family:monospace\"><b>STATIC CACHED DATA FILTER :</b> $filtersql</div>";
                 }
             }
-            return $FILTERSETS[$fielddef];
+            return $FILTERSET[$fielddef];
         }
 
         // Check DB cache.
@@ -1063,7 +1079,6 @@ class block_dashboard extends block_base {
 
         if ((!$PAGE->user_is_editing() || !@$config->enable_isediting_security) && (!@$this->config->uselocalcaching || !$cachefootprint || ($cachefootprint && $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) || $forcereload)) {
             $DB->delete_records('block_dashboard_filter_cache', array('querykey' => $sqlkey, 'access' => $this->config->target));
-    
             list($usec, $sec) = explode(' ', microtime());
             $t1 = (float)$usec + (float)$sec;
 
@@ -1158,7 +1173,7 @@ class block_dashboard extends block_base {
      * by SQL radical (i.e., removing LIMIT and OFFSET clauses
      * LIMIT and OFFSET are applied to the local proxy.
      */
-    function fetch_dashboard_data($sql, $limit = '', $offset = '', $forcereload = false, $tracing = false) {
+    public function fetch_dashboard_data($sql, $limit = '', $offset = '', $forcereload = false, $tracing = false) {
         global $extra_db_CNX, $CFG, $DB, $PAGE;
 
         $config = get_config('block_dashboard');
@@ -1170,7 +1185,7 @@ class block_dashboard extends block_base {
 
         $results = array();
 
-        /* 
+        /*
          * we can get real data : 
          * Only if we are NOT editing => secures acces in case of bad strangled query
          * If we have no cache footprint and are needing one (cache expired or using cache and having no footprint)
@@ -1234,12 +1249,14 @@ class block_dashboard extends block_base {
                 }
             } else {
                 // TODO : enhance performance by using recordsets
-                
+
                 if (empty($extra_db_CNX)) {
                     extra_db_connect(false, $error);
                 }
 
-                if ($tracing) mtrace('Getting data from DB');
+                if ($tracing) {
+                    mtrace('Getting data from DB');
+                }
 
                 if ($allresults = extra_db_query($sql, false, true, $error)) {
                     foreach ($allresults as $reckey => $rec) {
@@ -1438,31 +1455,31 @@ class block_dashboard extends block_base {
     }
 
     /**
-    * determines if filter is global
-    * a global filter will be catched by all dashboard instances in the same page
-    */
+     * determines if filter is global
+     * a global filter will be catched by all dashboard instances in the same page
+     */
     public function is_filter_global($filterkey) {
         return strstr($this->filterfields->options[$filterkey], 'g') !== false;
     }
 
     /**
-    * determines if filter is single
-    * a single filter can only be constraint by a single value
-    */
+     * determines if filter is single
+     * a single filter can only be constraint by a single value
+     */
     public function is_filter_single($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 's') !== false ;
+        return strstr($this->filterfields->options[$filterkey], 's') !== false;
     }
 
     /**
-    * determines if filter must desaggregate from original query
-    */
+     * determines if filter must desaggregate from original query
+     */
     public function allow_filter_desaggregate($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 'x') === false ;
+        return strstr($this->filterfields->options[$filterkey], 'x') === false;
     }
 
     /**
-    *
-    */
+     *
+     */
     public function user_can_edit() {
         global $CFG, $COURSE;
 
@@ -1489,7 +1506,9 @@ class block_dashboard extends block_base {
 
         $this->sql = $this->config->query;
 
-        if (empty($this->config->exportcharset)) $this->config->exportcharset = 'utf8';
+        if (empty($this->config->exportcharset)) {
+            $this->config->exportcharset = 'utf8';
+        }
 
         // Output from query.
         $outputfields = explode(';', @$this->config->outputfields);
@@ -1705,24 +1724,33 @@ class block_dashboard extends block_base {
         $this->sql .= $havingparamsql;
         $this->filteredsql .= $havingparamsql;
 
+        $paramsql = '';
+        $paramfilteredsql = '';
         // Integrates where filtering.
-        $paramsql = implode(' AND ', $paramsqlarr);
-        if (!empty($paramsql)) {
-            $paramsql = " AND $paramsql ";
+        if (!preg_match('/\bWHERE\b/si', $this->sql)) {
+            $paramsql = ' WHERE 1=1 ';
         }
+        if (!preg_match('/\bWHERE\b/si', $this->filteredsql)) {
+            $paramfilteredsql = ' WHERE 1=1 ';
+        }
+        $paramsqlparts = implode(' AND ', $paramsqlarr);
+        if (!empty($paramsqlparts)) {
+            $paramsql .= " AND $paramsqlparts ";
+            $paramfilteredsql .= " AND $paramsqlparts ";
+        }
+        $group = groups_get_course_group($COURSE);
 
-        $group = groups_get_course_group();
         $this->sql = str_replace('<%%PARAMS%%>', $paramsql, $this->sql);
         $this->sql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->sql);
         $this->sql = str_replace('<%%CATID%%>', $COURSE->category, $this->sql);
         $this->sql = str_replace('<%%USERID%%>', $USER->id, $this->sql);
-        $this->sql = str_replace('<%%GROUPID%%>', $group->id, $this->sql);
+        $this->sql = str_replace('<%%GROUPID%%>', $group, $this->sql);
         $this->sql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->sql);
-        $this->filteredsql = str_replace('<%%PARAMS%%>', $paramsql, $this->filteredsql);
+        $this->filteredsql = str_replace('<%%PARAMS%%>', $paramfilteredsql, $this->filteredsql);
         $this->filteredsql = str_replace('<%%COURSEID%%>', $COURSE->id, $this->filteredsql);
         $this->filteredsql = str_replace('<%%CATID%%>', $COURSE->category, $this->filteredsql);
         $this->filteredsql = str_replace('<%%USERID%%>', $USER->id, $this->filteredsql);
-        $this->filteredsql = str_replace('<%%GROUPID%%>', $group->id, $this->filteredsql);
+        $this->filteredsql = str_replace('<%%GROUPID%%>', $group, $this->filteredsql);
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
 
         if (!empty($paramsurlvalues)) {
@@ -1783,6 +1811,7 @@ class block_dashboard extends block_base {
                 $canonicalfilter = (array_key_exists($filter, $this->filterfields->translations)) ? $this->filterfields->translations[$filter] : $filter;
                 $voidstr = null;
                 $default = (preg_match('/LAST|FIRST/i', $default)) ? $this->filter_get_results($filter, $canonicalfilter, $default, false, $voidstr /* no print out */) : $default ;
+
                 if ($this->is_filter_global($filter)) {
                     if (!array_key_exists('filter0_'.$canonicalfilter, $filterinputs)) {
                         $filterinputs['filter0_'.$canonicalfilter] = $default;
@@ -1799,7 +1828,7 @@ class block_dashboard extends block_base {
             foreach ($filterinputs as $key => $value) {
                 $radical = preg_replace('/filter\d+_/','', $key);
                 $sqlfiltername = (isset($this->filterfields->filtercanonicalfield[$radical])) ? $this->filterfields->filtercanonicalfield[$radical] : $radical ;
-                if (!empty($value)) {
+                if ($value !== '' && !is_null($value)) {
                     if (!is_array($value)) {
                         $filters[] = " $sqlfiltername = '".str_replace("'", "''", $value)."' ";
                     } else {
@@ -1813,14 +1842,14 @@ class block_dashboard extends block_base {
         }
 
         // Build filtering SQL clause and insert it at placeholder.
-        if (!empty($filters)) {
-            if (!preg_match('/\bWHERE\b/si', $this->sql)) {
-                $filterclause = ' WHERE '.implode('AND', $filters);
-            } else {
-                $filterclause = ' AND '. implode('AND', $filters);
-            }
+        if (!preg_match('/\bWHERE\b/si', $this->sql)) {
+            $filterclause = ' WHERE 1=1 ';
         }
-        $this->filteredsql = str_replace('<%%FILTERS%%>', $filterclause, $this->sql); 
+        if (!empty($filters)) {
+            $filterclause .= ' AND '. implode('AND', $filters);
+        }
+
+        $this->filteredsql = str_replace('<%%FILTERS%%>', $filterclause, $this->sql);
 
         return $filterquerystring;
     }
@@ -1948,7 +1977,7 @@ class block_dashboard extends block_base {
      * @param string $sort the current sorting state
      * @todo : move to renderer
      */
-    function add_sort_controls($fieldname, $sort) {
+    public function add_sort_controls($fieldname, $sort) {
         global $OUTPUT;
 
         $str = '';

@@ -70,7 +70,7 @@ Given a full query, the dashboard block mashes up :
 # Library locations
 ########################################
 
-Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_30_STABLE.zip
+Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_27_STABLE.zip
 and add the ocntent to the moodle/local directory
 
 Those libs are NOT moodle libs but additional public opensource libraries i use in several components as

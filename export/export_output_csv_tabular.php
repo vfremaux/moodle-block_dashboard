@@ -152,7 +152,7 @@ if ($results) {
 
     $str = print_cross_table_csv($theBlock, $m, $hcols, true);
 
-    if ($theBlock->config->exportcharset == 'utf8'){
+    if ($theBlock->config->exportcharset == 'utf8') {
         $str = utf8_decode($str); 
     }
 

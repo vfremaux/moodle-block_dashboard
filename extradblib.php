@@ -14,10 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-// ########################
-
 /**
  * @package block_dashboard
  * @category blocks
@@ -25,6 +21,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 2.0
  */
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Software environement wrappers
@@ -36,43 +33,47 @@ defined('MOODLE_INTERNAL') || die();
  * and full generic API is available.
  */
 
-// protect eventually against unwanted accesses
+// Protect eventually against unwanted accesses.
 extra_db_protect();
 
 function extra_db_protect() {
-    // TODO : implement environment dependant code here
+    // TODO : implement environment dependant code here.
 
-    // example : Moodle 1.9 environement : simplest way, non internationalised
-    if (!defined('MOODLE_INTERNAL')) die ('You cannot use this library this way');    
+    // Example : Moodle 1.9 environement : simplest way, non internationalised.
+    if (!defined('MOODLE_INTERNAL')) {
+        die ('You cannot use this library this way');
+    }
 }
 
 function extra_db_debugging() {
     // TODO : implement environment dependant code here
 
-    // example : Moodle 1.9 environement : simplest way, non internationalised
+    // Example : Moodle 1.9 environement : simplest way, non internationalised.
     return debugging();
 }
 
 /**
  * wraps to environement fatal error reporting function
  */
-function extra_db_error($error, $return = false){
+function extra_db_error($error, $return = false) {
     // TODO : implement environment dependant code here
-    
-    // example : Moodle 1.9 environement : simplest way, non internationalised
-    if ($return) return '<span class="error">'.$error.'</span>';
+
+    // Example : Moodle 1.9 environement : simplest way, non internationalised.
+    if ($return) {
+        return '<span class="error">'.$error.'</span>';
+    }
     echo($error);
 }
 
 /**
  * wraps to environement non fatal error reporting function (debugging)
  */
-function extra_db_notify($error){
+function extra_db_notify($error) {
     global $OUTPUT;
 
     // TODO : implement environment dependant code here
-    
-    // example : Moodle 1.9 environement : simplest way, non internationalised
+
+    // Example : Moodle 1.9 environement : simplest way, non internationalised.
     $OUTPUT->notification($error);
 }
 
@@ -82,7 +83,7 @@ function extra_db_notify($error){
 function extra_db_get_config($configkey) {
     // TODO : implement environment dependant code here
 
-    // example : Moodle 2 environement
+    // Example : Moodle 2 environement.
     $config = get_config('block_dashboard');
 
     return @$config->$configkey;
@@ -94,8 +95,7 @@ function extra_db_get_config($configkey) {
 function extra_db_set_config($configkey, $value) {
     // TODO : implement environment dependant code here
 
-    // example : Moodle 1.9 environement
-
+    // Example : Moodle 2 environement.
     set_config($configkey, $value, 'block_dashboard');
 }
 
@@ -114,15 +114,17 @@ function extra_db_connect($return = false, &$error) {
 
     $extra_dbhost = extra_db_get_config('extra_dbhost');
     if (empty($extra_dbhost)) {
-        extra_db_set_config('extra_db_host', 'localhost'); // Default host for PostGre
+        extra_db_set_config('extra_db_host', 'localhost'); // Default host for PostGre.
     }
 
     $extra_dbdb = extra_db_get_config('extra_db_db');
     if (empty($extra_dbdb)) {
-        extra_db_error("extra_db needs a DB"); // Default host for PostGre
+        extra_db_error("extra_db needs a DB"); // Default host for PostGre.
     }
 
-    $cnxstring = ' host='.extra_db_get_config('extra_db_host').' port='.extra_db_get_config('extra_db_port').' dbname='.extra_db_get_config('extra_db_db').' user='.extra_db_get_config('extra_db_user').' password='.extra_db_get_config('extra_db_password');
+    $cnxstring = ' host='.extra_db_get_config('extra_db_host').' port='.extra_db_get_config('extra_db_port').' ';
+    $cnxstring .= 'dbname='.extra_db_get_config('extra_db_db').' user='.extra_db_get_config('extra_db_user').' ';
+    $cnxstring .= 'password='.extra_db_get_config('extra_db_password');
 
     if (!$extra_db_CNX) {
         if (!$extra_db_CNX = pg_connect($cnxstring)) {

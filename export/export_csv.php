@@ -26,7 +26,7 @@ require('../../../config.php');
 
 $debug = optional_param('debug', false, PARAM_BOOL);
 if (!$debug){
-    // needs buffering for a really clean file output
+    // Needs buffering for a really clean file output.
     ob_start();
 } else {
     echo "<pre>Debugging mode\n";
@@ -43,7 +43,7 @@ $limit = optional_param('limit', '', PARAM_INT);
 $offset = optional_param('offset', '', PARAM_INT); 
 $alldata = optional_param('alldata', '', PARAM_INT); 
 
-if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
+if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
     print_error('badcourseid');
 }
 
@@ -70,15 +70,16 @@ if (!empty($theBlock->config->filters)) {
 }
 $theBlock->sql = str_replace('<%%FILTERS%%>', '', $theBlock->sql); // needed to prepare for filter range prefetch
 
-if (!empty($theBlock->params)){
+if (!empty($theBlock->params)) {
     $theBlock->prepare_params();
 }
 
 $sort = optional_param('tsort'.$theBlock->instance->id, '', PARAM_TEXT);
 if (!empty($sort)) {
     // do not sort if already sorted in explained query
-    if (!preg_match('/ORDER\s+BY/si', $theBlock->sql))
+    if (!preg_match('/ORDER\s+BY/si', $theBlock->sql)) {
         $theBlock->filteredsql .= " ORDER BY $sort";
+    }
 }
 
 $filteredsql = $theBlock->protect($theBlock->filteredsql);
@@ -86,14 +87,14 @@ $filteredsql = $theBlock->protect($theBlock->filteredsql);
 $results = $theBlock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
 
 if ($results) {
-    // Output csv file
+    // Output csv file.
     $exportname = (!empty($theBlock->config->title)) ? clean_filename($theBlock->config->title) : 'dashboard_export' ;
     header("Content-Type:text/csv\n\n");
     header("Content-Disposition:filename={$exportname}.csv\n\n");
 
     // Print column names.
     $headrow = array();
-    foreach($theBlock->output as $field => $label){
+    foreach($theBlock->output as $field => $label) {
         $headrow[] = $label;
     }
 
@@ -125,9 +126,9 @@ if ($results) {
             $row[] = $datum;
         }
         if ($theBlock->config->exportcharset == 'utf8') {
-            echo utf8_decode(implode($config->csv_field_separator, $row)); 
+            echo utf8_decode(implode($config->csv_field_separator, $row));
         } else {
-            echo implode($config->csv_field_separator, $row); 
+            echo implode($config->csv_field_separator, $row);
         }
         echo $config->csv_line_separator;
     }
