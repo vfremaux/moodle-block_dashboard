@@ -113,5 +113,5 @@ if (block_dashboard_supports_feature('emulate/community')) {
     $key = 'block_dashboard/emulatecommunity';
     $label = get_string('emulatecommunity', 'block_dashboard');
     $desc = get_string('emulatecommunity_desc', 'block_dashboard');
-    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, '1'));
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
 }
