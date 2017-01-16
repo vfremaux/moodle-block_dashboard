@@ -1,10 +1,33 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// Capabilitites
+/**
+ * @package    block_dashboard
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *  Exporter of dashboard data snapshot
+ */
+
+// Capabilitites.
 $string['dashboard:addinstance'] = 'Can add an instance';
 $string['dashboard:myaddinstance'] = 'Can add an instance to My Page';
 $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard:systempathaccess'] = 'Can configure output in system data path';
+$string['dashboard:export'] = 'Export data (web service)';
 
 $string['backtocourse'] = 'Back to course';
 $string['bar'] = 'Bars';
@@ -86,6 +109,10 @@ $string['configparent'] = 'Parent';
 $string['configparentserie'] = 'Parent serie';
 $string['configquery'] = 'Query';
 $string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Never forget the field separator is <b>necessarily</b> a ;</span>';
+$string['configqueryrotate'] = 'Rotate results ';
+$string['configrotatecolumns'] = 'Rotate colums ';
+$string['configrotatepivot'] = ' around column ';
+$string['configrotatenewkeys'] = ' with new PKeys ';
 $string['configsendadminnotification'] = 'Send admin notification on cron';
 $string['configserieslabels'] = 'Series labels';
 $string['configshowdata'] = 'Show data';
@@ -183,6 +210,9 @@ $string['day'] = 'Day';
 $string['dofilter'] = 'Filter';
 $string['donut'] = 'Donut';
 $string['dropconfig'] = 'Copy here the configuration string';
+$string['plugindist'] = 'Plugin distribution';
+$string['emulatecommunity'] = 'Emulate community version';
+$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['enabled'] = ' enabled';
 $string['eventdesc'] = 'Event desc';
 $string['eventend'] = 'Event end serie';
@@ -352,14 +382,15 @@ clause</p>
 <p>To setup distinct filters for resp. year and month, you should write:</p>
 <pre>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year<b>;</b>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y-%m\') as month</pre>
 
-<p>Beware : when using two filters, each of them provides its value list independently. Thus some filtering combination could result in "no values" ar all.</p>
+<p>Beware : when using two filters, each of them provides its value list independently. Thus some filtering combination
+could result in "no values" ar all.</p>
 
 <h4>Query configuration</h4>
 
 <p>Filters operate on query results depending on a  "&lt;%%FILTERS%%&gt;" marker that can complete or replace a WHERE clause.</p>
 <p><u>Valid location samples:</u></p>
 <pre>
-    SELECT 
+    SELECT
       data1,data2
     FROM
        table1 t1,
@@ -369,7 +400,7 @@ clause</p>
        data1
 </pre>
 <pre>
-    SELECT 
+    SELECT
       data1,data2
     FROM
        table1 t1,
@@ -383,7 +414,7 @@ clause</p>
 
 <p><u>Invalid location samples:</u></p>
 <pre>
-    SELECT 
+    SELECT
       data1,data2
     FROM
        table1 t1,
@@ -409,7 +440,7 @@ avoid to browse back to the "all data" situation.</p>
 <h4>Several filters</h4>
 
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
-(";" separated). Non used values should be left as "empty strings".</p> 
+(";" separated). Non used values should be left as "empty strings".</p>
 
 <h4>Special values</h4>
 
@@ -426,18 +457,21 @@ $string['configxaxis_help'] = '
 
 $string['configfilteroptions_help'] = '
 <h3>Filter options</h3>
-<p>Some special options can help to enrich or solved query struture isues. Each option string is a string with one char enablers that may be present (enabled) or absent (disabled).</p>
+<p>Some special options can help to enrich or solved query struture isues. Each option string is a string with one char
+enablers that may be present (enabled) or absent (disabled).</p>
 <h4>Values</h4>
 <ul>
     <li><b>m</b> : (multiple) makes the selector multiple so that set of possible values or ranges can be asked for.</li>
-    <li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined. Un filtre en mode "s" exclut le précédent.</li>
-    <li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values. You may try to disable this processing with the "x" option on. Sometimes it works.</li>
+    <li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined.
+    Un filtre en mode "s" exclut le précédent.</li>
+    <li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values.
+    You may try to disable this processing with the "x" option on. Sometimes it works.</li>
 </ul>
 
 <h4>Several filters</h4>
 
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
-(";" separated). Non used values should be left as "empty strings".</p> 
+(";" separated). Non used values should be left as "empty strings".</p>
 
 <h4>Example</h4>
 
@@ -451,13 +485,19 @@ $string['configfilteroptions_help'] = '
 <p>will allow choosing only one year for data, a month selection, and one day or all day range.</p>
 ';
 
+$string['configmaptype_help'] = '';
+
+$string['configeventmapping_help'] = '';
+
 $string['configgmdata_help'] = '
 <h3>Geolocated information</h3>
 
-<p>PLotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
+<p>Plotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
     or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
     coordinate and will cache this information.</p>
-<p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Geocoding API of Google</a> for more information.</p>
+<p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per
+day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Geocoding API of Google</a>
+for more information.</p>
 
 <h4>Geographic data settings</h4>
 
@@ -479,13 +519,16 @@ $string['configgmdata_help'] = '
 <li><i>Marker Class</i>: A classname, that will bind to a graphical icon</li>
 </ul>
 
-<p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or more field (or alias) names separated by semicolons (";").</p>
+<p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or
+more field (or alias) names separated by semicolons (";").</p>
 <ul>
 <li><i>Title input</i>: Query output fieldname providing the textual label</li>
 <li><i>Location input</i>: 
 <ul>
-<li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point values : "lat,lng" (ex : 47.098456,1.4534456)</li>
-<li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order : address, post code, city, and region code (*)</li>
+<li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point
+values : "lat,lng" (ex : 47.098456,1.4534456)</li>
+<li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order:
+address, post code, city, and region code (*)</li>
 </ul>
 </li>
 <li><i>Marker type input</i>: The query output fieldname that provides a class label</li>
@@ -504,7 +547,8 @@ $string['configoutputfields_help'] = '
 <h3>Data output</h3>
 
 <p>Specifies which output fields will be used in the output table (display data).</p>
-<p>Fields must be mentionned using real or aliased column identity. SQL statement must be represented by a named alias. Multiple output columns must be separated by semi-columns (;).</p>
+<p>Fields must be mentionned using real or aliased column identity. SQL statement must be represented by a named alias.
+Multiple output columns must be separated by semi-columns (;).</p>
 <h4>Example:</h4>
 <p>If query is: </p>
 <pre>
@@ -538,7 +582,8 @@ $string['configquery_help'] = '
 </ul>
 
 <h3>Placeholder for filters</h3>
-<p>If some data filtering is to be used, then a &lt;%%FILTERS%%&gt; tag needs to be inserted as placeholder in the original query as WHERE clause or for completing a WHERE clause</p>  
+<p>If some data filtering is to be used, then a &lt;%%FILTERS%%&gt; tag needs to be inserted as placeholder in
+the original query as WHERE clause or for completing a WHERE clause</p>
 ';
 
 $string['configsplitsumonsort_help'] = '
@@ -555,7 +600,7 @@ $string['configtabletype_help'] = '
 
 <p>This selector allows choosing the type of table that will be used for presenting data :</p>
 <ul><li><b>Linear</b>: Data re linearily displayed as records</li>
-<ul><li><b>Tabular</b>: data are presented within bidimensional tabular array. Extra params will need setup: 
+<ul><li><b>Tabular</b>: data are presented within bidimensional tabular array. Extra params will need setup:
     <ul><li>the unique column driving horizontal dimension</li>
         <li>Colomuns driving the vertical dimension.</li>
         <li>Data used for filling cells</li>
@@ -577,8 +622,7 @@ Data series MUST be output column names (or aliases) and are given as a semi-col
 
 <p>When a serie is mentionned as :</p>
 <pre>S(<i>serie_name</i>)</pre>
-<p>output values will be accumulated in order of the
-display. </p>
+<p>output values will be accumulated in order of the display. </p>
 ';
 
 $string['configbigresult_help'] = '
@@ -632,7 +676,7 @@ $string['configtabular_help'] = '
 <p>Tabular display show query results in a bidimensional table, using a special output field to produce
 columns and a set of fields to produce hierachic organised row captions.</p>
 <p>The printed data in cell is the value of the specified "output field", or in case it has been defined as
-a list, a n-uplet of values comming from correeponding output fields.  
+a list, a n-uplet of values comming from correeponding output fields.
 ';
 
 $string['configspliton_help'] = '
@@ -645,24 +689,25 @@ on the specified field, and eah time a new value il encountered, a table splitte
 $string['configsums_help'] = '
 <h3>Tabular table row and column sums</h3>
 
-<p>When enabling this feature, each row (resp. columns) will have an extra column (resp. row)  with the 
-sum of the cell value of the entire row. Note in ae of multiplet in cell, only the first numerial field is summated.  
+<p>When enabling this feature, each row (resp. columns) will have an extra column (resp. row)  with the
+sum of the cell value of the entire row. Note in ae of multiplet in cell, only the first numerial field is summated.</p>
 ';
 
 $string['configparentserie_help'] = '
-<p>This is the output field (resul column alias) that should contain a "parent" information, relative to the natural id of the result. the natural id refers to the first field of the result row.</p>  
+<p>This is the output field (resul column alias) that should contain a "parent" information, relative to the natural id of the result.
+The natural id refers to the first field of the result row.</p>
 ';
 
 $string['configtreeoutput_help'] = '
-<p>this field contains the list of columns providing the tree node caption.</p>  
+<p>this field contains the list of columns providing the tree node caption.</p>
 ';
 
 $string['configzoom_help'] = '
-<p>Google zoom factor. This helps to focus the appropriate geographic zone in the Google viewport.</p>  
+<p>Google zoom factor. This helps to focus the appropriate geographic zone in the Google viewport.</p>
 ';
 
 $string['configlocation_help'] = '
-<p>The central point of the map shown in viewport. You may retrieve directly those values using GoogleMaps interface.</p>  
+<p>The central point of the map shown in viewport. You may retrieve directly those values using GoogleMaps interface.</p>
 ';
 
 $string['configxaxisfield_help'] = '
@@ -674,16 +719,28 @@ $string['configxaxisfield_help'] = '
 ';
 
 $string['configexplicitscaling_help'] = '
-<p>Usually, JQPlot will automate the graph axis scale and viewport bounds. You may force some bounding and grid parameters here. JQPlot may not always follow your recomendations exaly in some cases (unknown reasons).</p>
+<p>Usually, JQPlot will automate the graph axis scale and viewport bounds. You may force some bounding and grid parameters here.
+JQPlot may not always follow your recomendations exaly in some cases (unknown reasons).</p>
 ';
 
 $string['configfilelocation_help'] = '
-<p>When cron data refresh is programmed on a cached dashboard, a file output an be scheduled. This setting will define the file path the file has to be generated in.</p>
+<p>When cron data refresh is programmed on a cached dashboard, a file output an be scheduled. This setting will define the file
+path the file has to be generated in.</p>
 <p><b>Beware :</b> This path needs to bind to an existing storage context.</p>
 ';
 
 $string['configfilelocationadmin_help'] = '
 <p>If you see this option, you probably are a site administrator. 
-This allows to add a special path start from dataroot in order to store the genrated file in a non standard location in moodledata.</p> ';
+This allows to add a special path start from dataroot in order to store the genrated file in a non standard location in moodledata.</p>';
 
 $string['confighorodatefiles_help'] = 'When enabled, a timestamp will be added at the end of each generated filename';
+
+$string['configqueryrotate_help'] = '
+#Result rotation
+
+Because SQL queries cannot make the output column set dynamic, SQL queries cannot query for matricial results. Results
+rotation is a way to transform a flat result into a dynamic bidimensional matrix. This is usefull e.g. for feeding 
+several curves in a multiple serie graph from a single flat query source. rotation will convert some field result rows
+into an expansion of the results columns, remapping the pivot column data to form a bidimensional matrix.
+
+';

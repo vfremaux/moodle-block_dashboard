@@ -22,6 +22,7 @@
  */
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/block_dashboard.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_setup_renderer.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/dashboard/js/module.js', true);
@@ -58,7 +59,8 @@ $PAGE->set_url(new moodle_url('/blocks/dashboard/view.php', array('id' => $cours
 $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
 
-$renderer = $PAGE->get_renderer('block_dashboard');
+$renderer = $PAGE->get_renderer('block_dashboard', 'setup');
+$renderer->set_block($theblock);
 
 echo $OUTPUT->header();
 
@@ -66,7 +68,53 @@ echo $OUTPUT->box_start();
 
 echo '<form name="setup" action="#" method="post">';
 
-include($CFG->dirroot.'/blocks/dashboard/setup_instance.html');
+if (!isset($theblock->config)) {
+    $theblock->config = new StdClass();
+}
+
+if (!isset($theblock->config->target)) {
+    $theblock->config->target = 'moodle';
+}
+if (!isset($theblock->config->hidetitle)) {
+    $theblock->config->hidetitle = 0;
+}
+if (!isset($theblock->config->showdata)) {
+    $theblock->config->showdata = 1;
+}
+if (!isset($theblock->config->showgraph)) {
+    $theblock->config->showgraph = 1;
+}
+if (!isset($theblock->config->shownumsums)) {
+    $theblock->config->shownumsums = 1;
+}
+if (!isset($theblock->config->showquery)) {
+    $theblock->config->showquery = 0;
+}
+if (!isset($theblock->config->showfilterqueries)) {
+    $theblock->config->showfilterqueries = 0;
+}
+if (!isset($theblock->config->inblocklayout)) {
+    $theblock->config->inblocklayout = ($COURSE->format == 'page') ? 1 : 0;
+}
+
+echo $renderer->form_header();
+echo $renderer->layout();
+echo $renderer->setup_tabs();
+echo $renderer->query_description();
+echo $renderer->query_params();
+echo $renderer->output_params();
+echo $renderer->tabular_params();
+echo $renderer->treeview_params();
+echo $renderer->graph_params();
+echo $renderer->google_params();
+echo $renderer->timeline_params();
+echo $renderer->summators();
+if (block_dashboard_supports_feature('result/colouring')) {
+    echo $renderer->tablecolor_mapping();
+}
+echo $renderer->data_refresh();
+echo $renderer->file_output();
+echo $renderer->setup_returns($theblock);
 
 echo '</form>';
 

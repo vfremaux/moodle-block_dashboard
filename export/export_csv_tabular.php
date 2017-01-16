@@ -26,7 +26,7 @@ require('../../../config.php');
 
 $debug = optional_param('debug', false, PARAM_BOOL);
 if (!$debug) {
-    // needs buffering for a really clean file output
+    // Needs buffering for a really clean file output.
     ob_start();
 } else {
     echo "<pre>Debugging mode\n";
@@ -34,11 +34,11 @@ if (!$debug) {
 
 $config = get_config('block_dashboard');
 
-$courseid = required_param('id', PARAM_INT); // the course ID
-$instanceid = required_param('instance', PARAM_INT); // the block ID
-$output = optional_param('output', 'csv', PARAM_ALPHA); // output format (csv)
+$courseid = required_param('id', PARAM_INT); // The course ID.
+$instanceid = required_param('instance', PARAM_INT); // The block ID.
+$output = optional_param('output', 'csv', PARAM_ALPHA); // Output format (csv).
 $limit = optional_param('limit', '', PARAM_INT);
-$offset = optional_param('offset', '', PARAM_INT); 
+$offset = optional_param('offset', '', PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
     print_error('badcourseid');
@@ -50,59 +50,60 @@ if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid")
     print_error('badblockinstance', 'block_dashboard');
 }
 
-$theBlock = block_instance('dashboard', $instance);
+$theblock = block_instance('dashboard', $instance);
 
-// prepare data for tables
+// Prepare data for tables.
 
-$theBlock->prepare_config();
+$theblock->prepare_config();
 
-if (!empty($theBlock->config->filters)) {
-    $theBlock->prepare_filters();
+if (!empty($theblock->config->filters)) {
+    $theblock->prepare_filters();
 } else {
-    $theBlock->filteredsql = str_replace('<%%FILTERS%%>', '', $theBlock->sql);
+    $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }
 
-$theBlock->sql = str_replace('<%%FILTERS%%>', '', $theBlock->sql); // needed to prepare for filter range prefetch
+$theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
 
-if (!empty($theBlock->params)) {
-    $theBlock->prepare_params();
+if (!empty($theblock->params)) {
+    $theblock->prepare_params();
 } else {
-    $theBlock->filteredsql = str_replace('<%%PARAMS%%>', '', $theBlock->filteredsql);
+    $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql);
 }
-$theBlock->sql = str_replace('<%%PARAMS%%>', '', $theBlock->sql); // needed to prepare for filter range prefetch
+$theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
 
-$sort = optional_param('tsort'.$theBlock->instance->id, '', PARAM_TEXT);
+$sort = optional_param('tsort'.$theblock->instance->id, '', PARAM_TEXT);
 
 if (!empty($sort)) {
-    // do not sort if already sorted in explained query
-    if (!preg_match('/ORDER\s+BY/si', $theBlock->sql)) {
-        $theBlock->filteredsql .= " ORDER BY $sort";
+    // Do not sort if already sorted in explained query.
+    if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
+        $theblock->filteredsql .= " ORDER BY $sort";
     }
 }
 
-$filteredsql = $theBlock->protect($theBlock->filteredsql);
+$filteredsql = $theblock->protect($theblock->filteredsql);
 
-$results = $theBlock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
+$results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
 
 if ($results) {
     // Output csv file.
-    $exportname = (!empty($theBlock->config->title)) ? clean_filename($theBlock->config->title) : 'dashboard_export' ;
+    $exportname = (!empty($theblock->config->title)) ? clean_filename($theblock->config->title) : 'dashboard_export' ;
     header("Content-Type:text/csv\n\n");
     header("Content-Disposition:filename={$exportname}.csv\n\n");
 
     $hcols = array();
     // Print data.
     foreach ($results as $r) {
-        // this is a tabular table
-        /* in a tabular table, data can be placed :
-        * - in first columns in order of vertical keys
-        * - in first columns in order of vertical keys
-        * the results are grabbed sequentially and spread into the matrix 
-        */
+        // This is a tabular table.
+        /*
+         * in a tabular table, data can be placed :
+         * - in first columns in order of vertical keys
+         * - in first columns in order of vertical keys
+         * the results are grabbed sequentially and spread into the matrix 
+         */
         $keystack = array();
         $matrix = array();
 
-        foreach (array_keys($theBlock->vertkeys->formats) as $vkey) {
+        foreach (array_keys($theblock->vertkeys->formats) as $vkey) {
             if (empty($vkey)) {
                 continue;
             }
@@ -110,7 +111,7 @@ if ($results) {
             $matrix[] = "['".addslashes($vkeyvalue)."']";
         }
 
-        $hkey = $theBlock->config->horizkey;
+        $hkey = $theblock->config->horizkey;
         $hkeyvalue = (!empty($hkey)) ? $r->$hkey :  '';
         $matrix[] = "['".addslashes($hkeyvalue)."']";
         $matrixst = "\$m".implode($matrix);
@@ -121,39 +122,35 @@ if ($results) {
 
         // Now put the cell value in it.
         $outvalues = array();
-        foreach (array_keys($theBlock->outputf) as $field) {
+        foreach (array_keys($theblock->outputf) as $field) {
 
-            // did we ask for cumulative results ? 
+            // Did we ask for cumulative results ?
             $cumulativeix = null;
             if (preg_match('/S\((.+?)\)/', $field, $matches)) {
                 $field = $matches[1];
-                $cumulativeix = $theBlock->instance->id.'_'.$field;
+                $cumulativeix = $theblock->instance->id.'_'.$field;
             }
 
-            if (!empty($theBlock->outputf[$field])){
-                $datum = dashboard_format_data($theBlock->outputf[$field], $r->$field, $cumulativeix);
+            if (!empty($theblock->outputf[$field])){
+                $datum = dashboard_format_data($theblock->outputf[$field], $r->$field, $cumulativeix);
             } else {
                 $datum = dashboard_format_data(null, @$r->$field, $cumulativeix);
             }
-            /*
-            // no colour possible that way in excel
-            if (!empty($theBlock->config->colorfield) && $theBlock->config->colorfield == $field){
-                $datum = dashboard_colour_code($theBlock, $datum, $colorcoding);
-            }
-            */
+
             if (!empty($datum)) {
                 $outvalues[] = str_replace('"', '\\"', $datum);
             }
         }
         $matrixst .= ' = "'.implode(' ',$outvalues).'"';
 
-        // make the matrix in memory
+        // Make the matrix in memory.
         eval($matrixst.";");
     }
 
-    $str = print_cross_table_csv($theBlock, $m, $hcols, true);
+    $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
+    $str = $csvrenderer->cross_table_csv($theblock, $m, $hcols);
 
-    if ($theBlock->config->exportcharset == 'utf8') {
+    if ($theblock->config->exportcharset == 'utf8') {
         echo utf8_decode($str); 
     } else {
         echo $str;

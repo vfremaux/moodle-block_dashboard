@@ -21,6 +21,14 @@ div.dashboard-query-box{
    margin:1px;
 }
 
+.dashboard-filter-query {
+    border:1px solid #808080;
+    font-size:0.75em;
+    font-family:monospace;
+    padding:1px;
+    margin:2px;
+}
+
 table.dashboard-table{
    border: 1px solid #7E7ACB;
    border-collapse:separate;
@@ -184,8 +192,8 @@ div.dashboard-special{
 }
 
 .dashboard-panel{
-    overflow:scroll;
     font-size:0.9em;
+    overflow:scroll;
 }
 
 .dashbobard-filter-query{
@@ -218,4 +226,15 @@ table.dashboard-setup td {
     border-radius:3px;
     box-shadow: 10px 10px 5px #888888;
     font-size:1.05em;
+}
+
+.dashboard-table-buttons {
+    padding-top:10px;
+    text-align:right;
+}
+
+.dashboard-table-buttons div,
+.dashboard-table-buttons form,
+.dashboard-table-buttons form div {
+    display:inline-block;
 }

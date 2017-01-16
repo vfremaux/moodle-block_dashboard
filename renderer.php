@@ -19,7 +19,6 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.x
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -27,74 +26,6 @@ defined('MOODLE_INTERNAL') || die();
  * Main renderer class for block dashboard
  */
 class block_dashboard_renderer extends plugin_renderer_base {
-
-    /**
-     * Print tabs for setup screens.
-     * @param object $theblock a dashboard block instance
-     */
-    public function setup_tabs($theblock) {
-
-        $config = $theblock->config;
-
-        $tabs = array(
-            array('querydesc', get_string('querydesc', 'block_dashboard'), true),
-            array('queryparams', get_string('queryparams', 'block_dashboard'), true),
-            array('outputparams', get_string('outputparams', 'block_dashboard'), true),
-            array('tabularparams', get_string('tabularparams', 'block_dashboard'), (!empty($config->tabletype) && $config->tabletype == 'tabular') ? true : false ),
-            array('treeviewparams', get_string('treeviewparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'treeview') ? true : false ),
-            array('graphparams', get_string('graphparams', 'block_dashboard'), true),
-            array('googleparams', get_string('googleparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'googlemap') ? true : false ),
-            array('timelineparams', get_string('timelineparams', 'block_dashboard'), (!empty($config->graphtype) && $config->graphtype == 'timeline') ? true : false ),
-            array('summatorsparams', get_string('summatorsparams', 'block_dashboard'), true),
-            array('tablecolormapping', get_string('tablecolormapping', 'block_dashboard'), true),
-            array('datarefresh', get_string('datarefresh', 'block_dashboard'), true),
-            array('fileoutput', get_string('fileoutput', 'block_dashboard'), true),
-        );
-
-        $str = '<div id="dashboardsettings-menu" class="tabtree">';
-        $str .= '<ul class="nav nav-tabs">';
-        foreach ($tabs as $tabarr) {
-            list($tabkey, $tabname, $visible) = $tabarr;
-            $class = ($tabkey == 'querydesc') ? 'active ' : '';
-            $class .= ($visible) ? "on" : "off" ;
-            $tabname = str_replace(' ', '&nbsp;', $tabname);
-            $link = '<a href="Javascript:open_panel(\''.$tabkey.'\')"><span>'.$tabname.'</span></a>';
-            $str .= '<li id="setting-tab-'.$tabkey.'" class="setting-tab '.$class.'">'.$link.'</li> ';
-        }
-        $str .= '</ul>';
-
-        return $str;
-    }
-
-    /**
-     *
-     * @param object $theblock a dashboard block instance
-     */
-    public function setup_returns($theblock) {
-        global $COURSE;
-
-        $str = '<table width="100%" cellpadding="5" cellspacing="0">';
-        $str .= '<tr>';
-        $str .= '<td colspan="3" align="center">';
-
-        $params = array('id' => $COURSE->id, 'instance' => $theblock->instance->id, 'what' => 'upload');
-        $copyurl = new moodle_url('/blocks/dashboard/copyconfig.php', $params);
-        $button = <input type="button" name="go_import" value="'.get_string('importconfig', 'block_dashboard').'">;
-        $str .= '<a href="'.$copyurl.'">'.$button.'</a>&nbsp;';
-
-        $params = array('id' => $COURSE->id, 'instance' => $theblock->instance->id, 'what' => 'get');
-        $exporturl = new moodle_url('/blocks/dashboard/copyconfig.php', $params);
-        $buton = '<input type="button" name="go_export" value="'.get_string('exportconfig', 'block_dashboard').'">';
-        $str .= '<a href="'.$exporturl.'" target="_blank">'.$button.'</a>&nbsp;';
-        $str .= '<input type="submit" name="submit" value="'.get_string('savechanges').'" />&nbsp;';
-        $str .= '<input type="submit" name="save" value="'.get_string('savechangesandconfig', 'block_dashboard').'" />';
-        $str .= '<input type="submit" name="saveview" value="'.get_string('savechangesandview', 'block_dashboard').'" />';
-        $str .= '</td>';
-        $str .= '</tr>';
-        $str .= '</table>';
-
-        return $str;
-    }
 
     /**
      * An HTML raster for a matrix cross table
@@ -120,7 +51,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $subsums->subs = array();
         $subsums->all = array();
 
-        table_explore_rec($theblock, $str, $path, $hcols, $m, $vkeys, $hlabel, count($vkeys->formats), $subsums);
+        dashboard_table_explore_rec($theblock, $str, $path, $hcols, $m, $vkeys, $hlabel, count($vkeys->formats), $subsums);
 
         if (!empty($theblock->config->vertsums)) {
 
@@ -383,9 +314,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         if (!empty($theblock->config->filters) || !empty($theblock->params)) {
             $text .= '<form class="dashboard-filters" name="dashboardform'.$theblock->instance->id.'" method="GET">';
-            $text .= '<input type="hidden" name="id" value="'.s($COURSE->id).'" />';
+            $text .= '<input type="hidden" name="id" value="'.$COURSE->id.'" />';
             if (!@$theblock->config->inblocklayout) {
-                $text .= '<input type="hidden" name="blockid" value="'.s($theblock->instance->id).'" />';
+                $text .= '<input type="hidden" name="blockid" value="'.$theblock->instance->id.'" />';
+            } else {
+                $blockid = optional_param('blockid', 0, PARAM_INT);
+                $text .= '<input type="hidden" name="blockid" value="'.$blockid.'" />';
             }
             if ($COURSE->format == 'page') {
                 if (!empty($coursepage)) {
@@ -416,7 +350,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             if (!$javascripthandler) {
                 // Has been emptied, then no autocommit.
                 $strdofilter = get_string('dofilter', 'block_dashboard');
-                $jshandler = 'autosubmit = 1; submitdashboardfilter("dashboardform'.$theblock->instance->id'")';
+                $jshandler = 'autosubmit = 1; submitdashboardfilter(\'dashboardform'.$theblock->instance->id.'\')';
                 $text .= '&nbsp;&nbsp;<input type="button" onclick="'.$jshandler.'" value="'.$strdofilter.'" />';
                 // Post inhibits the submit function as result of filtering construction.
                 $text .= '<script type="text/javascript"> autosubmit = 0; </script>';
@@ -448,7 +382,8 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            $fieldname = (isset($theblock->filterfields->translations[$afield])) ? $theblock->filterfields->translations[$afield] : $afield;
+            $cond = isset($theblock->filterfields->translations[$afield]);
+            $fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
 
             $filterresults = $theblock->filter_get_results($afield, $fieldname, false, false, $str);
 
@@ -458,12 +393,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     $filterset['0'] = '*';
                 }
                 foreach (array_values($filterresults) as $value) {
-                    $radical = preg_replace('/^.*\./', '', $fieldname); // Removes table scope explicitators.
+                    // Removes table scope explicitators.
+                    $radical = preg_replace('/^.*\./', '', $fieldname);
                     $filterset[$value->$radical] = $value->$radical;
                 }
                 $str .= '<span class="dashboard-filter">'.$theblock->filterfields->labels[$afield].':</span>';
-                $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true ; 
-                $arrayform = ($multiple) ? '[]' : '' ;
+                $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
+                $arrayform = ($multiple) ? '[]' : '';
 
                 if (!is_array(@$theblock->filtervalues[$radical])) {
                     $unslashedvalue = stripslashes(@$theblock->filtervalues[$radical]);
@@ -484,9 +420,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 }
 
                 if ($theblock->is_filter_global($afield)) {
-                    $str .= html_writer::select($filterset, "filter0_{$radical}{$arrayform}", $unslashedvalue, array('' => 'choosedots'), $selectoptions);
+                    $key = "filter0_{$radical}{$arrayform}";
+                    $str .= html_writer::select($filterset, $key, $unslashedvalue, array('' => 'choosedots'), $selectoptions);
                 } else {
-                    $str .= html_writer::select($filterset, "filter{$theblock->instance->id}_{$radical}{$arrayform}", $unslashedvalue, array('' => 'choosedots'), $selectoptions);
+                    $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
+                    $str .= html_writer::select($filterset, $key, $unslashedvalue, array('' => 'choosedots'), $selectoptions);
                 }
                 $str .= "&nbsp;&nbsp;";
             }
@@ -560,6 +498,187 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         $str .= '</div>';
+        return $str;
+    }
+
+    /**
+     * Renders each declared sum as HTML
+     *
+     */
+    function numsums(&$theblock, &$aggr) {
+
+        $str = '';
+
+        $str .= $this->output->box_start('dashboard-sumative-box', '');
+        foreach (array_keys($theblock->numsumsf) as $numsum) {
+            if (!empty($theblock->numsumsf[$numsum])) {
+                $formattedsum = dashboard_format_data($theblock->numsumsf[$numsum], @$aggr->$numsum);
+            } else {
+                $formattedsum = 0 + @$aggr->$numsum;
+            }
+            $str .= $theblock->outputnumsums[$numsum].' : <b>'.$formattedsum.'</b>&nbsp;&nbsp;&nbsp;&nbsp;';
+        }
+        $str .= $this->output->box_end(true);
+
+        return $str;
+    }
+
+    public function export_buttons(&$theblock, $filterquerystring) {
+        global $COURSE;
+
+        // Passed to each buttons.
+        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
+
+        $tableexportstr = get_string('exportdataastable', 'block_dashboard');
+
+        $str = '<div class="dashboard-table-buttons">';
+
+        $str .= $this->allexport_button($theblock);
+        if ($filterquerystring) {
+            $str .= $this->filteredexport_button($theblock, $filterquerystring);
+        }
+        if (empty($theblock->config->filepathadminoverride)) {
+            $str .= $this->fileview_button($theblock);
+        }
+        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+        $str .= "</div>";
+
+        return $str;
+    }
+
+    public function tabular_buttons($theblock, $filterquerystring) {
+        global $COURSE;
+
+        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
+
+        $tableexportstr = get_string('exportdataastable', 'block_dashboard');
+
+        $str = '<div class="dashboard-table-buttons">';
+
+        $str .= $this->allexport_button($theblock);
+
+        $params = array('id' => $COURSE->id,
+                        'instance' => $theblock->instance->id,
+                        'tsort'.$theblock->instance->id => $this->sort);
+        $exporturl = new moodle_url('/blocks/dashboard/export/export_csv_tabular.php', $params);
+        $str .= $this->output->single_button($exporturl.$filterquerystring, $tableexportstr);
+
+        if (empty($theblock->config->filepathadminoverride)) {
+            $str .= $this->fileview_button($theblock);
+        }
+        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+
+        $str .= '</div>';
+
+        return $str;
+    }
+
+    public function tree_buttons($theblock, $filterquerystring) {
+        global $COURSE;
+
+        // passed to each buttons.
+        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
+
+        $str = '<div class="dashboard-table-buttons">';
+
+        $str .= $this->allexport_button($theblock);
+        if (empty($theblock->config->filepathadminoverride)) {
+            $str .= $this->fileview_button($theblock);
+        }
+        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+
+        $str .= '</div>';
+
+        return $str;
+    }
+
+    protected function allexport_button($theblock) {
+        global $COURSE;
+
+        $allexportstr = get_string('exportall', 'block_dashboard');
+        $params = array('id' => $COURSE->id,
+                        'instance' => $theblock->instance->id,
+                        'tsort'.$theblock->instance->id => $this->sort,
+                        'alldata' => 1);
+        $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
+        return $this->output->single_button($exporturl, $allexportstr);
+    }
+
+    protected function filteredexport_button(&$theblock, $filterquerystring) {
+        global $COURSE;
+
+        $filteredexportstr = get_string('exportfiltered', 'block_dashboard');
+        $params = array('id' => $COURSE->id,
+                        'instance' => $theblock->instance->id,
+                        'tsort'.$theblock->instance->id => $this->sort);
+        $exporturl = new moodle_url('/blocks/dashboard/export/export_csv.php', $params);
+        return $this->output->single_button($exporturl.$filterquerystring, $filteredexportstr);
+    }
+
+    protected function fileview_button(&$theblock) {
+        global $COURSE;
+
+        $filesviewstr = get_string('filesview', 'block_dashboard');
+        $params = array('id' => $COURSE->id,
+                        'instance' => $theblock->instance->id);
+        $fileareaurl = new moodle_url('/blocks/dashboard/export/filearea.php', $params);
+        return $this->output->single_button($fileareaurl, $filesviewstr);
+    }
+
+    protected function filteredoutput_button(&$theblock, $filterquerystring) {
+        global $COURSE;
+
+        $filteredoutputstr = get_string('outputfiltered', 'block_dashboard');
+        $params = array('id' => $COURSE->id,
+                        'instance' => $theblock->instance->id,
+                        'tsort'.$theblock->instance->id => $this->sort);
+        $exporturl = new moodle_url('/blocks/dashboard/export/export_output_csv.php', $params);
+        return $this->output->single_button($exporturl.$filterquerystring, $filteredoutputstr);
+    }
+
+    /**
+     * Builds column sorting controls
+     * @param string $fieldname the fieldname represented by the current data column
+     * @param string $sort the current sorting state
+     * @todo : move to renderer
+     */
+    public function sort_controls($theblock, $fieldname, $sort) {
+
+        $str = '';
+
+        $baseurl = new moodle_url(me());
+        $baseurl->remove_params('tsort');
+
+        if (preg_match('/(\w*?) DESC/', $sort, $matches)) {
+            $sortfield = $matches[1];
+            $dir = 'DESC';
+        } else {
+            $sortfield = str_replace(' ASC', '', $sort);
+            $dir = 'ASC';
+        }
+
+        if ($sortfield != $fieldname) {
+            $pix = '<img src="'.$this->output->pix_url('sinactive', 'block_dashboard').'" />';
+            $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
+        } else {
+            if ($dir == 'DESC') {
+                $pix = '<img src="'.$this->output->pix_url('sdesc', 'block_dashboard').'" />';
+                $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
+            } else {
+                $pix = '<img src="'.$this->output->pix_url('sasc', 'block_dashboard').'" />';
+                $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' DESC">'.$pix.'</a>';
+            }
+        }
+        return $str;
+    }
+
+    public function dhtmlxcalendar_style() {
+        global $CFG;
+
+        $cssurl = $CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/dhtmlxcalendar.css';
+        $str = '<link type="text/css" rel="stylesheet" href="'.$cssurl.'" />';
+        $cssurl = $CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css';
+        $str .= '<link type="text/css" rel="stylesheet" href="'.$cssurl.'" />';
         return $str;
     }
 }

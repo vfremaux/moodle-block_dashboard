@@ -19,7 +19,6 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.0
  */
 defined('MOODLE_INTERNAL') || die();
 
@@ -56,7 +55,7 @@ function extra_db_debugging() {
  * wraps to environement fatal error reporting function
  */
 function extra_db_error($error, $return = false) {
-    // TODO : implement environment dependant code here
+    // TODO : implement environment dependant code here.
 
     // Example : Moodle 1.9 environement : simplest way, non internationalised.
     if ($return) {
@@ -81,7 +80,7 @@ function extra_db_notify($error) {
  *
  */
 function extra_db_get_config($configkey) {
-    // TODO : implement environment dependant code here
+    // TODO : implement environment dependant code here.
 
     // Example : Moodle 2 environement.
     $config = get_config('block_dashboard');
@@ -93,7 +92,7 @@ function extra_db_get_config($configkey) {
  *
  */
 function extra_db_set_config($configkey, $value) {
-    // TODO : implement environment dependant code here
+    // TODO : implement environment dependant code here.
 
     // Example : Moodle 2 environement.
     set_config($configkey, $value, 'block_dashboard');
@@ -105,11 +104,11 @@ function extra_db_set_config($configkey, $value) {
  * connects to ERP database on a new postgre connection
  */
 function extra_db_connect($return = false, &$error) {
-    global $extra_db_CNX;
+    global $extradbcnx;
 
     $extra_dbport = extra_db_get_config('extra_db_port');
     if (empty($extra_dbport)) {
-        extra_db_set_config('extra_db_port', 5432); // Default port for PostGre
+        extra_db_set_config('extra_db_port', 5432); // Default port for PostGre.
     }
 
     $extra_dbhost = extra_db_get_config('extra_dbhost');
@@ -126,8 +125,8 @@ function extra_db_connect($return = false, &$error) {
     $cnxstring .= 'dbname='.extra_db_get_config('extra_db_db').' user='.extra_db_get_config('extra_db_user').' ';
     $cnxstring .= 'password='.extra_db_get_config('extra_db_password');
 
-    if (!$extra_db_CNX) {
-        if (!$extra_db_CNX = pg_connect($cnxstring)) {
+    if (!$extradbcnx) {
+        if (!$extradbcnx = pg_connect($cnxstring)) {
             $error = extra_db_error("Cannot connect to extra_db Database", $return);
             return false;
         }
@@ -139,10 +138,10 @@ function extra_db_connect($return = false, &$error) {
  * closes to ERP database on a new postgre connection
  */
 function extra_db_close() {
-    global $extra_db_CNX;
+    global $extradbcnx;
 
-    if ($extra_db_CNX) {
-        pg_close($extra_db_CNX);
+    if ($extradbcnx) {
+        pg_close($extradbcnx);
     }
 }
 
@@ -150,14 +149,14 @@ function extra_db_close() {
  *
  */
 function extra_db_query($sql, $renew = false, $return = false, &$error) {
-    global $extra_db_CNX;
+    global $extradbcnx;
     static $querycache;
 
     if (!isset($querycache)) {
         $querycache = array();
     }
 
-    if (!$extra_db_CNX) {
+    if (!$extradbcnx) {
         if ($return) {
             $error = "Attempt to use extra_db database with an unset connexion";
             return false;
@@ -170,7 +169,7 @@ function extra_db_query($sql, $renew = false, $return = false, &$error) {
     if (array_key_exists($cachekey, $querycache) && !$renew) {
         return $querycache[$cachekey];
     } else {
-        if ($res = pg_query($extra_db_CNX, $sql)) {
+        if ($res = pg_query($extradbcnx, $sql)) {
             while ($arr = pg_fetch_assoc($res)) {
                 $keys = array_keys($arr);
                 $key = $arr[$keys[0]];
@@ -181,7 +180,7 @@ function extra_db_query($sql, $renew = false, $return = false, &$error) {
         } else {
             if (extra_db_debugging()) {
                 extra_db_notify($sql);
-                extra_db_notify(pg_last_error($extra_db_CNX));
+                extra_db_notify(pg_last_error($extradbcnx));
             }
             return false;
         }

@@ -22,8 +22,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+$data = $_POST;
+
 if (array_key_exists('submit', $_POST)) {
-    $data = $_POST;
 
     unset($data['submit']);
 
@@ -34,7 +35,6 @@ if (array_key_exists('submit', $_POST)) {
 }
 
 if ($save) {
-    $data = $_POST;
 
     unset($data['save']);
 
@@ -45,7 +45,6 @@ if ($save) {
 }
 
 if ($saveview) {
-    $data = $_POST;
 
     unset($data['save']);
 

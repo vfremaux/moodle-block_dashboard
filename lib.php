@@ -19,9 +19,58 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.x
  */
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Tells wether a feature is supported or not. Gives back the 
+ * implementation path where to fetch resources.
+ * @param string $feature a feature key to be tested.
+ */
+function block_dashboard_supports_feature($feature) {
+    global $CFG;
+    static $supports;
+
+    if (!isset($supports)) {
+        $supports = array(
+            'pro' => array(
+                'format' => array('xls', 'csv'),
+                'config' => array('importexport'),
+                'result' => array('rotation'),
+                'result' => array('export'),
+            ),
+            'community' => array(
+                'format' => array('csv'),
+            ),
+        );
+    }
+
+    // Check existance of the 'pro' dir in plugin.
+    if (is_dir(__DIR__.'/pro')) {
+        if ($feature == 'emulate/community') {
+            return 'pro';
+        }
+        if (empty($config->emulatecommunity)) {
+            $versionkey = 'pro';
+        } else {
+            $versionkey = 'community';
+        }
+    } else {
+        $versionkey = 'community';
+    }
+
+    list($feat, $subfeat) = explode('/', $feature);
+
+    if (!array_key_exists($feat, $supports[$versionkey])) {
+        return false;
+    }
+
+    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
+        return false;
+    }
+
+    return $versionkey;
+}
 
 /**
  * A low level utility to format data in a cell
@@ -130,7 +179,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
  * Recursive worker for printing bidimensional table
  *
  */
-function table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null) {
+function dashboard_table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$t, &$vkeys, $hlabel, $keydeepness, &$subsums = null) {
     static $level = 0;
     static $r = 0;
 
@@ -142,7 +191,7 @@ function table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
         array_push($pathstack, $k);
         $level++;
         if ($level < $keydeepness) {
-            table_explore_rec($theblock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
+            dashboard_table_explore_rec($theblock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
         } else {
             $pre = "<tr class=\"row r{$r}\" >";
             $r = ($r + 1) % 2;
@@ -218,166 +267,6 @@ function table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$t, &$vkeys
 }
 
 /**
- * An HTML raster for a matrix cross table
- * printing raster uses a recursive cell drilldown over dynamic matrix dimension
- */
-function print_cross_table_csv(&$theblock, &$m, &$hcols, $return = false) {
-
-    $str = '';
-
-    dashboard_print_table_header_csv($str, $theblock, $hcols);
-    // Print flipped array.
-    $path = array();
-
-    $theblock->subsums = new StdClass;
-    $theblock->subsums->subs = array();
-    $theblock->subsums->all = array();
-
-    table_explore_rec_csv($theblock, $str, $path, $hcols, $m, $return);
-
-    if ($return) {
-        return $str;
-    }
-    echo $str;
-}
-
-/**
- * Recursive worker for CSV table writing
- *
- */
-function table_explore_rec_csv(&$theblock, &$str, &$pathstack, &$hcols, &$t, $return) {
-    global $CFG;
-
-    $config = get_config('block_dashboard');
-
-    static $level = 0;
-    static $r = 0;
-
-    $keydeepness = count($theblock->vertkeys->formats);
-    $vformats = array_values($theblock->vertkeys->formats);
-    $vcolumns = array_keys($theblock->vertkeys->formats);
-
-    foreach ($t as $k => $v) {
-        $plittable = false;
-        array_push($pathstack, $k);
-
-        $level++;
-        if ($level < $keydeepness) {
-            table_explore_rec_csv($theblock, $str, $pathstack, $hcols, $v, $return);
-        } else {
-            $r = ($r + 1) % 2;
-            $c = 0;
-            $pre = '';
-            foreach ($pathstack as $pathelm) {
-                if (!empty($vformats[$c])) {
-                    $pathelm = dashboard_format_data($vformats[$c], $pathelm);
-                }
-                if (!empty($theblock->config->cleandisplay)) {
-                    if ($pathelm != @$vkeys->mem[$c]) {
-                        $pre .= "$pathelm".$config->csv_field_separator;
-                        if (isset($vkeys->mem[$c]) && @$theblock->config->spliton == $vcolumns[$c]) {
-                            // First split do not play.
-                            // If vertsums are enabled, print vertsubs.
-                            if ($theblock->config->vertsums) {
-                                $span = count($pathstack);
-                                $subtotalstr = get_string('subtotal', 'block_dashboard');
-                                $str .= "$subtotalstr".$config->csv_field_separator;
-                                foreach ($hcols as $col) {
-                                    $str .= $theblock->subsumsf->subs[$col].$config->csv_field_separator;
-                                    $theblock->subsums->subs[$col] = 0;
-                                }
-                                if ($theblock->config->horizsums) {
-                                    $str .= $config->csv_field_separator;
-                                }
-                                $str .= $config->csv_line_separator;
-                            }
-
-                            // Then close previous table.
-                            dashboard_print_table_header_csv($str, $theblock, $hcols);
-                        }
-                        $theblock->vertkeys->mem[$c] = $pathelm;
-                    } else {
-                        $pre .= $config->csv_field_separator;
-                    }
-                } else {
-                    $pre .= "$pathelm".$config->csv_field_separator;
-                }
-                $c++;
-            }
-
-            $str .= $pre;
-
-            $sum = 0;
-            foreach ($hcols as $col) {
-                if (array_key_exists($col, $v)) {
-                    $str .= "{$v[$col]}".$config->csv_field_separator;
-                } else {
-                    $str .= ''.$config->csv_field_separator;
-                }
-                $sum = dashboard_sum($sum, strip_tags(@$v[$col]));
-                if (@$theblock->config->vertsums) {
-                    $theblock->subsums->subs[$col] = dashboard_sum(@$subsums->subs[$col], strip_tags(@$v[$col]));
-                    $theblock->subsums->all[$col] = dashboard_sum(@$subsums->all[$col], strip_tags(@$v[$col]));
-                }
-                $c++;
-            }
-
-            if (@$theblock->config->horizsums) {
-                $str .= $sum.$config->csv_field_separator;
-            }
-
-            // Chop last value.
-
-            $str = preg_replace("/{$config->csv_field_separator}$/", '', $str);
-
-            if (!$return) {
-                if ($theblock->config->exportcharset == 'utf8') {
-                    echo utf8_decode($str); 
-                } else {
-                    echo $str; 
-                }
-                echo $config->csv_line_separator;
-            } else {
-                $str .= $config->csv_line_separator;
-            }
-        }
-        $level--;
-        array_pop($pathstack);
-    }
-}
-
-/**
- * prints the first line as column titles
- */
-function dashboard_print_table_header_csv(&$str, &$theblock, &$hcols) {
-    global $CFG;
-
-    $config = get_config('block_dashboard');
-
-    $vlabels = array_values($theblock->vertkeys->labels);
-
-    $row = array();
-    foreach ($theblock->vertkeys->labels as $vk => $vlabel) {
-        $row[] = $vlabel;
-    }
-
-    foreach ($hcols as $hc) {
-        $row[] = $hc;
-    }
-
-    if (isset($theblock->config->horizsums)) {
-        $row[] = get_string('total', 'block_dashboard');
-    }
-
-    if ($theblock->config->exportcharset == 'utf8') {
-        $str .= utf8_decode(implode($config->csv_field_separator, $row));
-    } else {
-        $str .= implode($config->csv_field_separator, $row);
-    }
-    $str .= $config->csv_line_separator;
-}
-
-/**
  * processes given colour coding to a datum
  * @param object $theblock full block information
  *
@@ -425,34 +314,10 @@ function dashboard_prepare_colourcoding(&$config) {
     if (!empty($config->colorfield)) {
         $colors = explode("\n", @$config->colors);
         $colorvalues = explode("\n", @$config->coloredvalues);
-        dashboard_normalize($colorvalues, $colors); // normailzes options to keys
+        dashboard_normalize($colorvalues, $colors); // Normailzes options to keys.
         $colorcoding = array_combine($colorvalues, $colors);
     }
     return $colorcoding;
-}
-
-
-/**
- * Renders each declared sum as HTML
- *
- */
-function dashboard_render_numsums(&$theblock, &$aggr) {
-    global $OUTPUT;
-
-    $str = '';
-
-    $str .= $OUTPUT->box_start('dashboard-sumative-box', '', true);
-    foreach (array_keys($theblock->numsumsf) as $numsum) {
-        if (!empty($theblock->numsumsf[$numsum])) {
-            $formattedsum = dashboard_format_data($theblock->numsumsf[$numsum], @$aggr->$numsum);
-        } else {
-            $formattedsum = 0 + @$aggr->$numsum;
-        }
-        $str .= $theblock->outputnumsums[$numsum].' : <b>'.$formattedsum.'</b>&nbsp;&nbsp;&nbsp;&nbsp;';
-    }
-    $str .= $OUTPUT->box_end(true);
-
-    return $str;
 }
 
 /**
@@ -556,6 +421,9 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
     send_stored_file($file, 0, 0, false); // Download MUST be forced - security!
 }
 
+/**
+ * Creates an output file somewhere and fill it with output content.
+ */
 function dashboard_output_file(&$theblock, $str) {
     global $CFG;
 
@@ -567,7 +435,8 @@ function dashboard_output_file(&$theblock, $str) {
         fclose($FILE);
     } else {
         $location = (empty($theblock->config->filelocation)) ? '/' : $theblock->config->filelocation;
-        $location = (preg_match('/^\//', $theblock->config->filelocation)) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation ;
+        $cond = preg_match('/^\//', $theblock->config->filelocation);
+        $location = ($cond) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation ;
 
         $filerecord = new StdClass();
         $filerecord->component = 'block_dashboard';
@@ -585,8 +454,8 @@ function dashboard_output_file(&$theblock, $str) {
         $fs = get_file_storage();
 
         // Get file and deletes if exists.
-        $file = $fs->get_file($filerecord->contextid, $filerecord->component, $filerecord->filearea, 
-                $filerecord->itemid, $filerecord->filepath, $filerecord->filename);
+        $file = $fs->get_file($filerecord->contextid, $filerecord->component, $filerecord->filearea,
+                              $filerecord->itemid, $filerecord->filepath, $filerecord->filename);
 
         // Delete it if it exists.
         if ($file) {
@@ -623,7 +492,12 @@ function dashboard_sum($v1, $v2) {
         $hours = $T1[0] + $T2[0] + floor($mins / 60);
         $mins = $mins % 60;
         return "$hours:$mins:$secs";
-    } else if ((preg_match('/\d+:\d+/', $v1) || empty($v1)) && (preg_match('/\d+:\d+/', $v2) || empty($v2)) && !(empty($v1) && empty($v2))) {
+    } else if ((preg_match('/\d+:\d+/', $v1) ||
+            empty($v1)) &&
+                    (preg_match('/\d+:\d+/', $v2) ||
+                            empty($v2)) &&
+                                    !(empty($v1) &&
+                                            empty($v2))) {
 
         // Compatible time values.
         if (empty($v1)) {

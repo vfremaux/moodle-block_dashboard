@@ -37,7 +37,7 @@ $settings->add(new admin_setting_configtext($key, $label, $desc, @$CFG->dashboar
 $key = 'block_dashboard/extra_db_port';
 $label = get_string('dashboard_extra_db_port', 'block_dashboard');
 $desc = get_string('dashboard_extra_db_port_desc', 'block_dashboard');
-$settings->add(new admin_setting_configtext($key, $label, $deesc, @$CFG->dashboard_extra_db_port));
+$settings->add(new admin_setting_configtext($key, $label, $desc, @$CFG->dashboard_extra_db_port));
 
 $key = 'block_dashboard/extra_db_db';
 $label = get_string('dashboard_extra_db_db', 'block_dashboard');
@@ -106,3 +106,12 @@ $key = 'block_dashboard/csv_line_separator';
 $label = get_string('csvlineseparator', 'block_dashboard');
 $desc = get_string('csvfieldseparator_desc', 'block_dashboard');
 $settings->add(new admin_setting_configselect($key, $label, $desc, "\n", $seplineoptions));
+
+if (block_dashboard_supports_feature('emulate/community')) {
+    $settings->add(new admin_setting_heading('plugindisthdr', get_string('plugindist', 'block_dashboard'), ''));
+
+    $key = 'block_dashboard/emulatecommunity';
+    $label = get_string('emulatecommunity', 'block_dashboard');
+    $desc = get_string('emulatecommunity_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, '1'));
+}
