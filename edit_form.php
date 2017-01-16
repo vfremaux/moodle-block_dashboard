@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Form for editing HTML block instances.
  *
@@ -24,6 +22,9 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright 2012 Valery Fremaux
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 
 /**
  * Form for editing dashboard block instances.
@@ -42,7 +43,7 @@ class block_dashboard_edit_form extends block_edit_form {
 
         $mform->addElement('checkbox', 'config_hidetitle', '', get_string('checktohide', 'block_dashboard'));
 
-        /** Layout settings **/
+        // Layout settings ---------------------------------------------------------------.
 
         $mform->addElement('header', 'configheader1', get_string('dashboardlayout', 'block_dashboard'));
 
@@ -52,21 +53,26 @@ class block_dashboard_edit_form extends block_edit_form {
 
         $mform->addElement('header', 'configheader20', get_string('configdashboardparams', 'block_dashboard'));
         $generalparamsconfigstr = get_string('generalparams', 'block_dashboard');
-        $generalparmsurl = new moodle_url('/blocks/dashboard/setup.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id));
+        $params = array('id' => $COURSE->id, 'instance' => $this->block->instance->id);
+        $generalparmsurl = new moodle_url('/blocks/dashboard/setup.php', $params);
         $generalparamslink = '<a href="'.$generalparmsurl.'">'.$generalparamsconfigstr.'</a>';
 
         $mform->addElement('static', '', '', $generalparamslink);
         $mform->setExpanded('configheader20');
 
-        $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
-        $importconfigstr = get_string('importconfig', 'block_dashboard');
-        $exportconfigstr = get_string('exportconfig', 'block_dashboard');
-        $copyconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload'));
-        $import_export = '<a href="'.$copyconfigurl.'">'.$importconfigstr.'</a> - ';
-        $exportconfigurl = new moodle_url('/blocks/dashboard/copyconfig.php', array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get'));
-        $import_export .= '<a href="'.$exportconfigurl.'" target="_blank">'.$exportconfigstr.'</a>';
+        if (block_dashboard_supports_feature('config/importexport')) {
+            $mform->addElement('header', 'configheader19', get_string('configimportexport', 'block_dashboard'));
+            $importconfigstr = get_string('importconfig', 'block_dashboard');
+            $exportconfigstr = get_string('exportconfig', 'block_dashboard');
+            $params = array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'upload');
+            $copyconfigurl = new moodle_url('/blocks/dashboard/pro/copyconfig.php', $params);
+            $import_export = '<a href="'.$copyconfigurl.'">'.$importconfigstr.'</a> - ';
+            $params = array('id' => $COURSE->id, 'instance' => $this->block->instance->id, 'what' => 'get');
+            $exportconfigurl = new moodle_url('/blocks/dashboard/pro/copyconfig.php', $params);
+            $import_export .= '<a href="'.$exportconfigurl.'" target="_blank">'.$exportconfigstr.'</a>';
 
-        $mform->addElement('static', '', '', $import_export);
+            $mform->addElement('static', '', '', $import_export);
+        }
 
         $mform->addElement('header', 'configheader195', get_string('configcharset', 'block_dashboard'));
         $charsetopt['utf8'] = 'Utf-8';

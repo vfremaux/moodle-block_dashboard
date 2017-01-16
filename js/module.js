@@ -1,7 +1,11 @@
+/**
+ *
+ */
+// jshint undef:false, unused:false
 
 function showmoreoptions(selectobj){
 
-    for(i = 0 ; i < selectobj.options.length ; i++){
+    for(i = 0; i < selectobj.options.length; i++) {
         var divid = selectobj.options[i].value + 'params';
         divobj = document.getElementById(divid);
         if (divobj){
@@ -10,10 +14,10 @@ function showmoreoptions(selectobj){
         }
     }
 
-    if (selectobj.selectedIndex){
+    if (selectobj.selectedIndex) {
         var divid = selectobj.options[selectobj.selectedIndex].value + 'params';
         divobj = document.getElementById(divid);
-        if (divobj){
+        if (divobj) {
             divobj.style.visibility = 'visible';
             divobj.style.display = 'block';
         }
@@ -32,7 +36,7 @@ function open_panel(panelid) {
 var autosubmit = 1;
 
 function submitdashboardfilter(instance) {
-    if (autosubmit){
+    if (autosubmit) {
         document.forms[instance].submit();
     }
 }
