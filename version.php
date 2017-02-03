@@ -17,20 +17,21 @@
 /**
  * Version details.
  *
- * @package    block_dashboard
- * @category   blocks
- * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     block_dashboard
+ * @category    blocks
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * VFLibs can be found at http://github.com/vfremaux/moodle-local_vflibs
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015100906;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2016032400;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2014050800;        // Requires this Moodle version.
 $plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics).
-$plugin->release = '2.7.0 (build 2015100900)';
+$plugin->release = '2.7.0 (build 2016032400)';
 $plugin->maturity = MATURITY_RC;
 $plugin->dependencies = array('local_vflibs' => '*');
 
