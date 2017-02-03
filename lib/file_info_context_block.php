@@ -33,14 +33,19 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class file_info_context_block extends file_info {
+
     /** @var stdClass Course object */
     protected $course;
+
     /** @var stdClass Course module object */
     protected $instance;
+
     /** @var string Module name */
     protected $blockname;
+
     /** @var array Available file areas */
     protected $areas;
+
     /** @var array caches the result of last call to get_non_empty_children() */
     protected $nonemptychildren;
 
@@ -64,13 +69,13 @@ class file_info_context_block extends file_info {
 
         include_once($CFG->dirroot.'/blocks/'.$blockname.'/lib.php');
 
-        //find out all supported areas
+        // Find out all supported areas.
         $functionname = 'block_'.$blockname.'_get_file_areas';
         $functionname_old = $blockname.'_get_file_areas';
 
         if (function_exists($functionname)) {
             $this->areas = $functionname($course, $instance, $context);
-        } elseif (function_exists($functionname_old)) {
+        } else if (function_exists($functionname_old)) {
             $this->areas = $functionname_old($course, $instance, $context);
         } else {
             $this->areas = array();
@@ -90,7 +95,7 @@ class file_info_context_block extends file_info {
     public function get_file_info($component, $filearea, $itemid, $filepath, $filename) {
         global $CFG;
 
-        // try to emulate require_login() tests here
+        // Try to emulate require_login() tests here.
         if (!isloggedin()) {
             return null;
         }
@@ -101,7 +106,7 @@ class file_info_context_block extends file_info {
         }
 
         if (!is_viewing($coursecontext) and !is_enrolled($coursecontext)) {
-            // no peaking here if not enrolled or inspector
+            // No peaking here if not enrolled or inspector.
             return null;
         }
 
@@ -110,7 +115,7 @@ class file_info_context_block extends file_info {
         }
 
         require_once $CFG->dirroot.'/blocks/'.$this->blockname.'/lib.php';
-        $functionname     = 'block_'.$this->blockname.'_get_file_info';
+        $functionname = 'block_'.$this->blockname.'_get_file_info';
         $functionname_old = $this->blockname.'_get_file_info';
 
         if (function_exists($functionname)) {
@@ -122,43 +127,6 @@ class file_info_context_block extends file_info {
         return null;
     }
 
-    /**
-     * Get a file from module backup area
-     *
-     * @param int $itemid item ID
-     * @param string $filepath file path
-     * @param string $filename file name
-     * @return file_info|null
-     */
-     /*
-    protected function get_area_backup($itemid, $filepath, $filename) {
-        global $CFG;
-
-        if (!has_capability('moodle/backup:backupactivity', $this->context)) {
-            return null;
-        }
-
-        $fs = get_file_storage();
-
-        $filepath = is_null($filepath) ? '/' : $filepath;
-        $filename = is_null($filename) ? '.' : $filename;
-        if (!$storedfile = $fs->get_file($this->context->id, 'backup', 'activity', 0, $filepath, $filename)) {
-            if ($filepath === '/' and $filename === '.') {
-                $storedfile = new virtual_root_file($this->context->id, 'backup', 'activity', 0);
-            } else {
-                // not found
-                return null;
-            }
-        }
-
-        $downloadable = has_capability('moodle/backup:downloadfile', $this->context);
-        $uploadable   = has_capability('moodle/restore:uploadfile', $this->context);
-
-        $urlbase = $CFG->wwwroot.'/pluginfile.php';
-        return new file_info_stored($this->browser, $this->context, $storedfile, $urlbase, get_string('activitybackup', 'repository'), false, $downloadable, $uploadable, false);
-    }
-	*/
-	
     /**
      * Returns localised visible name.
      *
@@ -224,9 +192,10 @@ class file_info_context_block extends file_info {
      */
     private function get_filtered_children($extensions = '*', $countonly = false, $returnemptyfolders = false) {
         global $DB;
-        // prepare list of areas including intro and backup
-        $areas = array(
-        );
+
+        // Prepare list of areas including intro and backup.
+        $areas = array();
+
         foreach ($this->areas as $area => $description) {
             $areas[] = array('block_'.$this->blockname, $area);
         }
@@ -235,16 +204,21 @@ class file_info_context_block extends file_info {
         list($sql2, $params2) = $this->build_search_files_sql($extensions);
         $children = array();
         foreach ($areas as $area) {
-            if (!$returnemptyfolders) {
-                // fast pre-check if there are any files in the filearea
+            if (!$rfeturnemptyfolders) {
+                // Fast pre-check if there are any files in the filearea.
                 $params1['component'] = $area[0];
                 $params1['filearea'] = $area[1];
-                if (!$DB->record_exists_sql('SELECT 1 from {files}
-                        WHERE contextid = :contextid
-                        AND filename <> :emptyfilename
-                        AND component = :component
-                        AND filearea = :filearea '.$sql2,
-                        array_merge($params1, $params2))) {
+                $sql = '
+                    SELECT
+                        1
+                    FROM
+                        {files}
+                    WHERE
+                        contextid = :contextid AND
+                        filename <> :emptyfilename AND
+                        component = :component AND
+                        filearea = :filearea '.$sql2;
+                if (!$DB->record_exists_sql($sql, array_merge($params1, $params2))) {
                     continue;
                 }
             }

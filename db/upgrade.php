@@ -27,8 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_block_dashboard_upgrade($oldversion=0) {
-    global $CFG, $DB;
+function xmldb_block_dashboard_upgrade($oldversion = 0) {
 
     $result = true;
 

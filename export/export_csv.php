@@ -23,10 +23,12 @@
  */
 
 require('../../../config.php');
+require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_csv_renderer.php');
 
 $debug = optional_param('debug', false, PARAM_BOOL);
-if (!$debug){
-    // needs buffering for a really clean file output
+if (!$debug) {
+    // Needs buffering for a really clean file output.
     ob_start();
 } else {
     echo "<pre>Debugging mode\n";
@@ -36,9 +38,9 @@ $config = get_config('block_dashboard');
 
 require_once $CFG->dirroot.'/blocks/dashboard/lib.php';
 
-$courseid = required_param('id', PARAM_INT); // the course ID
-$instanceid = required_param('instance', PARAM_INT); // the block ID
-$output = optional_param('output', 'csv', PARAM_ALPHA); // output format (csv)
+$courseid = required_param('id', PARAM_INT); // The course ID.
+$instanceid = required_param('instance', PARAM_INT); // The block ID.
+$output = optional_param('output', 'csv', PARAM_ALPHA); // Output format (csv).
 $limit = optional_param('limit', '', PARAM_INT);
 $offset = optional_param('offset', '', PARAM_INT); 
 $alldata = optional_param('alldata', '', PARAM_INT); 
@@ -47,90 +49,58 @@ if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
     print_error('badcourseid');
 }
 
-// Security.
-
-require_login($course);
-
 if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))){
     print_error('badblockinstance', 'block_dashboard');
 }
 
-$theBlock = block_instance('dashboard', $instance);
+$theblock = block_instance('dashboard', $instance);
 
-$theBlock->prepare_config();
-// $theBlock->prepare_filters();
-$theBlock->prepare_params();
+// Security.
 
-/// fetch data
+require_login($course);
 
-if (!empty($theBlock->config->filters)) {
-    $theBlock->prepare_filters();
+$theblock->prepare_config();
+$theblock->prepare_params();
+
+// Fetch data.
+
+if (!empty($theblock->config->filters)) {
+    $theblock->prepare_filters();
 } else {
-    $theBlock->filteredsql = str_replace('<%%FILTERS%%>', '', $theBlock->sql);
+    $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }
-$theBlock->sql = str_replace('<%%FILTERS%%>', '', $theBlock->sql); // needed to prepare for filter range prefetch
+$theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
 
-if (!empty($theBlock->params)){
-    $theBlock->prepare_params();
+if (!empty($theblock->params)) {
+    $theblock->prepare_params();
 }
 
-$sort = optional_param('tsort'.$theBlock->instance->id, '', PARAM_TEXT);
+$sort = optional_param('tsort'.$theblock->instance->id, '', PARAM_TEXT);
 if (!empty($sort)) {
-    // do not sort if already sorted in explained query
-    if (!preg_match('/ORDER\s+BY/si', $theBlock->sql))
-        $theBlock->filteredsql .= " ORDER BY $sort";
+    // Do not sort if already sorted in explained query.
+    if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
+        $theblock->filteredsql .= " ORDER BY $sort";
+    }
 }
 
-$filteredsql = $theBlock->protect($theBlock->filteredsql);
+$filteredsql = $theblock->protect($theblock->filteredsql);
 
-$results = $theBlock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
+$theblock->results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // Get all data.
 
-if ($results) {
-    // Output csv file
-    $exportname = (!empty($theBlock->config->title)) ? clean_filename($theBlock->config->title) : 'dashboard_export' ;
+if ($theblock->results) {
+    // Output csv file.
+    $exportname = (!empty($theblock->config->title)) ? clean_filename($theblock->config->title) : 'dashboard_export' ;
     header("Content-Type:text/csv\n\n");
     header("Content-Disposition:filename={$exportname}.csv\n\n");
 
-    // Print column names.
-    $headrow = array();
-    foreach($theBlock->output as $field => $label){
-        $headrow[] = $label;
+    if (!$debug) {
+        ob_end_clean();
     }
 
-    if (!$debug) ob_end_clean();
-    if ($theBlock->config->exportcharset == 'utf8') {
-        echo utf8_decode(implode($config->csv_field_separator, $headrow)); 
-    } else {
-        echo implode($config->csv_field_separator, $headrow); 
-    }
-    echo $config->csv_line_separator;
+    $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
+    $csvdata = $csvrenderer->export($theblock);
+    echo $csvdata;
 
-    // print data
-    foreach ($results as $r) {
-        $row = array();
-        foreach ($theBlock->output as $field => $label) {
-
-            // did we ask for cumulative results ? 
-            $cumulativeix = null;
-            if (preg_match('/S\((.+?)\)/', $field, $matches)) {
-                $field = $matches[1];
-                $cumulativeix = $theBlock->instance->id.'_'.$field;
-            }
-
-            if (!empty($theBlock->outputf[$field])) {
-                $datum = dashboard_format_data($theBlock->outputf[$field], @$r->$field, $cumulativeix);
-            } else {
-                $datum = dashboard_format_data(null, @$r->$field, $cumulativeix);
-            }
-            $row[] = $datum;
-        }
-        if ($theBlock->config->exportcharset == 'utf8') {
-            echo utf8_decode(implode($config->csv_field_separator, $row));
-        } else {
-            echo implode($config->csv_field_separator, $row);
-        }
-        echo $config->csv_line_separator;
-    }
 } else {
     echo "No results. Empty file";
 }
