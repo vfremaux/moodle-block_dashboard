@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    block_dashboard
+ * @category   blocks
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *  Exporter of dashboard data snapshot
+ */
 
 require('../../../config.php');
 require_once($CFG->dirroot.'/lib/filelib.php');
@@ -20,7 +42,7 @@ if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid")
     print_error('badblockinstance', 'block_dashboard');
 }
 
-$theBlock = block_instance('dashboard', $instance);
+$theblock = block_instance('dashboard', $instance);
 
 $context = context_block::instance($instanceid);
 
@@ -30,12 +52,13 @@ if ($action == 'clear') {
     $fs->delete_area_files($context->id, 'block_dashboard', 'generated', $instanceid);
 }
 
-$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
-if (!empty($theBlock->config->title)) {
-    $PAGE->navbar->add($theBlock->config->title, NULL);
+$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), null);
+if (!empty($theblock->config->title)) {
+    $PAGE->navbar->add($theblock->config->title, null);
 }
 
-$url = new moodle_url('/blocks/dashboard/export/filearea.php', array('id' => $courseid, 'instance' => $instanceid));
+$params = array('id' => $courseid, 'instance' => $instanceid);
+$url = new moodle_url('/blocks/dashboard/export/filearea.php', $params);
 $PAGE->set_context($context);
 $PAGE->set_url($url);
 $PAGE->set_title($SITE->shortname);
@@ -54,7 +77,7 @@ $path = array();
 $files = array();
 $dirs = array();
 if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated', $instanceid, $browsepath, null)) {
-    // build a Breadcrumb trail
+    // Build a Breadcrumb trail.
     $level = $fileinfo->get_parent();
 
     while ($level) {
@@ -68,10 +91,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
 
     foreach ($children as $child) {
         if ($child->is_directory()) {
-            // echo $child->get_visible_name();
-            // display contextid, itemid, component, filepath and filename
             $dirs[] = $child;
-            // var_dump($child->get_params());
         } else {
             $files[] = $child;
         }
@@ -95,7 +115,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
 
     echo '<div class="block-dashboard-entrylist">';
     echo '<table with="80%">';
-    
+
     foreach ($dirs as $dir) {
         $dirinfo = $dir->get_params();
         echo '<tr>';
@@ -115,7 +135,8 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
         echo '<img src="'.$OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype())).'">';
         echo '</td>';
         echo '<td>';
-        $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'], $info['itemid'], $info['filepath'], $info['filename']);
+        $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
+                                                         $info['itemid'], $info['filepath'], $info['filename']);
         echo '<a href="'.$pluginfileurl.'">'.$file->get_visible_name().'</a>';
         echo '</td>';
         echo '</tr>';
@@ -126,12 +147,13 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
 
     echo '</div>';
 } else {
-    echo "<div class=\"block-dashboard-entrylist\">No files</div>";
+    echo '<div class="block-dashboard-entrylist">No files</div>';
 }
 
 if (($browsepath != '/') || $fileinfo){
     echo $OUTPUT->single_button($url.'&what=clear', get_string('cleararea', 'block_dashboard'));
 }
-echo $OUTPUT->single_button(new moodle_url('/course/view.php', array('id' => $courseid)), get_string('backtocourse', 'block_dashboard'));
+$buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
+echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
 
 echo $OUTPUT->footer();

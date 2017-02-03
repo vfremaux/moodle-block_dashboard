@@ -37,14 +37,14 @@ if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))) {
 // Security.
 
 require_login($course);
-$theBlock = block_instance('dashboard', $instance);
-$theBlock->get_required_javascript();
-$context = context_block::instance($theBlock->instance->id);
+$theblock = block_instance('dashboard', $instance);
+$theblock->get_required_javascript();
+$context = context_block::instance($theblock->instance->id);
 
-$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
+$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), null);
 
-if (!empty($theBlock->config->title)) {
-    $PAGE->navbar->add($theBlock->config->title, NULL);
+if (!empty($theblock->config->title)) {
+    $PAGE->navbar->add($theblock->config->title, null);
 }
 
 $PAGE->set_url(new moodle_url('/blocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $blockid)));
@@ -54,14 +54,15 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->box_start();
 
-echo $theBlock->print_dashboard();
+echo $theblock->print_dashboard();
 
-if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()){
+if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()) {
     $options = array();
     $options['id'] = $courseid;
     $options['instance'] = $blockid;
     echo '<div class="configure">';
-    echo $OUTPUT->single_button(new moodle_url('/blocks/dashboard/setup.php', $options), get_string('configure', 'block_dashboard'), 'get');
+    $buttonurl = new moodle_url('/blocks/dashboard/setup.php', $options);
+    echo $OUTPUT->single_button($buttonurl, get_string('configure', 'block_dashboard'), 'get');
     echo '</div>';
     echo "<br/>";
 }
@@ -71,7 +72,8 @@ echo "<br/>";
 echo '<center>';
 $options = array();
 $options['id'] = $courseid;
-echo $OUTPUT->single_button(new moodle_url('/course/view.php', $options), get_string('backtocourse', 'block_dashboard'), 'get');
+$buttonurl = new moodle_url('/course/view.php', $options);
+echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'), 'get');
 echo '</center>';
 echo "<br/>";
 echo $OUTPUT->footer($course);
