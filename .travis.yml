@@ -25,6 +25,7 @@ before_install:
 
 install:
   - moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH vfremaux/moodle-local_vflibs
+
   - moodle-plugin-ci install
 
 script:

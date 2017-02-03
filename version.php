@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Version details.
  *
  * @package    block_dashboard
  * @category   blocks
@@ -27,12 +27,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016032400;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2016051900;        // Requires this Moodle version
-$plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2016032400;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2016051900;        // Requires this Moodle version.
+$plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics).
 $plugin->release = '3.1.0 (build 2016032400)';
 $plugin->maturity = MATURITY_RC;
 $plugin->dependencies = array('local_vflibs' => '*');
 
 // Non moodle attributes.
 $plugin->codeincrement = '3.1.0000';
+$plugin->privacy = 'dualrelease';

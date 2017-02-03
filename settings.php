@@ -19,40 +19,105 @@
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
- * @version Moodle 2.x
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$yesnooptions[0] = get_string('no');
-$yesnooptions[1] = get_string('yes');
+if ($ADMIN->fulltree) {
 
-$settings->add(new admin_setting_heading('extradbparams', get_string('extradbparams', 'block_dashboard'), ''));
+    $yesnooptions[0] = get_string('no');
+    $yesnooptions[1] = get_string('yes');
 
-$settings->add(new admin_setting_configtext('block_dashboard/extra_db_host', get_string('dashboard_extra_db_host', 'block_dashboard'), get_string('dashboard_extra_db_host_desc', 'block_dashboard'), @$CFG->dashboard_extra_db_host));
-$settings->add(new admin_setting_configtext('block_dashboard/extra_db_port', get_string('dashboard_extra_db_port', 'block_dashboard'), get_string('dashboard_extra_db_port_desc', 'block_dashboard'), @$CFG->dashboard_extra_db_port));
-$settings->add(new admin_setting_configtext('block_dashboard/extra_db_db', get_string('dashboard_extra_db_db', 'block_dashboard'), get_string('dashboard_extra_db_db_desc', 'block_dashboard'), @$CFG->dashboard_extra_db_db));
-$settings->add(new admin_setting_configtext('block_dashboard/extra_db_user', get_string('dashboard_extra_db_user', 'block_dashboard'), get_string('dashboard_extra_db_user_desc', 'block_dashboard'), @$CFG->dashboard_extra_db_user));
-$settings->add(new admin_setting_configtext('block_dashboard/extra_db_password', get_string('dashboard_extra_db_password', 'block_dashboard'), get_string('dashboard_extra_db_password_desc', 'block_dashboard'), @$CFG->dashboard_extra_db_password));
+    $settings->add(new admin_setting_heading('extradbparams', get_string('extradbparams', 'block_dashboard'), ''));
 
-$settings->add(new admin_setting_heading('securityparams', get_string('securityparams', 'block_dashboard'),''));
+    $key = 'block_dashboard/extra_db_host';
+    $label = get_string('dashboard_extra_db_host', 'block_dashboard');
+    $desc = get_string('dashboard_extra_db_host_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, @$CFG->dashboard_extra_db_host));
 
-$settings->add(new admin_setting_configtext('block_dashboard/big_result_threshold', get_string('dashboard_big_result_threshold', 'block_dashboard'), get_string('dashboard_big_result_threshold_desc', 'block_dashboard'), @$CFG->dashboard_big_result_threshold));
-$settings->add(new admin_setting_configtext('block_dashboard/enable_isediting_security', get_string('dashboard_enable_isediting_security', 'block_dashboard'), get_string('dashboard_enable_isediting_security_desc', 'block_dashboard'), @$CFG->dashboard_enable_isediting_security));
+    $key = 'block_dashboard/extra_db_port';
+    $label = get_string('dashboard_extra_db_port', 'block_dashboard');
+    $desc = get_string('dashboard_extra_db_port_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, @$CFG->dashboard_extra_db_port));
 
-$settings->add(new admin_setting_heading('datarefresh', get_string('datarefresh', 'block_dashboard'), ''));
+    $key = 'block_dashboard/extra_db_db';
+    $label = get_string('dashboard_extra_db_db', 'block_dashboard');
+    $desc = get_string('dashboard_extra_db_db_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
 
-$settings->add(new admin_setting_configselect('block_dashboard/cron_enabled', get_string('dashboard_cron_enabled', 'block_dashboard'), get_string('dashboard_cron_enabled_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_enabled, $yesnooptions));
-$settings->add(new admin_setting_configtime('block_dashboard/cron_hour', 'block_dashboard_cron_min', get_string('dashboard_cron_hour', 'block_dashboard'), '', array('h' => @$CFG->block_dashboard_cron_hour, 'm' => @$CFG->block_dashboard_cron_min)));
+    $key = 'block_dashboard/extra_db_user';
+    $label = get_string('dashboard_extra_db_user', 'block_dashboard');
+    $desc = get_string('dashboard_extra_db_user_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
 
-$freq['daily'] = get_string('daily', 'block_dashboard');
-$freq['0'] = get_string('sunday', 'block_dashboard');
-$freq['1'] = get_string('monday', 'block_dashboard');
-$freq['2'] = get_string('tuesday', 'block_dashboard');
-$freq['3'] = get_string('wednesday', 'block_dashboard');
-$freq['4'] = get_string('thursday', 'block_dashboard');
-$freq['5'] = get_string('friday', 'block_dashboard');
-$freq['6'] = get_string('saturday', 'block_dashboard');
+    $key = 'block_dashboard/extra_db_password';
+    $label = get_string('dashboard_extra_db_password', 'block_dashboard');
+    $desc = get_string('dashboard_extra_db_password_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
 
-$settings->add(new admin_setting_configselect('block_dashboard/cron_freq', get_string('dashboard_cron_freq', 'block_dashboard'), get_string('dashboard_cron_freq_desc', 'block_dashboard'), @$CFG->block_dashboard_cron_freq, $freq));
+    $settings->add(new admin_setting_heading('securityparams', get_string('securityparams', 'block_dashboard'),''));
 
+    $key = 'block_dashboard/big_result_threshold';
+    $label = get_string('dashboard_big_result_threshold', 'block_dashboard');
+    $desc = get_string('dashboard_big_result_threshold_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 500));
+
+    $key = 'block_dashboard/enable_isediting_security';
+    $label = get_string('dashboard_enable_isediting_security', 'block_dashboard');
+    $desc = get_string('dashboard_enable_isediting_security_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, true));
+
+    $settings->add(new admin_setting_heading('datarefresh', get_string('datarefresh', 'block_dashboard'), ''));
+
+    $key = 'block_dashboard/cron_enabled';
+    $label = get_string('dashboard_cron_enabled', 'block_dashboard');
+    $desc = get_string('dashboard_cron_enabled_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 1, $yesnooptions));
+
+    $hkey = 'block_dashboard/cron_hour';
+    $mkey = 'block_dashboard_cron_min';
+    $label = get_string('dashboard_cron_hour', 'block_dashboard');
+    $settings->add(new admin_setting_configtime($hkey, $mkey, $label, '', array('h' => 4, 'm' => 0)));
+
+    $freq['daily'] = get_string('daily', 'block_dashboard');
+    $freq['0'] = get_string('sunday', 'block_dashboard');
+    $freq['1'] = get_string('monday', 'block_dashboard');
+    $freq['2'] = get_string('tuesday', 'block_dashboard');
+    $freq['3'] = get_string('wednesday', 'block_dashboard');
+    $freq['4'] = get_string('thursday', 'block_dashboard');
+    $freq['5'] = get_string('friday', 'block_dashboard');
+    $freq['6'] = get_string('saturday', 'block_dashboard');
+
+    $key = 'block_dashboard/cron_freq';
+    $label = get_string('dashboard_cron_freq', 'block_dashboard');
+    $desc = get_string('dashboard_cron_freq_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 0, $freq));
+
+    $sepoptions = array(',' => '"," '.get_string('coma', 'block_dashboard'),
+                        ':' => '":" '.get_string('colon', 'block_dashboard'),
+                        ';' => '";" '.get_string('semicolon', 'block_dashboard'),
+                        "\t" => '[TAB] '.get_string('tab', 'block_dashboard'));
+    $key = 'block_dashboard/csv_field_separator';
+    $label = get_string('csvfieldseparator', 'block_dashboard');
+    $desc = get_string('csvfieldseparator_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, ';', $sepoptions));
+
+    $seplineoptions = array("\n" => 'Linux [LF]', "\r\n" => 'Windows [CRLF]', "\r" => 'MACOS [CR]');
+    $key = 'block_dashboard/csv_line_separator';
+    $label = get_string('csvlineseparator', 'block_dashboard');
+    $desc = get_string('csvfieldseparator_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, "\n", $seplineoptions));
+
+    if (block_dashboard_supports_feature('emulate/community')) {
+        $settings->add(new admin_setting_heading('plugindisthdr', get_string('plugindist', 'block_dashboard'), ''));
+
+        $key = 'block_dashboard/emulatecommunity';
+        $label = get_string('emulatecommunity', 'block_dashboard');
+        $desc = get_string('emulatecommunity_desc', 'block_dashboard');
+        $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+    } else {
+        $desc = get_string('plugindistpro_desc', 'block_dashboard');
+        $label = get_string('plugindist', 'block_use_stats');
+        $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
+    }
+}
