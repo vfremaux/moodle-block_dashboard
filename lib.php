@@ -515,6 +515,6 @@ function dashboard_sum($v1, $v2) {
         $mins = $mins % 60;
         return "$hours:$mins";
     } else {
-        return $v1 + $v1;
+        return $v1 + $v2;
     }
 }
