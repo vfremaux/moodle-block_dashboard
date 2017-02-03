@@ -29,12 +29,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2016032400;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2015050500;        // Requires this Moodle version.
+$plugin->requires  = 2015111100;        // Requires this Moodle version.
 $plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics).
-$plugin->release = '2.9.0 (build 2016032400)';
+$plugin->release = '3.0.0 (build 2016032400)';
 $plugin->maturity = MATURITY_RC;
-$plugin->dependencies = array('local_vflibs' => ANY_VERSION);
+$plugin->dependencies = array('local_vflibs' => '*');
 
 // Non moodle attributes.
-$plugin->codeincrement = '2.9.0000';
+$plugin->codeincrement = '3.0.0000';
 $plugin->privacy = 'dualrelease';
