@@ -117,7 +117,7 @@ if ($ADMIN->fulltree) {
         $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
     } else {
         $desc = get_string('plugindistpro_desc', 'block_dashboard');
-        $label = get_string('plugindist', 'block_use_stats');
+        $label = get_string('plugindist', 'block_dashboard');
         $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
     }
 }
