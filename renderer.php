@@ -28,6 +28,589 @@ defined('MOODLE_INTERNAL') || die();
 class block_dashboard_renderer extends plugin_renderer_base {
 
     /**
+     * Real raster that prints graphs and data
+     */
+    public function render_dashboard($theblock) {
+        global $CFG, $extradbcnx, $COURSE, $DB, $OUTPUT, $PAGE;
+
+        $config = get_config('block_dashboard');
+        $sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
+
+        $template = new StdClass;
+
+        $template->dhtmlxcalendarstyle = $this->dhtmlxcalendar_style();
+
+        if (!isset($theblock->config)) {
+            $theblock->config = new StdClass;
+        }
+        $theblock->config->limit = 20;
+
+        $coursepage = '';
+        if ($COURSE->format == 'page') {
+            include_once($CFG->dirroot.'/course/format/lib.php');
+            $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
+            if (!$pageid) {
+                $flexpage = course_page::get_current_page($COURSE->id);
+            } else {
+                $flexpage = new StdClass;
+                $flexpage->id = $pageid;
+            }
+            $coursepage = "&page=".$flexpage->id;
+        }
+
+        $rpage = optional_param('rpage'.$theblock->instance->id, 0, PARAM_INT); // Result page.
+
+        if ($rpage < 0) {
+            $rpage = 0;
+        }
+
+        // Editing security to avoid blocked dashboards blocking the ocurse page when displayed in block space.
+        if ($PAGE->user_is_editing() && !empty($config->enable_isediting_security) && $theblock->config->inblocklayout == 1) {
+            $template->errormsg = $OUTPUT->notification(get_string('editingnoexecute', 'block_dashboard'));
+            return $this->render_from_template('block_dashboard/dashboard', $template);
+        }
+
+        // Unlogged people cannot see their status.
+        if ((!isloggedin() || isguestuser()) && @$theblock->config->guestsallowed) {
+
+            $template->errormsg = $OUTPUT->notification(get_string('guestsnotallowed', 'block_dashboard'));
+
+            $loginstr = get_string('login');
+            $loginurl = new moodle_url('/login/index.php');
+            $template->errormsg .= '<a href="'.$loginurl.'">'.$loginstr.'</a>';
+            return $this->render_from_template('block_dashboard/dashboard', $template);
+        }
+
+        if (!isset($theblock->config) || empty($theblock->config->query)) {
+            $template->errormsg = $OUTPUT->notification(get_string('noquerystored', 'block_dashboard'));
+            return $this->render_from_template('block_dashboard/dashboard', $template);
+        }
+
+        if (!isset($config->big_result_threshold)) {
+            set_config('big_result_threshold', 500, 'block_dashboard');
+            $config->big_result_threshold = 500;
+        }
+
+        // Connecting.
+        if ($theblock->config->target == 'moodle') {
+            // Already connected.
+        } else {
+            $error = '';
+            if (!isset($extradbcnx)) {
+                $extradbcnx = extra_db_connect(true, $error);
+            }
+            if ($error) {
+                $template->errormsg = $error;
+                return $this->render_from_template('block_dashboard/dashboard', $template);
+            }
+        }
+
+        // Prepare all params from config.
+
+        $theblock->prepare_config();
+
+        $graphdata = array();
+        $ticks = array();
+        $filterquerystring = '';
+
+        if (!empty($theblock->config->filters)) {
+            try {
+                $filterquerystring = $theblock->prepare_filters();
+            } catch (Exception $e) {
+                $filtersql = $theblock->filteredsql;
+                $template->errormsg = '<div class="dashboard-query-box">';
+                $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
+                $template->errormsg .= $DB->get_last_error();
+                $template->errormsg .= '</div>';
+                $template->errormsg .= $OUTPUT->notification(get_string('invalidorobsoletefilterquery', 'block_dashboard'));
+                return $this->render_from_template('block_dashboard/dashboard', $template);
+            }
+        } else {
+            $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
+        }
+
+        // Needed to prepare for filter range prefetch.
+        $theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
+
+        if (!empty($theblock->params)) {
+            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_params() : $theblock->prepare_params();
+        } else {
+            $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
+            $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
+        }
+
+        if (!empty($sort)) {
+            // Do not sort if already sorted in explained query.
+            if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
+                $theblock->filteredsql .= " ORDER BY $sort";
+            }
+        }
+
+        $theblock->filteredsql = $theblock->protect($theblock->filteredsql);
+
+        // GETTING RESULTS ---------------------------------------------------.
+
+        try {
+            $countres = $theblock->count_records($error);
+        } catch (Exception $e) {
+            $countres = 0;
+        }
+
+        // If too many results, we force paging mode.
+        if (empty($theblock->config->pagesize) &&
+                ($countres > $config->big_result_threshold) &&
+                        !empty($theblock->config->bigresult)) {
+            $template->warningmsg = $OUTPUT->notification(get_string('toomanyrecordsusepaging', 'block_dashboard'));
+            $theblock->config->pagesize = $config->big_result_threshold;
+            $rpage = 0;
+        }
+
+        // Getting real results including page and offset.
+
+        if (!empty($theblock->config->pagesize)) {
+            $offset = $rpage * $theblock->config->pagesize;
+        } else {
+            $offset = '';
+        }
+
+        try {
+            $status = @$theblock->fetch_dashboard_data($theblock->filteredsql, $results, @$theblock->config->pagesize, $offset);
+        } catch (Exception $e) {
+            // Showing query.
+            $template->errormsg = '<div class="dashboard-query-box">';
+            $template->errormsg .= '<pre>'.$theblock->filteredsql.'</pre>';
+            $template->errormsg .= $DB->get_last_error();
+            $template->errormsg .= '</div>';
+            $template->errormsg .= $OUTPUT->notification(get_string('invalidorobsoletequery', 'block_dashboard'));
+            return $this->render_from_template('block_dashboard/dashboard', $template);
+        }
+
+        // Rotate results if required ---------------------------.
+
+        /*
+         * rotation has a strong effect on data structure, transforming flat recors
+         * into a data matrix that may be used to feed multiple graph series.
+         */
+        if (block_dashboard_supports_feature('result/rotate')) {
+            if (!empty($theblock->config->queryrotatecols) &&
+                    !empty($theblock->config->queryrotatenewkeys) &&
+                            !empty($theblock->config->queryrotatepivot)) {
+
+                $results = dashboard_rotate_result($theblock, $results);
+            }
+        }
+
+        if (!$results) {
+            // No data, but render filters anyway.
+            $template->filterandparams = $this->filters_and_params_form($theblock, $sort);
+            $template->data = $OUTPUT->notification(get_string('nodata', 'block_dashboard'));
+
+            // Showing query.
+            if (@$theblock->config->showquery) {
+                $template->query = $theblock->filteredsql;
+            }
+
+            return $this->render_from_template('block_dashboard/dashboard', $template);
+        }
+
+        // process results -----------------------------------.
+
+        $filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '';
+
+        if (@$theblock->config->inblocklayout) {
+            $baseurl = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd;
+        } else {
+            $baseurl = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$theblock->instance->id.$coursepage.$filterquerystringadd;
+        }
+
+        // Start prepare output table.
+
+        $table = new html_table();
+        $table->id = 'mod-dashboard'.$theblock->instance->id;
+        $table->class = 'dashboard';
+        $table->width = '100%';
+        $table->head = array();
+
+        $numcols = count($theblock->output);
+
+        foreach ($theblock->output as $field => $label) {
+            if (!empty($theblock->config->sortable)) {
+                $label .= $this->sort_controls($theblock, $field, $sort);
+            }
+            $table->head[$field] = $label;
+            $table->size[$field] = (100 / $numcols).'%';
+        }
+
+        foreach ($theblock->output as $field => $label) {
+            $table->colclasses[$field] = "$field";
+        }
+
+        if (!empty($theblock->config->pagesize)) {
+            $table->pagesize = min($theblock->config->pagesize, $countres); // No paginating at start.
+        }
+
+        $graphseries = array();
+        $treedata = array();
+        $treekeys = array();
+        $lastvalue = array();
+        $hcols = array();
+        $splitnumsonsort = @$theblock->config->splitsumsonsort;
+
+        foreach ($results as $result) {
+
+            // Prepare for subsums.
+            if (!empty($splitnumsonsort)) {
+                $orderkeyed = strtoupper($result->$splitnumsonsort);
+                if (!isset($oldorderkeyed)) {
+                    $oldorderkeyed = $orderkeyed; // First time.
+                }
+            }
+
+            // Pre-aggregates sums.
+            if (!empty($theblock->config->shownumsums)) {
+                foreach (array_keys($theblock->numsumsf) as $numsum) {
+                    if (empty($numsum)) {
+                        continue;
+                    }
+                    if (!isset($result->$numsum)) {
+                        continue;
+                    }
+
+                    /*
+                     * make subaggregates (only for linear tables and when sorting criteria is the split column)
+                     * post aggregate after table output
+                     */
+                    if (!isset($theblock->aggr)) {
+                        $theblock->aggr = new StdClass;
+                    }
+
+                    $theblock->aggr->$numsum = 0 + (float)@$theblock->aggr->$numsum + (float)$result->$numsum;
+
+                    if (!empty($splitnumsonsort) && @$theblock->config->tabletype == 'linear' &&
+                            (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
+                        $theblock->subaggr[$orderkeyed]->$numsum = 0 + (float)@$theblock->subaggr[$orderkeyed]->$numsum + (float)$result->$numsum;
+                    }
+                }
+            }
+
+            if (!empty($splitnumsonsort) &&
+                (@$theblock->config->tabletype == 'linear') &&
+                        (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
+                if ($orderkeyed != $oldorderkeyed) {
+                    // When range changes.
+                    $k = 0;
+                    $tabledata = null;
+                    foreach (array_keys($theblock->output) as $field) {
+                        if (in_array($field, array_keys($theblock->numsumsf))) {
+                            if (is_null($tabledata)) {
+                                $tabledata = array();
+                                for ($j = 0; $j < $k; $j++) {
+                                    $tabledata[$j] = '';
+                                }
+                            }
+                            $tabledata[$k] = '<b>Tot: '.@$theblock->subaggr[$oldorderkeyed]->$field.'</b>';
+                        }
+                        $k++;
+                    }
+                    if (!is_null($tabledata)) {
+                        $table->data[] = $tabledata;
+                    }
+                    $oldorderkeyed = $orderkeyed;
+                }
+            }
+
+            // Print data in results.
+            if (!empty($theblock->config->showdata)) {
+                /*
+                 * this is the most common case of a linear table
+                 */
+                if (empty($theblock->config->tabletype) ||
+                        ($theblock->config->tabletype == 'linear')) {
+                    $theblock->prepare_linear_table($table, $result, $lastvalue);
+                } else if ($theblock->config->tabletype == 'tabular') {
+
+                    // This is a tabular table.
+
+                    /* in a tabular table, data can be placed :
+                     * - in first columns in order of vertical keys
+                     * the results are grabbed sequentially and distributed into the matrix columns
+                     */
+
+                    $keystack = array();
+                    $matrix = array();
+                    foreach (array_keys($theblock->vertkeys->formats) as $vkey) {
+                        if (empty($vkey)) {
+                            continue;
+                        }
+                        $vkeyvalue = $result->$vkey;
+                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                    }
+                    $hkey = $theblock->config->horizkey;
+                    $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
+                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrixst = "\$m".implode($matrix);
+                    if (!in_array($hkeyvalue, $hcols)) {
+                        $hcols[] = $hkeyvalue;
+                    }
+
+                    // Now put the cell value in it.
+                    $outvalues = array();
+                    foreach (array_keys($theblock->output) as $field) {
+
+                        // Did we ask for cumulative results ?
+                        $cumulativeix = null;
+                        if (preg_match('/S\((.+?)\)/', $field, $matches)) {
+                            $field = $matches[1];
+                            $cumulativeix = $theblock->instance->id.'_'.$field;
+                        }
+
+                        // Try to defer this formating as post formatting in cross table print.
+                        if (!empty($theblock->outputf[$field])) {
+                            $datum = dashboard_format_data($theblock->outputf[$field], $result->$field, $cumulativeix, $result);
+                        } else {
+                            $datum = dashboard_format_data(null, @$result->$field, $cumulativeix, $result);
+                        }
+                        if (!empty($theblock->config->colorfield) &&
+                                ($theblock->config->colorfield == $field)) {
+                            $datum = dashboard_colour_code($theblock, $datum, $theblock->colourcoding);
+                        }
+                        $outvalues[] = str_replace("\"", "\\\"", $datum);
+                    }
+                    $matrixst .= ' = "'.implode(' ',$outvalues).'";';
+                    // Make the matrix in memory.
+                    eval($matrixst.";");
+                } else {
+
+                    $debug = optional_param('debug', false, PARAM_BOOL);
+                    $template->debug = '';
+
+                    // Treeview.
+                    $resultarr = array_values((array)$result);
+                    $resultid = $resultarr[0];
+                    if (!empty($parentserie)) {
+                        if (!empty($result->$parentserie)) {
+                            // Non root node, attache to his parent if we found it.
+                            if (array_key_exists($result->$parentserie, $treekeys)) {
+                                if (!empty($debug)) {
+                                    $template->debug .= 'binding to '. $result->$parentserie.'. ';
+                                }
+                                $treekeys[$result->$parentserie]->childs[$resultid] = $result;
+                                if (!array_key_exists($resultid, $treekeys)) {
+                                    $treekeys[$resultid] = $result;
+                                }
+                            } else {
+                                // In case nodes do not come in correct order, do not connect but register only.
+                                if (!empty($debug)) {
+                                    $template->debug .= 'waiting for '. $result->$parentserie.'. ';
+                                }
+                                $waitingnodes[$resultid] = $result;
+                                if (!array_key_exists($resultid, $treekeys)) {
+                                    $treekeys[$resultid] = $result;
+                                }
+                            }
+                        } else {
+                            // Root node.
+                            if (!empty($debug)) {
+                                $template->debug .= 'root as '. $resultid.'. ';
+                            }
+                            if (!array_key_exists($resultid, $treekeys)) {
+                                $treekeys[$resultid] = $result;
+                            }
+                            $treedata[$resultid] = &$treekeys[$resultid];
+                        }
+                    } else {
+                        if (!array_key_exists($resultid, $treekeys)) {
+                            $treekeys[$resultid] = $result;
+                        }
+                    }
+                }
+            }
+
+            // Prepare data for graphs.
+            if (!empty($theblock->config->showgraph)) {
+                if (!empty($theblock->config->xaxisfield) &&
+                        $theblock->config->graphtype != 'googlemap' &&
+                                $theblock->config->graphtype != 'timeline') {
+                    $xaxisfield = $theblock->config->xaxisfield;
+                    if ($theblock->config->graphtype != 'pie') {
+                        // Linear, bars.
+                        // TODO : check if $theblock->config->xaxisfield exists really (misconfiguration).
+                        $ticks[] = addslashes($result->$xaxisfield);
+                        $ys = 0;
+
+                        foreach (array_keys($theblock->yseries) as $yserie) {
+
+                            // Did we ask for cumulative results ?
+                            $cumulativeix = null;
+                            if (preg_match('/S\((.+?)\)/', $yserie, $matches)) {
+                                $yserie = $matches[1];
+                                $cumulativeix = $theblock->instance->id.'_'.$yserie;
+                            }
+
+                            if (!isset($result->$yserie)) {
+                                continue;
+                            }
+
+                            if ($theblock->config->graphtype != 'timegraph') {
+                                if (!empty($theblock->yseriesf[$yserie])) {
+                                    $graphseries[$yserie][] = dashboard_format_data($theblock->yseriesf[$yserie], $result->$yserie, $cumulativeix, $result);
+                                } else {
+                                    $graphseries[$yserie][] = dashboard_format_data(null, $result->$yserie, $cumulativeix, $result);
+                                }
+                            } else {
+                                if (!empty($theblock->yseriesf[$yserie])) {
+                                    $timeelm = array($result->$xaxisfield, dashboard_format_data($theblock->yseriesf[$yserie], $result->$yserie, $cumulativeix, $result)); 
+                                    $graphseries[$ys][] = $timeelm;
+                                } else {
+                                    $timeelm = array($result->$xaxisfield, dashboard_format_data(null, $result->$yserie, $cumulativeix, $result));
+                                    $graphseries[$ys][] = $timeelm;
+                                }
+                            }
+                            $ys++;
+                        }
+                    } else if ($theblock->config->graphtype == 'pie') {
+                        foreach (array_keys($theblock->yseriesf) as $yserie) {
+                            if (empty($result->$xaxisfield)) {
+                                $result->$xaxisfield = 'N.C.';
+                            }
+                            if (!empty($theblock->yseriesf[$field])) {
+                                $graphseries[$yserie][] = array($result->$xaxisfield, dashboard_format_data($theblock->yseriesf[$field], $result->$yserie, false, $result));
+                            } else {
+                                $graphseries[$yserie][] = array($result->$xaxisfield, $result->$yserie);
+                            }
+                        }
+                    }
+                } else {
+                    $data[] = $result;
+                }
+            }
+        }
+
+        $graphdata = array_values($graphseries);
+
+        // Post aggregating last subtotal ----------------------------------------.
+
+        if (!empty($theblock->config->shownumsums) && $results) {
+            if (!empty($splitnumsonsort) &&
+                    (@$theblock->config->tabletype == 'linear') &&
+                            (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
+                $k = 0;
+                $tabledata = null;
+                foreach (array_keys($theblock->output) as $field) {
+                    if (in_array($field, array_keys($theblock->numsumsf))) {
+                        if (is_null($tabledata)) {
+                            $tabledata = array();
+                            for ($j = 0; $j < $k; $j++) {
+                                $tabledata[$j] = '';
+                            }
+                        }
+                        $tabledata[$k] = '<b>Tot: '.@$theblock->subaggr[$orderkeyed]->$field.'</b>';
+                    }
+                    $k++;
+                }
+                $oldorderkeyed = $orderkeyed;
+                if (!is_null($tabledata)) {
+                    $table->data[] = $tabledata;
+                }
+            }
+        }
+
+        // Starting outputing data -------------------------------------------------.
+
+        // If treeview, need to post process waiting nodes.
+        if (@$theblock->config->tabletype == 'treeview') {
+            if (!empty($waitingnodes)) {
+                foreach ($waitingnodes as $wnid => $wn) {
+                    if (array_key_exists($wn->$parentserie, $treekeys)) {
+                        if (!empty($debug)) {
+                            $template->debug .= ' postbinding to '. $wn->$parentserie.'. ';
+                        }
+                        $treekeys[$wn->$parentserie]->childs[$wnid] = $wn;
+                        unset($waitingnodes[$wnid]); // Free some stuff.
+                    }
+                }
+            }
+        }
+
+        if (@$theblock->config->inblocklayout) {
+            $params = array('id' => $COURSE->id.$coursepage, 'tsort'.$theblock->instance->id => $sort);
+            $url = new moodle_url('/course/view.php', $params);
+        } else {
+            $params = array('id' => $COURSE->id,
+                            'blockid' => $theblock->instance->id.$coursepage,
+                            'tsort'.$theblock->instance->id => $sort);
+            $url = new moodle_url('/blocks/dashboard/view.php', $params);
+        }
+
+        $template->filterandparams = $this->filters_and_params_form($theblock, $sort);
+
+        if ($theblock->config->showdata) {
+            $filterquerystring = (!empty($filterquerystring)) ? '&'.$filterquerystring : '';
+            if (empty($theblock->config->tabletype) ||
+                    @$theblock->config->tabletype == 'linear') {
+
+                $template->data = html_writer::table($table);
+                $template->controlbuttons = $this->export_buttons($theblock, $filterquerystring);
+
+            } else if (@$theblock->config->tabletype == 'tabular') {
+                // Forget table and use $m matrix for making display.
+                $template->data = $this->cross_table($theblock, $m, $hcols, $theblock->config->horizkey, $theblock->vertkeys, $theblock->config->horizlabel, true);
+                $template->controlbuttons = $this->tabular_buttons($theblock, $filterquerystring);
+            } else {
+                $template->data = $this->tree_view($theblock, $treedata, $theblock->treeoutput, $theblock->output, $theblock->outputf, $theblock->colourcoding, true);
+                $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring);
+            }
+        }
+
+        // Showing graph.
+        if ($theblock->config->showgraph && !empty($theblock->config->graphtype)) {
+            $graphdesc = $theblock->dashboard_graph_properties();
+
+            if ($theblock->config->graphtype != 'googlemap' && $theblock->config->graphtype != 'timeline') {
+                $data = $graphdata;
+                $template->graph = local_vflibs_jqplot_print_graph('dashboard'.$theblock->instance->id, $graphdesc, $data,
+                                                         $theblock->config->graphwidth, $theblock->config->graphheight,
+                                                         '', true, $ticks);
+            } else if ($theblock->config->graphtype == 'googlemap') {
+                $template->graph = $this->googlemaps_data($theblock, $data, $graphdesc);
+            } else {
+
+                // Timeline graph.
+                if (empty($theblock->config->timelineeventstart) || empty($theblock->config->timelineeventend)) {
+                    $template->graph = $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
+                } else {
+                    $template->graph = timeline_print_graph($theblock, 'dashboard'.$theblock->instance->id, $theblock->config->graphwidth,
+                                                  $theblock->config->graphheight, $data, true);
+                }
+            }
+        }
+
+        // Showing bottom summators.
+        if ($theblock->config->numsums) {
+            $template->summators = $this->numsums($theblock, $theblock->aggr);
+        }
+
+        // Showing query.
+        if (@$theblock->config->showquery) {
+            $template->query = $theblock->filteredsql;
+        }
+
+        // Showing SQL benches.
+        if (@$theblock->config->showbenches) {
+            $rows = array();
+            foreach ($theblock->benches as $bench) {
+                $row = new StdClass;
+                $row->name = $bench->name;
+                $row->value = $bench->end - $bench->start;
+                $rows[] = $row;
+            }
+            $template->benchrows = $rows;
+        }
+
+        return $this->render_from_template('block_dashboard/dashboard', $template);
+    }
+
+    /**
      * An HTML raster for a matrix cross table
      * printing raster uses a recursive cell drilldown over dynamic matrix dimension
      *
@@ -257,7 +840,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 }
             }
         } else {
-            $text .= " This is a demo set !! ";
+            $str .= " This is a demo set !! ";
             /**
              * demo
              */
@@ -297,7 +880,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             );
         }
 
-        $str .= googlemaps_embed_graph('dashboard'.$theblock->instance->id, @$theblock->config->lat, @$theblock->config->lng, @$theblock->config->graphwidth, $this->config->graphheight, $graphdesc, $gmdata, true);
+        $str .= googlemaps_embed_graph('dashboard'.$theblock->instance->id, @$theblock->config->lat, @$theblock->config->lng, @$theblock->config->graphwidth, $theblock->config->graphheight, $graphdesc, $gmdata, true);
 
         return $str;
     }
@@ -308,57 +891,48 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param string $sort name of the actual sorting column
      */
     public function filters_and_params_form(&$theblock, $sort) {
-        global $COURSE;
+        global $COURSE, $CFG;
 
         $text = '';
 
-        if (!empty($theblock->config->filters) || !empty($theblock->params)) {
-            $text .= '<form class="dashboard-filters" name="dashboardform'.$theblock->instance->id.'" method="GET">';
-            $text .= '<input type="hidden" name="id" value="'.$COURSE->id.'" />';
-            if (!@$theblock->config->inblocklayout) {
-                $text .= '<input type="hidden" name="blockid" value="'.$theblock->instance->id.'" />';
-            } else {
-                $blockid = optional_param('blockid', 0, PARAM_INT);
-                $text .= '<input type="hidden" name="blockid" value="'.$blockid.'" />';
-            }
-            if ($COURSE->format == 'page') {
-                if (!empty($coursepage)) {
-                    $text .= '<input type="hidden" name="page" value="'.$flexpage->id.'" />';
-                }
-            }
-            if ($sort == 'id DESC') {
-                $sort = '';
-            }
-            $text .= '<input type="hidden" name="tsort'.$theblock->instance->id.'" value="'.$sort.'" />';
-
-            // TODO repair or remove
-            // $autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
-            $autosubmit = false;
-
-            $javascripthandler = '';
-            if ($autosubmit) {
-                $javascripthandler = "submitdashboardfilter('dashboardform{$theblock->instance->id}')";
-            }
-
-            if (!empty($theblock->config->filters)) {
-                $text .= $this->filters($theblock, $javascripthandler);
-            }
-            if (!empty($theblock->params)) {
-                $text .= $this->params($theblock, $javascripthandler);
-            }
-
-            if (!$javascripthandler) {
-                // Has been emptied, then no autocommit.
-                $strdofilter = get_string('dofilter', 'block_dashboard');
-                $jshandler = 'autosubmit = 1; submitdashboardfilter(\'dashboardform'.$theblock->instance->id.'\')';
-                $text .= '&nbsp;&nbsp;<input type="button" onclick="'.$jshandler.'" value="'.$strdofilter.'" />';
-                // Post inhibits the submit function as result of filtering construction.
-                $text .= '<script type="text/javascript"> autosubmit = 0; </script>';
-            }
-            $text .= '</form>';
+        if (empty($theblock->config->filters) && empty($theblock->params)) {
+            return;
         }
 
-        return $text;
+        $template = new StdClass;
+
+        $template->blockid = $theblock->instance->id;
+        $template->courseid = $COURSE->id;
+
+        $template->inblocklayout = @$theblock->config->inblocklayout;
+        $template->blockidparam = optional_param('blockid', 0, PARAM_INT);
+
+        if ($COURSE->format == 'page') {
+            require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
+            $pageid = optional_param('page', false, PARAM_INT);
+            $template->ispageformatpage = !empty($pageid);
+            if ($page = course_page::get_current_page($COURSE->id)) {
+                $template->pageid = $page->id;
+            }
+        }
+
+        if ($sort == 'id DESC') {
+            $sort = '';
+        }
+        $template->sort = $sort;
+
+        $template->strdofilter = get_string('dofilter', 'block_dashboard');
+
+        $template->autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
+
+        if (!empty($theblock->config->filters)) {
+            $template->filters = $this->filters($theblock);
+        }
+        if (!empty($theblock->params)) {
+            $template->params = $this->params($theblock);
+        }
+
+        return $this->render_from_template('block_dashboard/filterandparamsform', $template);
     }
 
     /**
@@ -369,7 +943,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
      *
      * Javascript handler is provided when preparing form overrounding.
      */
-    public function filters(&$theblock, $javascripthandler) {
+    public function filters(&$theblock) {
 
         $str = '';
 
@@ -388,14 +962,15 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $filterresults = $theblock->filter_get_results($afield, $fieldname, false, false, $str);
 
             if ($filterresults) {
-                $filterset = array();
+                $filteropts = array();
                 if (!$theblock->is_filter_single($afield)) {
-                    $filterset['0'] = '*';
+                    $filteropts['*'] = '*';
                 }
+
                 foreach (array_values($filterresults) as $value) {
                     // Removes table scope explicitators.
                     $radical = preg_replace('/^.*\./', '', $fieldname);
-                    $filterset[$value->$radical] = $value->$radical;
+                    $filteropts[$value->$radical] = $value->$radical;
                 }
                 $str .= '<span class="dashboard-filter">'.$theblock->filterfields->labels[$afield].':</span>';
                 $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
@@ -408,23 +983,21 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 }
 
                 // Build the select options.
-                $selectoptions = array();
-
-                if (!empty($javascripthandler)) {
-                    $selectoptions['onchange'] = $javascripthandler;
-                }
+                $attrs = array();
 
                 if ($multiple) {
-                    $selectoptions['multiple'] = 1;
-                    $selectoptions['size'] = 5;
+                    $attrs['multiple'] = 1;
+                    $attrs['size'] = 5;
                 }
 
                 if ($theblock->is_filter_global($afield)) {
                     $key = "filter0_{$radical}{$arrayform}";
-                    $str .= html_writer::select($filterset, $key, $unslashedvalue, array('' => 'choosedots'), $selectoptions);
+                    $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
+                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 } else {
                     $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
-                    $str .= html_writer::select($filterset, $key, $unslashedvalue, array('' => 'choosedots'), $selectoptions);
+                    $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
+                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 }
                 $str .= "&nbsp;&nbsp;";
             }
@@ -441,7 +1014,76 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param string $javascripthandler if empty, no onchange handler is required. Filter change
      * is triggered by an explicit button.
      */
-    public function params(&$theblock, &$javascripthandler) {
+    public function params(&$theblock) {
+
+        $template = new Stdclass;
+        $template->strfrom = get_string('from', 'block_dashboard');
+        $template->strto = get_string('to', 'block_dashboard');
+
+        foreach ($theblock->params as $key => $param) {
+
+            $param->paramkey = preg_replace('/[.() *]/', '', $key).'_'.$theblock->instance->id;
+
+            switch ($param->type) {
+
+                case 'choice':
+                    $param->choice = true;
+                    $values = explode("\n", $param->values);
+                    $param->value0checked = ($param->value == $values[0]) ? 'checked="checked"' : '';
+                    $param->value1checked = ($param->value == $values[1]) ? 'checked="checked"' : '';
+                    $param->quotedvalue0 = htmlentities($values[0], ENT_QUOTES, 'UTF-8');
+                    $param->value0 = $values[0];
+                    $param->quotedvalue1 = htmlentities($values[1], ENT_QUOTES, 'UTF-8');
+                    $param->value1 = $values[1];
+                    break;
+
+                case 'text':
+                    $param->text = true;
+                    $param->quotedvalue = htmlentities($param->value, ENT_QUOTES, 'UTF-8');
+                    break;
+
+                case 'list':
+                    $param->list = true;
+                    $param->options = array();
+                    foreach ($param->values as $v) {
+                        $option = new Stdclass;
+                        $option->selected = ($v == $param->value) ? ' selected="selected" ' : '';
+                        $option->value = htmlentities($v, ENT_QUOTES, 'UTF-8');
+                        $option->label = $v;
+                        $param->options[] = $options;
+                    }
+                    break;
+
+                case 'range':
+                    $param->range = true;
+                    $param->quotedvaluefrom = htmlentities($param->valuefrom, ENT_QUOTES, 'UTF-8');
+                    $param->quotedvalueto = htmlentities($param->valueto, ENT_QUOTES, 'UTF-8');
+                    break;
+
+                case 'date':
+                    $param->date = true;
+                    break;
+
+                case 'daterange':
+                    $param->daterange = true;
+                    break;
+            }
+
+            $template->params[] = $param;
+        }
+
+        return $this->render_from_template('block_dashboard/param', $template);
+    }
+
+    /**
+     * if there are some user params, print widgets for them. If one of them is a daterange, 
+     * then cancel the javascripthandler as we will need to explictely submit.
+     *
+     * @param objectref $theblock a dashboard block instance
+     * @param string $javascripthandler if empty, no onchange handler is required. Filter change
+     * is triggered by an explicit button.
+     */
+    public function old_params(&$theblock) {
 
         $str = '';
 
@@ -454,8 +1096,8 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     $values = explode("\n", $param->values);
                     $option1checked = ($param->value == $values[0]) ? 'checked="checked"' : '';
                     $option2checked = ($param->value == $values[1]) ? 'checked="checked"' : '';
-                    $str .= ' '.$param->label.': <input type="radio" name="'.$htmlkey.'" value="'.htmlentities($values[0], ENT_QUOTES, 'UTF-8').'" '.$option1checked.' onchange="'.$javascripthandler.'" /> '.$values[0];
-                    $str .= ' - <input type="radio" name="'.$key.'" value="'.htmlentities($values[1], ENT_QUOTES, 'UTF-8').'" '.$option2checked.'  onchange="'.$javascripthandler.'"/> '.$values[1].' &nbsp;&nbsp;';
+                    $str .= ' '.$param->label.': <input type="radio" name="'.$htmlkey.'" value="'.htmlentities($values[0], ENT_QUOTES, 'UTF-8').'" '.$option1checked.' /> '.$values[0];
+                    $str .= ' - <input type="radio" name="'.$key.'" value="'.htmlentities($values[1], ENT_QUOTES, 'UTF-8').'" '.$option2checked.' "/> '.$values[1].' &nbsp;&nbsp;';
                     break;
 
                 case 'text':
@@ -477,7 +1119,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     break;
 
                 case 'date':
-                    $str .= ' '.$param->label.': <input type="text" size="10"  id="date-'.$htmlkey.'" name="'.$htmlkey.'" value="'.$param->originalvalue.'"  onchange="'.$javascripthandler.'" />';
+                    $str .= ' '.$param->label.': <input type="text" size="10"  id="date-'.$htmlkey.'" name="'.$htmlkey.'" value="'.$param->originalvalue.'" />';
                     $str .= '<script type="text/javascript">'."\n";
                     $str .= 'var '.$htmlkey.'Cal = new dhtmlXCalendarObject(["date-'.$htmlkey.'"]);'."\n";
                     $str .= $htmlkey.'Cal.loadUserLanguage(\''.current_language().'_utf8\');'."\n";
@@ -492,7 +1134,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     $str .= $htmlkey.'fromCal.loadUserLanguage(\''.current_language().'_utf8\');'."\n";
                     $str .= $htmlkey.'fromCal.setSkin(\'dhx_web\');';
                     $str .= '</script>'."\n";
-                    $javascripthandler = ''; // Cancel the autosubmit possibility.
                     break;
             }
         }

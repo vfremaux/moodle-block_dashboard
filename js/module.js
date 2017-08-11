@@ -24,14 +24,6 @@ function showmoreoptions(selectobj){
     }
 }
 
-function open_panel(panelid) {
-    $('.dashboardsettings-panel').attr('class', 'dashboardsettings-panel off');
-    $('#dashboardsettings-panel-'+panelid).attr('class', 'dashboardsettings-panel on');
-    $('.setting-tab').removeClass('here');
-    $('#setting-tab-'+panelid).addClass('here');
-    $('.setting-tab').removeClass('active');
-    $('#setting-tab-'+panelid).addClass('active');
-}
 
 var autosubmit = 1;
 

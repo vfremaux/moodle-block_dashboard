@@ -35,7 +35,9 @@ $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
+$string['cacheddata'] = 'Data from query cache';
 $string['cleararea'] = 'Clear all file area';
+$string['cleandisplayuptocolumn'] = 'Do not clean after column index';
 $string['configbands'] = 'Hide show time bands';
 $string['configbigresult'] = 'Enable Big Result option';
 $string['configcache'] = 'Result Cache Settings';
@@ -104,7 +106,7 @@ $string['configoutputfields'] = 'Output fields';
 $string['configoutputfieldslabels'] = 'Output fields labels';
 $string['configoutputformats'] = 'Output data formatting';
 $string['configpagesize'] = 'Result paging size';
-$string['configparams'] = 'User param definitions';
+$string['configparams'] = 'User parameters are values that are given by the dashboard end user to alter the query behaviour or output range.';
 $string['configparent'] = 'Parent';
 $string['configparentserie'] = 'Parent serie';
 $string['configquery'] = 'Query';
@@ -213,6 +215,7 @@ $string['dropconfig'] = 'Copy here the configuration string';
 $string['plugindist'] = 'Plugin distribution';
 $string['emulatecommunity'] = 'Emulate community version';
 $string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
+$string['editingnoexecute'] = ' You are in editing mode, the dashboard cannot execute queries';
 $string['enabled'] = ' enabled';
 $string['eventdesc'] = 'Event desc';
 $string['eventend'] = 'Event end serie';
@@ -229,6 +232,8 @@ $string['filegenerated'] = 'File has been successfully generated';
 $string['fileoutput'] = 'Data Export settings';
 $string['filters'] = 'Filters';
 $string['filesview'] = 'View filearea content';
+$string['filegenerationfailed'] = 'File failed to be generated';
+$string['filternotretrievable'] = 'Filter not retrievable';
 $string['friday'] = 'Friday';
 $string['from'] = 'from';
 $string['generalparams'] = 'Access to dashboard settings';
@@ -257,6 +262,8 @@ $string['mins'] = 'Min';
 $string['monday'] = 'Monday';
 $string['month'] = 'Month';
 $string['newdashboard'] = 'New dashboard';
+$string['nodata'] = 'No data available';
+$string['nofiles'] = 'No files';
 $string['noquerystored'] = 'No query stored';
 $string['norefresh'] = 'No refresh';
 $string['notretrievable'] = 'No data retrievable. You may be in editing mode and no previous data has been cached. This mode is forced to prevent loosing control of dashboard setup on strangling queries.';
@@ -284,7 +291,7 @@ $string['sqlparamtype'] = 'Type';
 $string['sqlparamvalues'] = 'Values';
 $string['sqlparamvar'] = 'SQL Variable Name';
 $string['subtotal'] = 'Subtotal';
-$string['summatorsparams'] = 'Summators settings';
+$string['sumsandfiltersparams'] = 'Summators settings';
 $string['sunday'] = 'Sunday';
 $string['tablecolormapping'] = 'Output table color mapping';
 $string['tabular'] = 'Tabular';
@@ -306,6 +313,7 @@ $string['viewdashboard'] = 'View dashboard';
 $string['wednesday'] = 'Wednesday';
 $string['week'] = 'Week';
 $string['year'] = 'Year';
+$string['sums'] = 'Summators';
 
 $string['configbands_help'] = 'A time line graph has two timebands one over the other. The second timeband has more precision.';
 $string['configtimeunits_help'] = 'Setup the time units and scale for each band.';
@@ -334,7 +342,6 @@ $string['configfilesqlouttable_help'] = '
 <p>In case file format is outputing an SQL inserts, youl\'ll need tell the table name in which records go in. </p>
 ';
 
-$string['configfilepathadminoverride'] = 'Only administrators can choose where to put the file.';
 $string['configfilepathadminoverride_help'] = 'Administrators may need to generate the files outside the Moodle controlled area';
 
 $string['configformatting_help'] = '
@@ -736,7 +743,7 @@ This allows to add a special path start from dataroot in order to store the genr
 $string['confighorodatefiles_help'] = 'When enabled, a timestamp will be added at the end of each generated filename';
 
 $string['configqueryrotate_help'] = '
-#Result rotation
+# Result rotation
 
 Because SQL queries cannot make the output column set dynamic, SQL queries cannot query for matricial results. Results
 rotation is a way to transform a flat result into a dynamic bidimensional matrix. This is usefull e.g. for feeding 
@@ -751,3 +758,11 @@ and improvement effort.</p>
 <p>Please contact one of our distributors to get "Pro" version support.</p>
 <ul><li><a href="http://service.activeprolearn.com/local/shop/front/view.php?id=1">ActiveProLearn SAS</a></li>
 <li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>';
+
+$string['configserieslabels_help'] = '
+# Y series labels
+
+When plotting data series into graphs, Y series will by default be named with the X serie values. You may use this field to
+provide alternate labels for on screen printing. Labels should be given as a semicolon separated list in the order of
+the X serie values.
+';

@@ -1,0 +1,117 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for graph output params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-sumsandfiltersparams" class="dashboardsettings-panel off">
+<legend>{{strsumsandfilterparams}}</legend>
+
+<table class="dashboard-setup">
+
+    <tr valign="top">
+        <td align="center" colspan="4">
+                {{{strconfigreminderonsep}}}
+        </td>
+    </tr>
+</table>
+
+<h4>{{strfilters}}</h4>
+
+<table class="dashboard-setup">
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilters}}}: {{{helpiconconfigfilters}}}</b>
+        </td>
+        <td>
+            <input type="text" name="filters" size="40" value="{{{filters}}}" />
+        </td>
+
+        <td align="right" rowspan="3">
+            <b>{{{strconfigfilterlabels}}}:</b>
+        </td>
+
+        <td rowspan="3">
+            <textarea name="filterlabels" cols="30" rows="5" >{{{filterlabels}}}</textarea>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilterdefaults}}}: {{{helpiconconfigfilterdefaults}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="filterdefaults" size="30" value="{{{filterdefaults}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilteroptions}}}: {{{helpiconconfigfilteroptions}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="filteroptions" size="30" value="{{{filteroptions}}}" />
+        </td>
+    </tr>
+</table>
+
+<h4>{{strsums}}</h4>
+
+<table class="dashboard-setup">
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfignumsums}}}: {{{helpiconconfigsummators}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="numsums" size="30" value="{{numsums}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfignumsumsformats}}}: {{{helpiconconfigformatting}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="numsumformats" size="30" value="{{numsumformats}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfignumsumslabels}}}:</b>
+        </td>
+
+        <td>
+            <textarea name="numsumlabels" cols="30" rows="5" >{{{numsumlabels}}}</textarea>
+        </td>
+    </tr>
+
+</table>
+</fieldset>

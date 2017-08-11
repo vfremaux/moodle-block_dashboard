@@ -82,20 +82,32 @@ if (!empty($sort)) {
 
 $filteredsql = $theblock->protect($theblock->filteredsql);
 
-$results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // Get all data.
+$theblock->fetch_dashboard_data($filteredsql, $results, '', '', true); // Get all data.
 
 if ($results) {
     echo '<pre>';
-    $theblock->generate_output_file($results);
-    echo '</pre>';
-    echo $OUTPUT->notification(get_string('filegenerated', 'block_dashboard'));
-    if (empty($theblock->config->filepathadminoverride)) {
-        $params = array('id' => $courseid, 'instance' => $instanceid);
-        $buttonurl = new moodle_url('/blocks/dashboard/export/filearea.php', $params);
-        echo $OUTPUT->single_button($buttonurl, get_string('filesview', 'block_dashboard'));
+    $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
+    if ($csvrenderer->generate_output_file($theblock, $results)) {
+        echo '</pre>';
+        echo $OUTPUT->notification(get_string('filegenerated', 'block_dashboard'), 'notifysuccess');
+        if (empty($theblock->config->filepathadminoverride)) {
+            $params = array('id' => $courseid, 'instance' => $instanceid);
+            $buttonurl = new moodle_url('/blocks/dashboard/export/filearea.php', $params);
+            echo $OUTPUT->single_button($buttonurl, get_string('filesview', 'block_dashboard'));
+        }
+
+    } else {
+        echo '</pre>';
+        echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyfailure');
     }
-    $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
-    echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
+    if ($theblock->config->inblocklayout) {
+        $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
+        echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
+    } else {
+        $params = array('id' => $theblock->instance->id, 'id' => $courseid);
+        $buttonurl = new moodle_url('/blocks/dashboard/view.php', $params);
+        echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
+    }
 } else {
     echo "No results. Empty file";
 }
