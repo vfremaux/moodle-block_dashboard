@@ -1,0 +1,86 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for graph output params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-googleparams" class="dashboardsettings-panel off">
+<legend>{{strgoogleparams}}</legend>
+
+<table class="dashboard-setup">
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigmaptype}}}: {{{helpiconconfigmaptype}}}</b>
+        </td>
+
+        <td align="left">
+            {{{maptypeselect}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigzoom}}}: {{{helpiconconfigzoom}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" style="width:2em" name="zoom" size="30" value="{{zoom}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigdata}}}: {{{helpiconconfiggmdata}}}</b>
+        </td>
+
+        <td align="right">
+            <table cellpadding="2" width="100%">
+
+                <tr>
+                    <td>{{{strdatatitles}}}</td>
+                    <td>{{{strdatalocations}}}</td>
+                    <td>{{{strdatatypes}}}</td>
+                </tr>
+
+                <tr>
+                    <td><input type="text" name="datatitles" size="12" value="{{{datatitles}}}" /></td>
+                    <td><input type="text" name="datalocations" size="35" value="{{{datalocations}}}" /></td>
+                    <td><input type="text" name="datatypes" size="12" value="{{{datatypes}}}" /></td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfiglocation}}}:</b>
+        </td>
+
+        <td>
+            (lat : <input type="text" style="width:8em" size="8" name="lat" value="{{lat}}" />,
+            long : <input type="text" style="width:8em" size="8" name="lng" value="{{lng}}" />)
+        </td>
+    </tr>
+</table>
+</fieldset>

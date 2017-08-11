@@ -1,0 +1,66 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/param
+
+    Block template query param widget
+
+    Classes required for JS:
+    * none
+
+}}
+<div class="dashboard-sql-params">
+
+{{#params}}
+
+{{label}}:
+
+{{#choice}}
+<input type="radio" id="id_param_{{paramkey}}" class="dashboard-param" name="{{paramkey}}" value="{{quotedvalue0}}" {{{value0checked}}} /> {{value0}}
+ - <input type="radio" id="id_param_{{paramkey}}" class="dashboard-param" name="{{paramkey}}" value="{{quotedvalue1}}" {{{value1checked}}} "/> {{value1}}
+&nbsp;&nbsp;
+{{/choice}}
+
+{{#text}}
+<input type="text" size="10" id="id_param_{{paramkey}}" class="dashboard-param" name="{{paramkey}}" value="{{quotedparamvalue}}" />
+{{/text}}
+
+{{#list}}
+<select name="{{paramkey}}" class="dashboard-param" id="id_param_{{paramkey}}>
+{{#options}}
+    <option value="{{value}}" {{selected}}>{{label}}</option>
+{{/options}}}
+</select>
+{{/list}}
+
+{{#range}}
+{{strfrom}} <input type="text" size="10" name="{{paramkey}}_from" value="{{quotedvalueform}}" />
+{{strto}} <input type="text" size="10" name="{{paramkey}}_to" value="{{quotedvalueto}}" />
+{{/range}}
+
+{{#date}}
+<input type="text" size="10" id="date-{{paramkey}}" class="dashboard-param-date" name="{{paramkey}}" value="{{originalvalue}}" />
+{{/date}}
+
+{{#daterange}}
+{{strfrom}} <input type="text" size="10"  id="date-{{paramkey}}_from" class="dashboard-param-daterange" name="{{paramkey}}_from" value="{{originalvaluefrom}}" />
+{{strto}} <input type="text" size="10"  id="date-{{paramkey}}_to" name="{{paramkey}}_to" value="{{originalvalueto}}" />
+{{/daterange}}
+
+{{/params}}
+
+</div>

@@ -65,7 +65,7 @@ if ($ADMIN->fulltree) {
     $key = 'block_dashboard/enable_isediting_security';
     $label = get_string('dashboard_enable_isediting_security', 'block_dashboard');
     $desc = get_string('dashboard_enable_isediting_security_desc', 'block_dashboard');
-    $settings->add(new admin_setting_configtext($key, $label, $desc, true));
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, true));
 
     $settings->add(new admin_setting_heading('datarefresh', get_string('datarefresh', 'block_dashboard'), ''));
 
@@ -116,8 +116,8 @@ if ($ADMIN->fulltree) {
         $desc = get_string('emulatecommunity_desc', 'block_dashboard');
         $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
     } else {
-        $desc = get_string('plugindist_desc', 'block_dashboard');
-        $label = get_string('plugindist', 'block_use_stats');
+        $desc = get_string('plugindistpro_desc', 'block_dashboard');
+        $label = get_string('plugindist', 'block_dashboard');
         $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
     }
 }

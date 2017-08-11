@@ -21,10 +21,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *  Exporter of dashboard data snapshot
  */
+namespace block_dashboard\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-class block_dashboard_csv_renderer extends \plugin_renderer_base {
+class csv_renderer extends \plugin_renderer_base {
 
     public function export($theblock) {
 
@@ -154,7 +155,7 @@ class block_dashboard_csv_renderer extends \plugin_renderer_base {
                     mtrace ($reccount.' processed');
                 }
 
-                dashboard_output_file($theblock, $filestr);
+                return dashboard_output_file($theblock, $filestr);
             }
         }
     }
@@ -306,5 +307,9 @@ class block_dashboard_csv_renderer extends \plugin_renderer_base {
             $str .= implode($config->csv_field_separator, $row);
         }
         $str .= $config->csv_line_separator;
+    }
+
+    public function render_filearea($template) {
+        return $this->render_from_template('block_dashboard/filearea', $template);
     }
 }

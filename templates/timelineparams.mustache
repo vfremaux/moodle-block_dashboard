@@ -1,0 +1,111 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for graph output params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-timelineparams" class="dashboardsettings-panel off">
+<legend>{{strtimelineparams}}</legend>
+
+<table class="dashboard-setup">
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{strconfigshowlowerband}}: {{{helpiconconfigbands}}}</b>
+        </td>
+
+        <td>
+            <input type="radio" name="showlowerband" value="1" {{{showlowerbandchecked}}} > {{stryes}}
+            - <input type="radio" name="showlowerband" value="0" {{{showlowerbandunchecked}}} > {{strno}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{strconfigupperbandunit}}: {{{helpiconconfigtimeunits}}}</b>
+        </td>
+
+        <td align="right">
+                {{{upperbandunitselect}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{strconfiglowerbandunit}}: {{{helpiconconfigtimeunits}}}</b>
+        </td>
+
+        <td>
+            {{{lowerbandunitselect}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{strconfigeventmapping}}: {{{helpiconconfigeventmapping}}}</b>
+        </td>
+
+        <td colspan="3">
+
+            <table cellpadding="2">
+                <tr>
+                    <td>{{streventtitles}}</td>
+                    <td>{{streventstart}}</td>
+                    <td>{{streventend}}</td>
+                    <td>{{streventlink}}</td>
+                    <td>{{streventdesc}}</td>
+                </tr>
+
+                <tr>
+                    <td><input type="text" name="timelineeventtitle" size="12" value="{{eventtitle}}" /></td>
+                    <td><input type="text" name="timelineeventstart" size="12" value="{{eventstart}}" /></td>
+                    <td><input type="text" name="timelineeventend" size="12" value="{{eventend}}" /></td>
+                    <td><input type="text" name="timelineeventlink" size="12" value="{{eventlink}}" /></td>
+                    <td><input type="text" name="timelineeventdesc" size="12" value="{{eventdesc}}" /></td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="center">
+            <b>{{strconfigcolors}}:<b><br/>
+            <textarea cols="20" rows="10" name="timelinecolors" >{{{timelinecolors}}}</textarea>
+        </td>
+
+        <td align="center">
+            <b>{{strconfigcolorfield}}:</b><br/>
+            <input type="text" name="timelinecolorfield" value="{{theblock->config->timelinecolorfield}}" size="20" />
+        </td>
+
+        <td align="center">
+            <b>{{strconfigcoloredvalues}}:</b><br/>
+            <textarea cols="20" rows="10" name="timelinecolorkeys" >{{{timelinecolorkeys}}}</textarea>
+        </td>
+    </tr>
+</table>
+</fieldset>
