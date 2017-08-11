@@ -1,0 +1,138 @@
+{{!
+    This file is part of The Course Module Navigation Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/querydescription
+
+    Block template for query description form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-querydesc" class="dashboardsettings-panel on">
+<legend>{{strquerydesc}}</legend>
+<table class="dashboard-setup">
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigtarget}}}:</b>
+        </td>
+
+        <td colspan="3">
+           {{{targetselect}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigdisplay}}}:</b>
+        </td>
+
+        <td colspan="3">
+            <table width="100%">
+                <tr>
+                    <td>{{{strconfigshowdata}}}</td>
+                    <td>
+                        <input type="radio" name="showdata" value="1" {{{showdatachecked}}} />
+                        {{stryes}}
+                        <input type="radio" name="showdata" value="0" {{{showdataunchecked}}} />
+                        {{strno}}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{{strconfigshowgraph}}}</td>
+                    <td>
+                        <input type="radio" name="showgraph" value="1" {{{showgraphchecked}}} />
+                        {{stryes}}
+                        <input type="radio" name="showgraph" value="0" {{{showgraphunchecekd}}} />
+                        {{strno}}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{{strconfigshownumsums}}}</td>
+                    <td>
+                        <input type="radio" name="shownumsums" value="1" {{{shownumsumschecked}}} />
+                        {{stryes}}
+                        <input type="radio" name="shownumsums" value="0" {{{shownumsumsunchecked}}} />
+                        {{strno}}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{{strconfigshowquery}}}</td>
+                    <td>
+                        <input type="radio" name="showquery" value="1" {{{showquerychecked}}} />
+                        {{stryes}}
+                        <input type="radio" name="showquery" value="0" {{{showqueryunchecked}}} />
+                        {{strno}}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{{strconfigshowfilterqueries}}}</td>
+                    <td>
+                        <input type="radio" name="showfilterqueries" value="1" {{{showfilterquerieschecked}}} />
+                        {{stryes}}
+                        <input type="radio" name="showfilterqueries" value="0" {{{showfilterqueriesunchecked}}} />
+                        {{strno}}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigquery}}}: {{{helpiconconfigquery}}}</b>
+        </td>
+
+        <td align="center" colspan="3">
+            <textarea name="query" cols="80" rows="10" >{{{theblocktitle}}}</textarea>
+        </td>
+    </tr>
+
+{{#resultrotate}}
+    <tr valign="top">
+        <td align="left" colspan="4">
+            <b>{{{strconfigqueryrotate}}}: {{{helpiconconfigqueryrotate}}}</b>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+        </td>
+
+        <td align="center">
+            <b>{{{strconfigrotatecolumns}}}: </b><br/>
+            <input text name="queryrotatecols" size="30" value="{{configqueryrotatecols}}" />
+        </td>
+
+        <td align="right">
+            <b>{{{strconfigrotatepivot}}}: </b><br/>
+            <input text name="queryrotatepivot" size="30" value="{{configqueryrotatepivot}}" />
+        </td>
+
+        <td align="center">
+            <b>{{{strconfigrotatenewkeys}}}: </b><br/>
+            <input text name="queryrotatenewkeys" size="30" value="{{configqueryrotatenewkeys}}" />
+        </td>
+    </tr>
+{{/resultrotate}}
+
+</table>
+</fieldset>

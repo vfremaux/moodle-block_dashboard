@@ -39,6 +39,7 @@ if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))) {
 require_login($course);
 $theblock = block_instance('dashboard', $instance);
 $theblock->get_required_javascript();
+$renderer = $PAGE->get_renderer('block_dashboard');
 $context = context_block::instance($theblock->instance->id);
 
 $PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), null);
@@ -52,9 +53,11 @@ $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
 echo $OUTPUT->header();
 
+echo $OUTPUT->heading($theblock->get_title());
+
 echo $OUTPUT->box_start();
 
-echo $theblock->print_dashboard();
+echo $renderer->render_dashboard($theblock);
 
 if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()) {
     $options = array();

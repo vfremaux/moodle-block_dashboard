@@ -1,0 +1,193 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for graph output params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-graphparams" class="dashboardsettings-panel off">
+<legend>{{strgraphparams}}</legend>
+
+<table class="dashboard-setup">
+
+    <tr valign="top">
+        <td align="center" colspan="4">
+                {{{strconfigreminderonsep}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfiggraphtype}}}:</b>
+        </td>
+
+        <td>
+                {{{graphtypeselect}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigxaxisfield}}}: {{{helpiconconfigxaxis}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="xaxisfield" size="30" value="{{{xaxisfield}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigxaxislabel}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="xaxislabel" value="{{{xaxislabel}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigyseries}}}: {{{helpiconconfigyseries}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="yseries" size="30" value="{{{yseries}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigyseriesformats}}}: {{{helpiconconfigformatting}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="yseriesformats" size="30" value="{{{yseriesformats}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigserieslabels}}}: {{{helpiconconfigserieslabels}}}</b>
+        </td>
+
+        <td>
+            <textarea name="serieslabels" cols="30" rows="4" >{{{serieslabels}}}</textarea>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigymin}}}: {{{helpiconconfigexplicitscaling}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="ymin" size="10" value="{{{ymin}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigymax}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="ymax" size="10" value="{{{ymax}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigtickspacing}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="tickspacing" size="10" value="{{{tickspacing}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigyaxisscale}}}:</b>
+        </td>
+
+        <td>
+            <input type="radio" name="yaxisscale" value="linear" {{linearchecked}} /> {{strlinear}}
+            - <input type="radio" name="yaxisscale" value="log" {{logchecked}} /> {{strlog}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigyaxislabel}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="yaxislabel" size="30" value="{{{yaxislabel}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigyaxistickangle}}}:</b>
+        </td>
+
+        <td>
+            <input type="radio" name="yaxistickangle" value="-45" {{{yaxistickanglechecked1}}} /> -45
+            - <input type="radio" name="yaxistickangle" value="0" {{{yaxistickanglechecked2}}} /> 0
+            - <input type="radio" name="yaxistickangle" value="45" {{{yaxistickanglechecked3}}} /> 45
+            - <input type="radio" name="yaxistickangle" value="90" {{{yaxistickanglechecked4}}} /> 90
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfiggraphwidth}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="graphwidth" value="{{{graphwidth}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfiggraphheight}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="graphheight" value="{{{graphheight}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigshowlegend}}}:</b>
+        </td>
+
+        <td>
+            <input type="radio" name="showlegend" value="1" {{{showlegendchecked}}} /> {{stryes}}
+            - <input type="radio" name="showlegend" value="0" {{{showlegendunchecked}}} /> {{strno}}
+        </td>
+    </tr>
+
+</table>
+</fieldset>

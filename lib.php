@@ -36,8 +36,7 @@ function block_dashboard_supports_feature($feature) {
             'pro' => array(
                 'format' => array('xls', 'csv'),
                 'config' => array('importexport'),
-                'result' => array('rotation'),
-                'result' => array('export'),
+                'result' => array('rotation', 'export'),
             ),
             'community' => array(
                 'format' => array('csv'),
@@ -443,10 +442,15 @@ function dashboard_output_file(&$theblock, $str) {
         $filerecord->contextid = context_block::instance($theblock->instance->id)->id;
         $filerecord->filearea = 'generated';
         $filerecord->itemid = $theblock->instance->id;
-        $parts = pathinfo($theblock->config->filelocation);
-        $filerecord->filepath = '/'.$parts['dirname'].'/';
-        $filerecord->filepath = preg_replace('/\/\//', '/', $filerecord->filepath); // Normalise.
-        $filename = $parts['basename'];
+        if (empty($theblock->config->filelocation)) {
+            $filerecord->filepath = '/';
+            $filename = 'csv_report_dashboard_'.$theblock->instance->id.'.csv';
+        } else {
+            $parts = pathinfo($theblock->config->filelocation);
+            $filerecord->filepath = '/'.@$parts['dirname'].'/';
+            $filerecord->filepath = preg_replace('#//#', '/', $filerecord->filepath); // Normalise.
+            $filename = $parts['basename'];
+        }
         if (@$theblock->config->horodatefiles) {
             $filename = $parts['filename'].'_'.strftime("%Y%m%d-%H:%M", time()).'.'.$parts['extension'];
         }
@@ -463,7 +467,7 @@ function dashboard_output_file(&$theblock, $str) {
         }
 
         // Create new one.
-        $fs->create_file_from_string($filerecord, $str);
+        return $fs->create_file_from_string($filerecord, $str);
     }
 }
 

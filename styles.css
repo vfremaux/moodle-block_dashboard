@@ -29,6 +29,10 @@ div.dashboard-query-box{
     margin:2px;
 }
 
+table.dashboard-setup tr {
+    min-height: 1.3em;
+}
+
 table.dashboard-table{
    border: 1px solid #7E7ACB;
    border-collapse:separate;
@@ -169,11 +173,11 @@ div.dashboard-special{
    left:-40px !important;
 }
 
-.off{
+.dashboardsettings-panel.off{
     display:none !important;
 }
 
-.on{
+.dashboardsettings-panel.on{
     display:block;
 }
 
@@ -237,4 +241,12 @@ table.dashboard-setup td {
 .dashboard-table-buttons form,
 .dashboard-table-buttons form div {
     display:inline-block;
+}
+
+#dashboardsettings-menu .setting-tab {
+    display: inline-block;
+}
+
+#dashboardsettings-menu .setting-tab.off {
+    display:none;
 }
