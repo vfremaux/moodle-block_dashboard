@@ -1,18 +1,36 @@
 div.configure{
-	float:right;
-	width:100px;
+    float:right;
+    width:100px;
 }
 
-.dashboard-filters{
-   margin:1px;
+form.dashboard-filters{
    border:solid 1px #9B5992;
+   margin:1px;
+   padding:2px 8px;
+}
+
+form.dashboard-filters input{
+    margin:1px;
+    padding:1px;
 }
 
 div.dashboard-query-box{
-   margin:1px;
+   background-color:#E0E9F1;
    border:solid 1px #9B5992;
    color:#8080A0;
-   background-color:#E0E9F1;
+   margin:1px;
+}
+
+.dashboard-filter-query {
+    border:1px solid #808080;
+    font-size:0.75em;
+    font-family:monospace;
+    padding:1px;
+    margin:2px;
+}
+
+table.dashboard-setup tr {
+    min-height: 1.3em;
 }
 
 table.dashboard-table{
@@ -28,17 +46,17 @@ table.dashboard-table td{
 .dashboard-table .hkey{
    background-color:#9996D6;
    color:white;
-   font-weight:bolder;
    font-size:1.1em;
+   font-weight:bolder;
    padding:1px 5px;
 }
 
 .dashboard-horiz-serie{
    background-color:#C2C0E7;
-   text-align:center;
-   font-weight:bolder;
    border:2px solid white;
+   font-weight:bolder;
    margin-top:2px;
+   text-align:center;
 }
 
 .dashboard-table .vkey{
@@ -46,24 +64,52 @@ table.dashboard-table td{
 }
 
 .dashboard-table .vkey.c0{
-   background-color:#8B87BE;
+   background-color:#48447D;
    color:white;
-   font-weight:bolder;
    font-size:1.1em;
+   font-weight:bolder;
 }
 
 .dashboard-table .vkey.c1{
-   background-color:#9F9BCA;
+   background-color:#5B56A3;
    color:#F0F0F7;
-   font-weight:bolder;
    font-size:1.1em;
+   font-weight:bolder;
 }
 
 .dashboard-table .vkey.c2{
+   background-color:#746CB3;
+   color:white;
+   font-size:1.1em;
+   font-weight:bolder;
+}
+
+.dashboard-table .vkey.c3{
+   background-color:#948EC4;
+   color:white;
+   font-size:1.1em;
+   font-weight:bolder;
+}
+
+.dashboard-table .vkey.c4{
    background-color:#9D98C9;
    color:white;
-   font-weight:bolder;
    font-size:1.1em;
+   font-weight:bolder;
+}
+
+.dashboard-table .vkey.c5{
+   background-color:#AFABD3;
+   color:black;
+   font-size:1.1em;
+   font-weight:bolder;
+}
+
+.dashboard-table .vkey.c6{
+   background-color:#BEBBDB;
+   color:black;
+   font-size:1.1em;
+   font-weight:bolder;
 }
 
 .dashboard-table .data{
@@ -72,8 +118,8 @@ table.dashboard-table td{
 }
 
 .dashboard-table .empty{
-   border:1px solid #F0F0F0;
    background-color:#F8F8F8;
+   border:1px solid #F0F0F0;
 }
 
 div.dashboard-special{
@@ -112,11 +158,11 @@ div.dashboard-special{
 }
 
 .jqplot-table-legend-swatch{
+   border-style:solid;
    border-width:4px;
+   height:9px;
    margin:1px;
    width:9px;
-   height:9px;
-   border-style:solid;
 }
 
 .jqplot-xaxis-tick{
@@ -127,6 +173,7 @@ div.dashboard-special{
    left:-40px !important;
 }
 
+<<<<<<< HEAD
 .off{
 	display:none !important;
 }
@@ -143,4 +190,82 @@ div.dashboard-special{
 
 #dashboardsettings-menu LI{
 	line-height:1.7em;
+=======
+.dashboardsettings-panel.off{
+    display:none !important;
+}
+
+.dashboardsettings-panel.on{
+    display:block;
+}
+
+.dashboard-sql-params{
+    display:inline;
+    font-size:0.85em;
+    margin-top:2px;
+}
+
+#dashboardsettings-menu LI{
+    line-height:1.7em;
+}
+
+.block-dashboard-entrylist{
+    padding:20px;
+}
+
+.dashboard-panel{
+    font-size:0.9em;
+    overflow:scroll;
+}
+
+.dashbobard-filter-query{
+    border:1px solid #808080;
+    font-family:monospace
+    font-size:0.75em;
+    margin:2px;
+    padding:1px;
+}
+
+.dashboard-query-box{
+    border:1px solid #808080;
+    font-family:monospace
+    font-size:0.75em;
+    margin:2px;
+    padding:1px;
+}
+
+table.dashboard-setup {
+    width:  100%;
+}
+
+table.dashboard-setup td {
+    padding: 10px;
+}
+
+.dhtmlxcalendar_container {
+    background-color:#fdfdfd;
+    border:#fbfbfb solid 1px;
+    border-radius:3px;
+    box-shadow: 10px 10px 5px #888888;
+    font-size:1.05em;
+}
+
+.dashboard-table-buttons {
+    padding-top:10px;
+    text-align:right;
+}
+
+.dashboard-table-buttons div,
+.dashboard-table-buttons form,
+.dashboard-table-buttons form div {
+    display:inline-block;
+}
+
+#dashboardsettings-menu .setting-tab {
+    display: inline-block;
+}
+
+#dashboardsettings-menu .setting-tab.off {
+    display:none;
+>>>>>>> MOODLE_33_STABLE
 }

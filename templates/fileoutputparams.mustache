@@ -1,0 +1,119 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for graph output params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-fileoutput" class="dashboardsettings-panel off">
+<legend>{{strfileoutput}}</legend>
+<table width="100%" class="dashboard-setup">
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfigmakefile}}}: {{{helpiconconfigmakefile}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="radio" name="makefile" value="0" {{makefileunchecked}} /> {{strno}}
+            - <input type="radio" name="makefile" value="1" {{makefilechecked}} />  {{stryes}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfigfileoutput}}}: {{{helpiconconfigfileoutput}}} </b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="fileoutput" value="{{fileoutput}}" />
+        </td>
+
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfileoutputformats}}}: {{{helpiconconfigformatting}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="fileoutputformats" value="{{fileoutputformats}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfileformat}}}:</b>
+        </td>
+
+        <td align="left">
+        {{{selectfileformats}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilesqlouttable}}}: {{{helpiconconfigfilesqlouttable}}}</b>
+        </td>
+
+        <td align="left">
+            {{{fileformatselect}}}
+            <input type="text" name="filesqlouttable" value="{{filesqlouttable}}" />
+        </td>
+    </tr>
+</table>
+
+<table width="100%" class="dashboard-setup">
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilelocation}}}: {{{helpiconconfigfilelocation}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="filelocation" size="30" value="{{filelocation}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfighorodatefiles}}}: {{{helpiconconfighorodatefiles}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="checkbox" name="horodatefiles" value="1" {{{horodatefileschecked}}} />
+        </td>
+    </tr>
+
+{{#isadmin}}
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigfilepathadminoverride}}}: {{{helpiconconfigfilepathadminoverride}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="filepathadminoverride" size="30" value="{{filepathadminoverride}}" />
+        </td>
+    </tr>
+{{/isadmin}}
+
+</table>
+</fieldset>

@@ -62,12 +62,16 @@ Given a full query, the dashboard block mashes up :
 # Library locations
 ########################################
 
-Libraries will work from inside the block dashboard. 
+Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_27_STABLE.zip
+and add the ocntent to the moodle/local directory
 
-A further version might propose to move them into a "shared libs framework" local plugin for code packaging optimisation.
+Those libs are NOT moodle libs but additional public opensource libraries i use in several components as
+extra framework. 
 
 # Install additive for running timelines
 ########################################
+
+@TODO : Review this with better JS provisioning calls
 
 Timeline needs to be post page loading activaed. We got some issue to stack onload events
 on body element. The solution is till now to add a late call to initialisation in footer : 

@@ -1,25 +1,47 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * GoogleMap iframe wrapper
  * 
- * @package block-dashboard
+ * @package block_dashboard
  * @category blocks
  * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @version Moodle 1.9
  */
-
-include '../../config.php';
+require('../../config.php');
 
 $courseid = required_param('id', PARAM_INT);
 
+<<<<<<< HEAD
 if ($courseid != SITEID){
 	if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
 		print_error('invalidcourseid');
 	}
 	
 	require_login($course);
+=======
+// Security.
+if ($courseid != SITEID) {
+    if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
+        print_error('invalidcourseid');
+    }
+    require_login($course);
+>>>>>>> MOODLE_33_STABLE
 }
 
 $options = stripslashes(urldecode(required_param('options', PARAM_TEXT)));
@@ -43,39 +65,40 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
 </script>
 <script type="text/javascript">
 
-  	function initialize() {
-    	var latlng = new google.maps.LatLng(<?php echo $lat ?>, <?php echo $lng ?>);
-    	var myOptions = <?php echo $options ?>;
-    	var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-    	map.setOptions({styles: administrative});
-    	for (i = 0; i < mks ; i++){
-	    	marker[i].setMap(map);
-	    }
-  	}
+    function initialize() {
+        var latlng = new google.maps.LatLng(<?php echo $lat ?>, <?php echo $lng ?>);
+        var myOptions = <?php echo $options ?>;
+        var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+        map.setOptions({styles: administrative});
+        for (i = 0; i < mks ; i++){
+            marker[i].setMap(map);
+        }
+    }
 
 <?php
-	$markerimages = glob ($CFG->dataroot.'/'.$course->id.'/blockdata/dashboard/all/mk_*.png');
-	$hasshadow = array();
-	if (!empty($markerimages)){
-		foreach($markerimages as $im){
-			$imname = basename($im, '.png');
-			$shadowimname = str_replace('mk_', 'sh_', $imname);
-			$classname = str_replace('mk_', '', $imname);
-			$sizeinfo = getimagesize($im);
-			$imfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$imname}.png";
-			echo "var image{$classname} = new google.maps.MarkerImage(\"$imfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
+    $markerimages = glob ($CFG->dataroot.'/'.$course->id.'/blockdata/dashboard/all/mk_*.png');
+    $hasshadow = array();
+    if (!empty($markerimages)) {
+        foreach ($markerimages as $im) {
+            $imname = basename($im, '.png');
+            $shadowimname = str_replace('mk_', 'sh_', $imname);
+            $classname = str_replace('mk_', '', $imname);
+            $sizeinfo = getimagesize($im);
+            $imfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$imname}.png";
+            echo "var image{$classname} = new google.maps.MarkerImage(\"$imfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
 
-			$shadowimagepath = $CFG->dataroot."/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
-			if (file_exists($shadowimagepath)){
-				$sizeinfo = getimagesize($shadowimagepath);
-				$shadowfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
-				echo "var shadow{$classname} = new google.maps.MarkerImage(\"$shadowfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
-				$hasshadow[$classname] = true;
-			} else {
-				$hasshadow[$classname] = false;
-			}
-		}
-	}
+            $shadowimagepath = $CFG->dataroot."/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
+            if (file_exists($shadowimagepath)) {
+                $sizeinfo = getimagesize($shadowimagepath);
+                // Todo reform to new pluginfile.php file wrapper
+                $shadowfullpath = $CFG->wwwroot."/file.php/{$course->id}/blockdata/dashboard/all/{$shadowimname}.png";
+                echo "var shadow{$classname} = new google.maps.MarkerImage(\"$shadowfullpath\", new google.maps.Size({$sizeinfo[0]}, {$sizeinfo[1]}), new google.maps.Point(0, 0),new google.maps.Point(10, {$sizeinfo[1]}));\n";
+                $hasshadow[$classname] = true;
+            } else {
+                $hasshadow[$classname] = false;
+            }
+        }
+    }
 ?>
 /*
     var imagecertif = new google.maps.MarkerImage("pix/of1.png", new google.maps.Size(40, 39), new google.maps.Point(0, 0),new google.maps.Point(10, 39));
@@ -89,40 +112,40 @@ $markers = optional_param('markers', PARAM_TEXT); // Array of markers
     var imagehq = new google.maps.MarkerImage("pix/hq.png", new google.maps.Size(13, 27), new google.maps.Point(0, 0),new google.maps.Point(5, 27));
     var shadowhq = new google.maps.MarkerImage("pix/hq_sh.png", new google.maps.Size(40, 39), new google.maps.Point(0, 0),new google.maps.Point(5, 27));
 */
-	var latlngmarks = new Array();
-	var marker = new Array();
-	var mks = 0;
+    var latlngmarks = new Array();
+    var marker = new Array();
+    var mks = 0;
 
 <?php
-if (!empty($markers)){
-	foreach($markers as $amarker){
-		$amarkerobj = json_decode(stripslashes(urldecode($amarker)));
+if (!empty($markers)) {
+    foreach ($markers as $amarker) {
+        $amarkerobj = json_decode(stripslashes(urldecode($amarker)));
 ?>
-	// 48.020587,0.151405
+    // 48.020587,0.151405
     latlngmarks[mks] = new google.maps.LatLng(<?php echo $amarkerobj->lat ?>, <?php echo $amarkerobj->lng ?>);
-	marker[mks] = new google.maps.Marker({
-       	position: latlngmarks[mks], 
-       	title:"<?php echo $amarkerobj->title ?>",
-       	<?php 
-       	if (!empty($amarkerobj->markerclass)) {
-       		if (@$hasshadow[$amarkerobj->markerclass]){
-       	?>
-       	shadow:shadow<?php echo $amarkerobj->markerclass ?>,
-       	<?php
-    		}
-    	?>
-       	icon:image<?php echo $amarkerobj->markerclass ?>
-		<?php
-		}
-		?>
+    marker[mks] = new google.maps.Marker({
+           position: latlngmarks[mks], 
+           title:"<?php echo $amarkerobj->title ?>",
+           <?php 
+           if (!empty($amarkerobj->markerclass)) {
+               if (@$hasshadow[$amarkerobj->markerclass]) {
+           ?>
+           shadow:shadow<?php echo $amarkerobj->markerclass ?>,
+           <?php
+            }
+        ?>
+           icon:image<?php echo $amarkerobj->markerclass ?>
+        <?php
+        }
+        ?>
     }); 
     mks++;
 <?php
-	}
+    }
 }
 ?>
 
-	var administrative = [
+    var administrative = [
     {
     featureType: "all",
     stylers: [
