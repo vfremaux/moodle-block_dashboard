@@ -124,7 +124,7 @@ class dashboard_file_browser extends file_browser {
         }
 
         if (!($blockinstance = $cachedmodules[$context->instanceid])) {
-            return null;
+            throw(new moodle_exception('Failed finding block'));
         }
 
         $coursecontext = $DB->get_record('context', array('id' => $blockrec->parentcontextid));
@@ -132,8 +132,8 @@ class dashboard_file_browser extends file_browser {
             $course = $COURSE;
         }
 
-        if (!file_exists($CFG->dirroot.'/blocks/$blockname/lib.php')) {
-            return null;
+        if (!file_exists($CFG->dirroot.'/blocks/'.$blockname.'/lib.php')) {
+            throw(new moodle_exception('No bloc library available'));
         }
 
         // Ok, we know that block exists, and user may access it.

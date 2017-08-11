@@ -63,6 +63,7 @@ $PAGE->set_context($context);
 $PAGE->set_url($url);
 $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
+$renderer = $PAGE->get_renderer('block_dashboard', 'csv');
 
 echo $OUTPUT->header();
 
@@ -76,7 +77,10 @@ $filename = null;
 $path = array();
 $files = array();
 $dirs = array();
+$template = new StdClass;
+
 if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated', $instanceid, $browsepath, null)) {
+
     // Build a Breadcrumb trail.
     $level = $fileinfo->get_parent();
 
@@ -97,58 +101,44 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
         }
     }
 
-    echo '<div class="filebrowser">';
-
-    echo '<div class="path">';
-    $breadcrumb = '';
+    $template->breadcrumb = '';
     if (!empty($path)) {
         $fullpath = '/';
         foreach ($path as $pel) {
             $fullpath .= $pel.'/';
-            $breadcrumb .= ' &gt; <a href="'.$url.'&path='.urlencode($fullpath).'">'.$pel.'</a>';
+            $template->breadcrumb .= ' &gt; <a href="'.$url.'&path='.urlencode($fullpath).'">'.$pel.'</a>';
         }
-        echo $breadcrumb;
     } else {
-        echo '/';
+        $template->breadcrumb = '/';
     }
-    echo '</div>';
 
-    echo '<div class="block-dashboard-entrylist">';
-    echo '<table with="80%">';
-
+    $template->exportdirs = array();
     foreach ($dirs as $dir) {
+        $exportdir = new StdClass;
         $dirinfo = $dir->get_params();
-        echo '<tr>';
-        echo '<td>';
-        echo '<img src="'.$OUTPUT->pix_url('f/folder').'">';
-        echo '</td>';
-        echo '<td>';
-        echo '<a href="'.$url.'&path='.$dirinfo['filepath'].'">'.$dir->get_visible_name().'</a>';
-        echo '</td>';
-        echo '</tr>';
+        $exportdir->nodeiconurl = $OUTPUT->pix_url('f/folder');
+        $exportdir->url = $url.'&path='.$dirinfo['filepath'];
+        $exportdir->name = $dir->get_visible_name();
+        $template->exportdirs[] = $exportdir;
     }
 
+    $template->exportfiles = array();
     foreach ($files as $file) {
         $info = $file->get_params();
-        echo '<tr>';
-        echo '<td>';
-        echo '<img src="'.$OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype())).'">';
-        echo '</td>';
-        echo '<td>';
+        $exportfile = new StdClass;
         $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
                                                          $info['itemid'], $info['filepath'], $info['filename']);
-        echo '<a href="'.$pluginfileurl.'">'.$file->get_visible_name().'</a>';
-        echo '</td>';
-        echo '</tr>';
+        $exportfile->nodeiconurl = $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype()));
+        $exportfile->url = $pluginfileurl;
+        $exportfile->name = $file->get_visible_name();
+        $exportfile->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());
+        $template->exportfiles[] = $exportfile;
     }
-
-    echo '</table>';
-    echo '</div>';
-
-    echo '</div>';
 } else {
-    echo '<div class="block-dashboard-entrylist">No files</div>';
+    $template->strnofiles = $OUTPUT->notification(get_string('nofiles', 'block_dashboard'));
 }
+
+echo $renderer->render_filearea($template);
 
 if (($browsepath != '/') || $fileinfo){
     echo $OUTPUT->single_button($url.'&what=clear', get_string('cleararea', 'block_dashboard'));

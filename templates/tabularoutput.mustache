@@ -1,0 +1,128 @@
+{{!
+    This file is part of The Course Module Navigation Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/layout
+
+    Block template for tabularoutput params form
+
+    Classes required for JS:
+    * none
+
+}}
+<fieldset id="dashboardsettings-panel-tabularparams" class="dashboardsettings-panel off">
+<legend>{{strtabularparams}}</legend>
+<table class="dashboard-setup">
+    <tr valign="top">
+        <td align="center" colspan="4">
+            {{{strconfigreminderonsep}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigverticalkeys}}}: {{{helpiconconfigtabular}}}</b><br/>
+        </td>
+
+        <td>
+            <input type="text" name="verticalkeys" size="20" value="{{{verticalkeys}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right" style="line-height:1.5em">
+            <b>{{{strconfighorizkey}}}: {{{helpiconconfigtabular}}}</b>
+        </td>
+
+        <td style="line-height:1.5em">
+            <input type="text" name="horizkey" size="20" value="{{{horizkey}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{configverticalformats}}}: {{{helpiconconfigformatting}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="verticalformats" size="20" value="{{{verticalformats}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td>
+            <b>{{{strconfighorizformat}}}: {{{helpiconconfigformatting}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="horizformat" size="20" value="{{{horizformat}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td>
+            <b>{{{strconfigspliton}}}: {{{helpiconconfigtablesplit}}}</b>
+        </td>
+
+        <td>
+            <input type="text" name="spliton" size="20" value="{{{spliton}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td class="conflabels">
+            <b>{{{strconfigenablehorizsums}}}: {{{helpiconconfigsums}}} </b>
+        </td>
+
+        <td>
+            <input type="radio" name="horizsums" value="0" {{{horizsumsunchecked}}} /> {{stro}}
+            - <input type="radio" name="horizsums" value="1" {{{horizsumschecked}}} /> {{stryes}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td>
+            <b>{{{strconfigenablevertsums}}}: {{{helpiconconfigsums}}}</b>
+        </td>
+
+        <td>
+            <input type="radio" name="vertsums" value="0" {{{vertsumsunchecked}}} /> {{strno}}
+            - <input type="radio" name="vertsums" value="1" {{{vertsumschecked}}} /> {{stryes}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td>
+            <b>{{{strconfigverticallabels}}}:</b>
+        </td>
+
+        <td>
+            <input type="text" name="verticallabels" size="30" value="{{{verticallabels}}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td>
+            <b>{{{strconfighorizlabel}}}:</b>
+        </td>
+
+        <td style="line-height:1.5em">
+            <input type="text" name="horizlabel" size="20" value="{{{horizlabel}}}" />
+        </td>
+    </tr>
+
+</table>
+</fieldset>

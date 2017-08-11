@@ -59,6 +59,7 @@ class block_dashboard extends block_base {
         $this->filters = array();
         $this->output = array();
         $this->outputf = array();
+        $this->filteredsql = '';
     }
 
     public function specialization() {
@@ -118,6 +119,7 @@ class block_dashboard extends block_base {
         $this->get_required_javascript();
 
         $context = context_block::instance($this->instance->id);
+        $renderer = $PAGE->get_renderer('block_dashboard');
 
         @raise_memory_limit('512M');
 
@@ -133,7 +135,7 @@ class block_dashboard extends block_base {
         $this->content = new StdClass;
 
         if (@$this->config->inblocklayout) {
-            $this->content->text = $this->print_dashboard();
+            $this->content->text = $renderer->render_dashboard($this);
         } else {
             $viewdashboardstr = get_string('viewdashboard', 'block_dashboard');
             $params = array('id' => $COURSE->id, 'blockid' => $this->instance->id);
@@ -156,619 +158,6 @@ class block_dashboard extends block_base {
         return $this->content;
     }
 
-    /**
-     * Real raster that prints graphs and data
-     */
-    public function print_dashboard() {
-        global $CFG, $extradbcnx, $COURSE, $DB, $OUTPUT, $PAGE;
-
-        $config = get_config('block_dashboard');
-        $renderer = $PAGE->get_renderer('block_dashboard');
-
-        $text = '<div class="dashboard-panel">';
-
-        $text .= $renderer->dhtmlxcalendar_style();
-
-        if (!isset($this->config)) {
-            $this->config = new StdClass;
-        }
-        $this->config->limit = 20;
-
-        $coursepage = '';
-        if ($COURSE->format == 'page') {
-            include_once($CFG->dirroot.'/course/format/lib.php');
-            $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
-            if (!$pageid) {
-                $flexpage = course_page::get_current_page($COURSE->id);
-            } else {
-                $flexpage = new StdClass;
-                $flexpage->id = $pageid;
-            }
-            $coursepage = "&page=".$flexpage->id;
-        }
-
-        $rpage = optional_param('rpage'.$this->instance->id, 0, PARAM_INT); // Result page.
-
-        if ($rpage < 0) {
-            $rpage = 0;
-        }
-
-        // Unlogged people cannot see their status.
-        if ((!isloggedin() || isguestuser()) && @$this->config->guestsallowed) {
-
-            $text = get_string('guestsnotallowed', 'block_dashboard');
-
-            $loginstr = get_string('login');
-            $loginurl = new moodle_url('/login/index.php');
-            $text .= '<a href="'.$loginurl.'">'.$loginstr.'</a>';
-            return $text;
-        }
-
-        if (!isset($this->config) || empty($this->config->query)) {
-            $noquerystr = get_string('noquerystored', 'block_dashboard');
-            $text = $noquerystr;
-            return $text;
-        }
-
-        if (!isset($config->big_result_threshold)) {
-            set_config('big_result_threshold', 500, 'block_dashboard');
-            $config->big_result_threshold = 500;
-        }
-
-        // Connecting.
-        if ($this->config->target == 'moodle') {
-            // Already connected.
-        } else {
-            $error = '';
-            if (!isset($extradbcnx)) {
-                $extradbcnx = extra_db_connect(true, $error);
-            }
-            if ($error) {
-                $text = $error;
-                return $text;
-            }
-        }
-
-        // Prepare all params from config.
-
-        $this->prepare_config();
-
-        $graphdata = array();
-        $ticks = array();
-        $filterquerystring = '';
-
-        if (!empty($this->config->filters)) {
-            try {
-                $filterquerystring = $this->prepare_filters();
-            } catch (Exception $e) {
-                if (debugging()) {
-                    echo @$e->error;
-                }
-                if (!empty($this->config->showfilterqueries)) {
-                    $filtersql = $this->filteredsql;
-                    $text .= '<div class="dashboard-filter-query"><b>FILTER :</b> '.$filtersql.'</div>';
-                }
-                return $text . get_string('invalidorobsoletefilterquery', 'block_dashboard');
-            }
-        } else {
-            $this->filteredsql = str_replace('<%%FILTERS%%>', '', $this->sql);
-        }
-
-        // Needed to prepare for filter range prefetch.
-        $this->sql = str_replace('<%%FILTERS%%>', '', $this->sql);
-
-        if (!empty($this->params)) {
-            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$this->prepare_params() : $this->prepare_params();
-        } else {
-            $this->sql = str_replace('<%%PARAMS%%>', '', $this->sql); // Needed to prepare for filter range prefetch.
-            $this->filteredsql = str_replace('<%%PARAMS%%>', '', $this->filteredsql); // Needed to prepare for filter range prefetch.
-        }
-
-        $sort = optional_param('tsort'.$this->instance->id, @$this->config->defaultsort, PARAM_TEXT);
-        if (!empty($sort)) {
-            // Do not sort if already sorted in explained query.
-            if (!preg_match('/ORDER\s+BY/si', $this->sql)) {
-                $this->filteredsql .= " ORDER BY $sort";
-            }
-        }
-
-        $this->filteredsql = $this->protect($this->filteredsql);
-
-        // GETTING RESULTS ---------------------------------------------------.
-
-        try {
-            $countres = $this->count_records($error);
-        } catch (Exception $e) {
-            $countres = 0;
-        }
-
-        // If too many results, we force paging mode.
-        if (empty($this->config->pagesize) && ($countres > $config->big_result_threshold) && !empty($this->config->bigresult)) {
-            $text .= '<span class="error">'.get_string('toomanyrecordsusepaging', 'block_dashboard').'</span><br/>';
-            $this->config->pagesize = $config->big_result_threshold;
-            $rpage = 0;
-        }
-
-        // Getting real results including page and offset.
-
-        if (!empty($this->config->pagesize)) {
-            $offset = $rpage * $this->config->pagesize;
-        } else {
-            $offset = '';
-        }
-
-        try {
-            $results = @$this->fetch_dashboard_data($this->filteredsql, @$this->config->pagesize, $offset);
-        } catch (Exception $e) {
-            // Showing query.
-            if (@$this->config->showquery) {
-                $text .= '<div class="dashboard-query-box">';
-                $text .= '<pre>'.$this->filteredsql.'</pre>';
-                $text .= '</div>';
-            }
-            return $text . get_string('invalidorobsoletequery', 'block_dashboard');
-        }
-
-        // Rotate results if required ---------------------------.
-
-        /*
-         * rotation has a strong effect on data structure, transforming flat recors
-         * into a data matrix that may be used to feed multiple graph series.
-         */
-        if (block_dashboard_supports_feature('result/rotate')) {
-            if (!empty($this->config->queryrotatecols) &&
-                    !empty($this->config->queryrotatenewkeys) &&
-                            !empty($this->config->queryrotatepivot)) {
-
-                $results = dashboard_rotate_result($this, $results);
-            }
-        }
-
-        // process results -----------------------------------.
-
-        if ($results) {
-
-            $filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '';
-
-            if (@$this->config->inblocklayout) {
-                $baseurl = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd;
-            } else {
-                $baseurl = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$this->instance->id.$coursepage.$filterquerystringadd;
-            }
-
-            // Start prepare output table
-
-            $table = new html_table();
-            $table->id = 'mod-dashboard'.$this->instance->id;
-            $table->class = 'dashboard';
-            $table->width = '100%';
-            $table->head = array();
-
-            $numcols = count($this->output);
-
-            foreach ($this->output as $field => $label) {
-                if (!empty($this->config->sortable)) {
-                    $label .= $renderer->sort_controls($this, $field, $sort);
-                }
-                $table->head[$field] = $label;
-                $table->size[$field] = (100 / $numcols).'%';
-            }
-
-            foreach ($this->output as $field => $label) {
-                $table->colclasses[$field] = "$field";
-            }
-
-            if (!empty($this->config->pagesize)) {
-                $table->pagesize = min($this->config->pagesize, $countres); // No paginating at start.
-            }
-
-            $graphseries = array();
-            $treedata = array();
-            $treekeys = array();
-            $lastvalue = array();
-            $hcols = array();
-            $splitnumsonsort = @$this->config->splitsumsonsort;
-
-            foreach ($results as $result) {
-
-                // Prepare for subsums.
-                if (!empty($splitnumsonsort)) {
-                    $orderkeyed = strtoupper($result->$splitnumsonsort);
-                    if (!isset($oldorderkeyed)) {
-                        $oldorderkeyed = $orderkeyed; // First time.
-                    }
-                }
-
-                // Pre-aggregates sums.
-                if (!empty($this->config->shownumsums)) {
-                    foreach (array_keys($this->numsumsf) as $numsum) {
-                        if (empty($numsum)) {
-                            continue;
-                        }
-                        if (!isset($result->$numsum)) {
-                            continue;
-                        }
-
-                        /*
-                         * make subaggregates (only for linear tables and when sorting criteria is the split column)
-                         * post aggregate after table output
-                         */
-                        if (!isset($this->aggr)) {
-                            $this->aggr = new StdClass;
-                        }
-
-                        $this->aggr->$numsum = 0 + (float)@$this->aggr->$numsum + (float)$result->$numsum;
-
-                        if (!empty($splitnumsonsort) && @$this->config->tabletype == 'linear' &&
-                                (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
-                            $this->subaggr[$orderkeyed]->$numsum = 0 + (float)@$this->subaggr[$orderkeyed]->$numsum + (float)$result->$numsum;
-                        }
-                    }
-                }
-
-                if (!empty($splitnumsonsort) &&
-                    (@$this->config->tabletype == 'linear') &&
-                            (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
-                    if ($orderkeyed != $oldorderkeyed) {
-                        // When range changes.
-                        $k = 0;
-                        $tabledata = null;
-                        foreach (array_keys($this->output) as $field) {
-                            if (in_array($field, array_keys($this->numsumsf))) {
-                                if (is_null($tabledata)) {
-                                    $tabledata = array();
-                                    for ($j = 0; $j < $k; $j++) {
-                                        $tabledata[$j] = '';
-                                    }
-                                }
-                                $tabledata[$k] = '<b>Tot: '.@$this->subaggr[$oldorderkeyed]->$field.'</b>';
-                            }
-                            $k++;
-                        }
-                        if (!is_null($tabledata)) {
-                            $table->data[] = $tabledata;
-                        }
-                        $oldorderkeyed = $orderkeyed;
-                    }
-                }
-
-                // Print data in results.
-                if (!empty($this->config->showdata)) {
-                    /*
-                     * this is the most common case of a linear table
-                     */
-                    if (empty($this->config->tabletype) ||
-                            ($this->config->tabletype == 'linear')) {
-                        $tabledata = array();
-
-                        foreach (array_keys($this->output) as $field) {
-                            if (empty($field)) {
-                                continue;
-                            }
-
-                            // Did we ask for cumulative results ?
-
-                            $cumulativeix = null;
-                            if (preg_match('/S\((.+?)\)/', $field, $matches)) {
-                                $field = $matches[1];
-                                $cumulativeix = $this->instance->id.'_'.$field;
-                            }
-
-                            if (!empty($this->outputf[$field])) {
-                                $datum = dashboard_format_data($this->outputf[$field], @$result->$field, $cumulativeix, $result);
-                            } else {
-                                $datum = dashboard_format_data(null, @$result->$field, $cumulativeix, $result);
-                            }
-
-                            // Process coloring if required.
-                            if (!empty($this->config->colorfield) &&
-                                    ($this->config->colorfield == $field)) {
-                                $datum = dashboard_colour_code($this, $datum, $this->colourcoding);
-                            }
-
-                            if (!empty($this->config->cleandisplay)) {
-                                if (!array_key_exists($field, $lastvalue) ||
-                                        ($lastvalue[$field] != $datum)) {
-                                    $lastvalue[$field] = $datum;
-                                    $tabledata[] = $datum;
-                                } else {
-                                    $tabledata[] = ''; // If same as above, add blanck.
-                                }
-                            } else {
-                                $tabledata[] = $datum;
-                            }
-                        }
-                        $table->data[] = $tabledata;
-                    } else if ($this->config->tabletype == 'tabular') {
-
-                        // This is a tabular table.
-
-                        /* in a tabular table, data can be placed :
-                        * - in first columns in order of vertical keys
-                        * the results are grabbed sequentially and spread into the matrix 
-                        */
-
-                        $keystack = array();
-                        $matrix = array();
-                        foreach (array_keys($this->vertkeys->formats) as $vkey) {
-                            if (empty($vkey)) {
-                                continue;
-                            }
-                            $vkeyvalue = $result->$vkey;
-                            $matrix[] = "['".addslashes($vkeyvalue)."']";
-                        }
-                        $hkey = $this->config->horizkey;
-                        $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                        $matrix[] = "['".addslashes($hkeyvalue)."']";
-                        $matrixst = "\$m".implode($matrix);
-                        if (!in_array($hkeyvalue, $hcols)) {
-                            $hcols[] = $hkeyvalue;
-                        }
-
-                        // Now put the cell value in it.
-                        $outvalues = array();
-                        foreach (array_keys($this->output) as $field) {
-
-                            // Did we ask for cumulative results ?
-                            $cumulativeix = null;
-                            if (preg_match('/S\((.+?)\)/', $field, $matches)) {
-                                $field = $matches[1];
-                                $cumulativeix = $this->instance->id.'_'.$field;
-                            }
-
-                            // Try to defer this formating as post formatting in cross table print.
-                            if (!empty($this->outputf[$field])) {
-                                $datum = dashboard_format_data($this->outputf[$field], $result->$field, $cumulativeix, $result);
-                            } else {
-                                $datum = dashboard_format_data(null, @$result->$field, $cumulativeix, $result);
-                            }
-                            if (!empty($this->config->colorfield) &&
-                                    ($this->config->colorfield == $field)) {
-                                $datum = dashboard_colour_code($this, $datum, $this->colourcoding);
-                            }
-                            $outvalues[] = str_replace("\"", "\\\"", $datum);
-                        }
-                        $matrixst .= ' = "'.implode(' ',$outvalues).'";';
-                        // Make the matrix in memory.
-                        eval($matrixst.";");
-                    } else {
-
-                        $debug = optional_param('debug', false, PARAM_BOOL);
-
-                        // Treeview.
-                        $resultarr = array_values((array)$result);
-                        $resultid = $resultarr[0];
-                        if (!empty($parentserie)) {
-                            if (!empty($result->$parentserie)) {
-                                // Non root node, attache to his parent if we found it.
-                                if (array_key_exists($result->$parentserie, $treekeys)) {
-                                    if (!empty($debug)) {
-                                        echo 'binding to '. $result->$parentserie.'. ';
-                                    }
-                                    $treekeys[$result->$parentserie]->childs[$resultid] = $result;
-                                    if (!array_key_exists($resultid, $treekeys)) {
-                                        $treekeys[$resultid] = $result;
-                                    }
-                                } else {
-                                    // In case nodes do not come in correct order, do not connect but register only.
-                                    if (!empty($debug)) echo 'waiting for '. $result->$parentserie.'. ';
-                                    $waitingnodes[$resultid] = $result;
-                                    if (!array_key_exists($resultid, $treekeys)) {
-                                        $treekeys[$resultid] = $result;
-                                    }
-                                }
-                            } else {
-                                // Root node.
-                                if (!empty($debug)) {
-                                    echo 'root as '. $resultid.'. ';
-                                }
-                                if (!array_key_exists($resultid, $treekeys)) {
-                                    $treekeys[$resultid] = $result;
-                                }
-                                $treedata[$resultid] = &$treekeys[$resultid];
-                            }
-                        } else {
-                            if (!array_key_exists($resultid, $treekeys)) {
-                                $treekeys[$resultid] = $result;
-                            }
-                        }
-                    }
-                }
-
-                // Prepare data for graphs.
-                if (!empty($this->config->showgraph)) {
-                    if (!empty($this->config->xaxisfield) &&
-                            $this->config->graphtype != 'googlemap' &&
-                                    $this->config->graphtype != 'timeline') {
-                        $xaxisfield = $this->config->xaxisfield;
-                        if ($this->config->graphtype != 'pie') {
-                            // Linear, bars.
-                            // TODO : check if $this->config->xaxisfield exists really (misconfiguration).
-                            $ticks[] = addslashes($result->$xaxisfield);
-                            $ys = 0;
-
-                            foreach (array_keys($this->yseries) as $yserie) {
-
-                                // Did we ask for cumulative results ?
-                                $cumulativeix = null;
-                                if (preg_match('/S\((.+?)\)/', $yserie, $matches)) {
-                                    $yserie = $matches[1];
-                                    $cumulativeix = $this->instance->id.'_'.$yserie;
-                                }
-
-                                if (!isset($result->$yserie)) {
-                                    continue;
-                                }
-
-                                if ($this->config->graphtype != 'timegraph') {
-                                    if (!empty($this->yseriesf[$yserie])) {
-                                        $graphseries[$yserie][] = dashboard_format_data($this->yseriesf[$yserie], $result->$yserie, $cumulativeix, $result);
-                                    } else {
-                                        $graphseries[$yserie][] = dashboard_format_data(null, $result->$yserie, $cumulativeix, $result);
-                                    }
-                                } else {
-                                    if (!empty($this->yseriesf[$yserie])) {
-                                        $timeelm = array($result->$xaxisfield, dashboard_format_data($this->yseriesf[$yserie], $result->$yserie, $cumulativeix, $result)); 
-                                        $graphseries[$ys][] = $timeelm;
-                                    } else {
-                                        $timeelm = array($result->$xaxisfield, dashboard_format_data(null, $result->$yserie, $cumulativeix, $result));
-                                        $graphseries[$ys][] = $timeelm;
-                                    }
-                                }
-                                $ys++;
-                            }
-                        } else if ($this->config->graphtype == 'pie') {
-                            foreach (array_keys($this->yseriesf) as $yserie) {
-                                if (empty($result->$xaxisfield)) {
-                                    $result->$xaxisfield = 'N.C.';
-                                }
-                                if (!empty($this->yseriesf[$field])) {
-                                    $graphseries[$yserie][] = array($result->$xaxisfield, dashboard_format_data($this->yseriesf[$field], $result->$yserie, false, $result));
-                                } else {
-                                    $graphseries[$yserie][] = array($result->$xaxisfield, $result->$yserie);
-                                }
-                            }
-                        }
-                    } else {
-                        $data[] = $result;
-                    }
-                }
-            }
-
-            $graphdata = array_values($graphseries);
-
-            // Post aggregating last subtotal ----------------------------------------.
-
-            if (!empty($this->config->shownumsums) && $results) {
-                if (!empty($splitnumsonsort) &&
-                        (@$this->config->tabletype == 'linear') &&
-                                (preg_match("/\\b$splitnumsonsort\\b/", $sort))) {
-                    $k = 0;
-                    $tabledata = null;
-                    foreach (array_keys($this->output) as $field) {
-                        if (in_array($field, array_keys($this->numsumsf))) {
-                            if (is_null($tabledata)) {
-                                $tabledata = array();
-                                for ($j = 0; $j < $k; $j++) {
-                                    $tabledata[$j] = '';
-                                }
-                            }
-                            $tabledata[$k] = '<b>Tot: '.@$this->subaggr[$orderkeyed]->$field.'</b>';
-                        }
-                        $k++;
-                    }
-                    $oldorderkeyed = $orderkeyed;
-                    if (!is_null($tabledata)) {
-                        $table->data[] = $tabledata;
-                    }
-                }
-            }
-
-            // Starting outputing data -------------------------------------------------.
-
-            // If treeview, need to post process waiting nodes.
-            if (@$this->config->tabletype == 'treeview') {
-                if (!empty($waitingnodes)) {
-                    foreach ($waitingnodes as $wnid => $wn) {
-                        if (array_key_exists($wn->$parentserie, $treekeys)) {
-                            if (!empty($debug)) {
-                                echo ' postbinding to '. $wn->$parentserie.'. ';
-                            }
-                            $treekeys[$wn->$parentserie]->childs[$wnid] = $wn;
-                            unset($waitingnodes[$wnid]); // Free some stuff.
-                        }
-                    }
-                }
-            }
-
-            if (@$this->config->inblocklayout) {
-                $params = array('id' => $COURSE->id.$coursepage, 'tsort'.$this->instance->id => $sort);
-                $url = new moodle_url('/course/view.php', $params);
-            } else {
-                $params = array('id' => $COURSE->id,
-                                'blockid' => $this->instance->id.$coursepage,
-                                'tsort'.$this->instance->id => $sort);
-                $url = new moodle_url('/blocks/dashboard/view.php', $params);
-            }
-
-            $text .= $renderer->filters_and_params_form($this, $sort);
-
-            if ($this->config->showdata) {
-                $filterquerystring = (!empty($filterquerystring)) ? '&'.$filterquerystring : '';
-                if (empty($this->config->tabletype) ||
-                        @$this->config->tabletype == 'linear') {
-
-                    $text .= html_writer::table($table);
-                    $text .= $renderer->export_buttons($this, $filterquerystring);
-
-                } else if (@$this->config->tabletype == 'tabular') {
-                    // Forget table and use $m matrix for making display.
-                    $text .= $renderer->cross_table($this, $m, $hcols, $this->config->horizkey, $this->vertkeys, $this->config->horizlabel, true);
-                    $text .= $renderer->tabular_buttons($this, $filterquerystring);
-                } else {
-                    $text .= $renderer->tree_view($this, $treedata, $this->treeoutput, $this->output, $this->outputf, $this->colourcoding, true);
-                    $text .= $renderer->tree_buttons($this, $filterquerystring);
-                }
-            } else {
-                $text .= '';
-            }
-        } else {
-            // No data, but render filters anyway.
-            $text .= $renderer->filters_and_params_form($this, $sort);
-        }
-
-        // Showing graph.
-        if ($this->config->showgraph && !empty($this->config->graphtype)) {
-            $text .= $OUTPUT->box_start('dashboard-graph-box');
-            $graphdesc = $this->dashboard_graph_properties();
-
-            if ($this->config->graphtype != 'googlemap' && $this->config->graphtype != 'timeline') {
-                $data = $graphdata;
-                $text .= local_vflibs_jqplot_print_graph('dashboard'.$this->instance->id, $graphdesc, $data,
-                                                         $this->config->graphwidth, $this->config->graphheight,
-                                                         '', true, $ticks);
-            } else if ($this->config->graphtype == 'googlemap') {
-                $text .= $renderer->googlemaps_data($this, $data, $graphdesc);
-            } else {
-
-                // Timeline graph.
-                if (empty($this->config->timelineeventstart) || empty($this->config->timelineeventend)) {
-                    $text .= $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
-                } else {
-                    $text .= timeline_print_graph($this, 'dashboard'.$this->instance->id, $this->config->graphwidth,
-                                                  $this->config->graphheight, $data, true);
-                }
-            }
-            $text .= $OUTPUT->box_end();
-        }
-
-        // Showing bottom summators.
-        if ($this->config->numsums) {
-            $text .= $renderer->numsums($this, $this->aggr);
-        }
-
-        // Showing query.
-        if (@$this->config->showquery) {
-            $text .= '<div class="dashboard-query-box">';
-            $text .= '<pre>'.$this->filteredsql.'</pre>';
-            $text .= '</div>';
-        }
-
-        // Showing SQL benches.
-        if (@$this->config->showbenches) {
-            $text .= '<div class="dashboard-benches-box">';
-            $text .= '<table width="100%">';
-            foreach ($this->benches as $bench) {
-                $value = $bench->end - $bench->start;
-                $text .= "<tr><td>{$bench->name}</td><td>{$value} sec.</td></tr>";
-            }
-            $text .= '</table>';
-            $text .= '</div>';
-        }
-        $text .= '</div>'; // Closing dashboard-panel.
-
-        return $text;
-    }
 
     /**
      * build a graph descriptor, taking some defaults decisions
@@ -855,6 +244,8 @@ class block_dashboard extends block_base {
                 'seriesDefaults' => array(
                     'renderer' => '$.jqplot.PieRenderer',
                     'rendererOptions' => array(
+                        'padding' => 2,
+                        'sliceMargin' => 2,
                         'showDataLabels' => true
                     ),
                 ),
@@ -961,7 +352,7 @@ class block_dashboard extends block_base {
      * rule 2 : avoiding closing char ";" to appear so a query cannot close to start a new one
      */
     public function protect($sql) {
-        $sql = preg_replace('/\b(UPDATE|ALTER|DELETE|INSERT|DROP|CREATE)\b/i', '', $sql);
+        $sql = preg_replace('/\b(UPDATE|ALTER|DELETE|INSERT|DROP|CREATE|GRANT)\b/i', '', $sql);
         $sql = preg_replace('/;/', '', $sql);
         return $sql;
     }
@@ -1130,17 +521,24 @@ class block_dashboard extends block_base {
             }
         }
 
+        $result = false;
         if (is_array($FILTERSET[$fielddef])) {
             switch ($specialvalue) {
                 case 'LAST':
                     $values = array_values($FILTERSET[$fielddef]);
-                    $result = end($values)->$fieldname;
-                    return (!empty($FILTERSET[$fielddef])) ? $result : false ;
+                    $lastvalue = end($values);
+                    if ($lastvalue) {
+                        $result = $lastvalue->$fieldname;
+                    }
+                    return $result;
 
                 case 'FIRST':
                     $values = array_values($FILTERSET[$fielddef]);
-                    $result = reset($values)->$fieldname ;
-                    return (!empty($FILTERSET[$fielddef])) ? $result : false ;
+                    $firstvalue = reset($values);
+                    if ($firstvalue) {
+                        $result = $firstvalue->$fieldname ;
+                    }
+                    return $result;
 
                 default:
                     return $FILTERSET[$fielddef];
@@ -1154,14 +552,22 @@ class block_dashboard extends block_base {
      * in a local table as serialized records. Only one data set is stored
      * by SQL radical (i.e., removing LIMIT and OFFSET clauses
      * LIMIT and OFFSET are applied to the local proxy.
+     * @param string $sql
+     * @param arrayref &$results
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forcereload
+     * @param bool $tracing
+     *
+     * @return a string status as complementary info on the data
      */
-    public function fetch_dashboard_data($sql, $limit = '', $offset = '', $forcereload = false, $tracing = false) {
+    public function fetch_dashboard_data($sql, &$results, $limit = '', $offset = '', $forcereload = false, $tracing = false) {
         global $extra_db_CNX, $CFG, $DB, $PAGE;
 
         $config = get_config('block_dashboard');
 
         $sqlrad = preg_replace('/LIMIT.*/si', '', $sql);
-        $sqlkey = md5($sql);
+        $sqlkey = md5("$sql LIMIT $limit OFFSET $offset");
 
         $cachefootprint = $DB->get_record('block_dashboard_cache', array('querykey' => $sqlkey));
 
@@ -1187,58 +593,12 @@ class block_dashboard extends block_base {
             $t1 = (float)$usec + (float)$sec;
 
             if ($this->config->target == 'moodle') {
-
-                // Get all results for cache.
-                $allresults = array();
-                if (@$this->config->showbenches) {
-                    $bench = new StdClass;
-                    $bench->name = "main query";
-                    $bench->start = time();
-                }
-
-                $rs = $DB->get_recordset_sql($sql);
-                while ($rs->valid()) {
-                    $rec = $rs->current();
-                    $recarr = array_values((array)$rec);
-                    $allresults[$recarr[0]] = $rec;
-                    if (!empty($this->config->uselocalcaching)) {
-                        $cacherec = new StdClass;
-                        $cacherec->access = $this->config->target;
-                        $cacherec->querykey = $sqlkey;
-                        $cacherec->recordid = $recarr[0]; // Get first column in result as key.
-                        $cacherec->record = base64_encode(serialize($rec));
-                        $DB->insert_record('block_dashboard_cache_data', $cacherec);
-                    }
-                    $rs->next();
-                }
-                $rs->close();
-
-                if ($limit) {
-                    $rs = $DB->get_recordset_sql($sql, $offset, $limit);
-                    while ($rs->valid()) {
-                        $rec = $rs->current();
-                        $recarr = array_values((array)$rec);
-                        $results[$recarr[0]] = $rec;
-                        $rs->next();
-                    }
-                    $rs->close();
-                } else {
-                    $results = $allresults;
-                }
-
-                if (@$this->config->showbenches) {
-                    $bench->end = time();
-                    $this->benches[] = $bench;
-                }
+                return $this->get_moodle_results($sql, $results, $limit, $offset);
             } else {
                 // TODO : enhance performance by using recordsets.
 
                 if (empty($extra_db_CNX)) {
                     extra_db_connect(false, $error);
-                }
-
-                if ($tracing) {
-                    mtrace('Getting data from DB');
                 }
 
                 if ($allresults = extra_db_query($sql, false, true, $error)) {
@@ -1254,8 +614,7 @@ class block_dashboard extends block_base {
                     }
                 }
                 if ($error) {
-                    $this->content->text .= '<span class="error">'.$error.'</span>';
-                    return array();
+                    return '<span class="error">'.$error.'</span>';
                 }
 
                 if (!empty($limit)) {
@@ -1266,8 +625,7 @@ class block_dashboard extends block_base {
                 }
 
                 if ($error) {
-                    $this->content->text .= '<span class="error">'.$error.'</span>';
-                    return array();
+                    return '<span class="error">'.$error.'</span>';
                 }
             }
             if (!empty($this->config->uselocalcaching) && empty($error)) {
@@ -1281,43 +639,118 @@ class block_dashboard extends block_base {
             list($usec, $sec) = explode(' ', microtime());
             $t2 = (float)$usec + (float)$sec;
 
+            if (@$this->config->showbenches) {
+                $this->benches[] = $$t2 - $t1;
+            }
+
         } else {
             if ($cachefootprint) {
-                if ($tracing) {
-                    mtrace('Getting data from cache');
-                }
-                if (!isset($this->content)) {
-                    $this->content = new StdClass;
-                }
-                $this->content->text .= '<div class="dashboard-special">Cache</div>';
-                // We are caching and have a key.
+                $results = $this->get_data_from_cache($sqlkey, $limit, $offset);
+                return '<div class="dashboard-special">'.get_string('cacheddata', 'block_dashboard').'</div>';
+            } else {
+                $notretrievablestr = get_string('notretrievable', 'block_dashboard');
+                return '<div class="dashboard-special">'.$notretrievablestr.'</div>';
+            }
+        }
+    }
 
-                list($usec, $sec) = explode(' ', microtime());
-                $t1 = (float)$usec + (float)$sec;
+    /**
+     * Internally get results in the current moodle.
+     * @param string $sql
+     * @param arrayref $results
+     * @param int $limit
+     * @param int $offset
+     */
+    protected function get_moodle_results($sql, &$results, $limit, $offset) {
+        global $DB;
 
-                if (@$this->config->showbenches) {
-                    $bench = new StdClass;
-                    $bench->name = "cache query";
-                    $bench->start = time();
+        $sqlkey = md5("$sql LIMIT $limit OFFSET $offset");
+
+        // Get all results for cache.
+        $allresults = array();
+        if (@$this->config->showbenches) {
+            $bench = new StdClass;
+            $bench->name = "main query";
+            $bench->start = time();
+        }
+
+        if ($rs = $DB->get_recordset_sql($sql)) {
+            while ($rs->valid()) {
+                $rec = $rs->current();
+                $recarr = array_values((array)$rec);
+                $allresults[$recarr[0]] = $rec;
+                if (!empty($this->config->uselocalcaching)) {
+                    $cacherec = new StdClass;
+                    $cacherec->access = $this->config->target;
+                    $cacherec->querykey = $sqlkey;
+                    $cacherec->recordid = $recarr[0]; // Get first column in result as key.
+                    $cacherec->record = base64_encode(serialize($rec));
+                    $DB->insert_record('block_dashboard_cache_data', $cacherec);
                 }
-                $rs = $DB->get_recordset('block_dashboard_cache_data', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
+                $rs->next();
+            }
+            $rs->close();
+        } else {
+            $error = $DB->get_last_error();
+            if ($error) {
+                return '<span class="error">'.$error.'</span>';
+            }
+        }
+
+        if ($limit) {
+            if ($rs = $DB->get_recordset_sql($sql, $offset, $limit)) {
                 while ($rs->valid()) {
                     $rec = $rs->current();
-                    $results[$rec->recordid] = unserialize(base64_decode($rec->record));
+                    $recarr = array_values((array)$rec);
+                    $results[$recarr[0]] = $rec;
                     $rs->next();
                 }
                 $rs->close();
-                if (@$this->config->showbenches) {
-                    $bench->end = time();
-                    $this->benches[] = $bench;
-                }
-
-                list($usec, $sec) = explode(' ', microtime());
-                $t2 = (float)$usec + (float)$sec;
             } else {
-                $notretrievablestr = get_string('notretrievable', 'block_dashboard');
-                $this->content->text .= '<div class="dashboard-special">'.$notretrievablestr.'</div>';
+                $error = $DB->get_last_error();
+                if ($error) {
+                    return '<span class="error">'.$error.'</span>';
+                }
             }
+        } else {
+            $results = $allresults;
+        }
+
+        if (@$this->config->showbenches) {
+            $bench->end = time();
+            $this->benches[] = $bench;
+        }
+    }
+
+    /**
+     * Internally read from dashboard DB cache
+     */
+    protected function get_data_from_cache($sqlkey, $limit, $offset) {
+        global $DB;
+
+        if (!isset($this->content)) {
+            $this->content = new StdClass;
+            $this->content->text = '';
+        }
+
+        $this->content->text .= '<div class="dashboard-special">Cache</div>';
+
+        list($usec, $sec) = explode(' ', microtime());
+        $t1 = (float)$usec + (float)$sec;
+
+        $rs = $DB->get_recordset('block_dashboard_cache_data', array('querykey' => $sqlkey), 'id', '*', $offset, $limit);
+        while ($rs->valid()) {
+            $rec = $rs->current();
+            $results[$rec->recordid] = unserialize(base64_decode($rec->record));
+            $rs->next();
+        }
+        $rs->close();
+
+        list($usec, $sec) = explode(' ', microtime());
+        $t2 = (float)$usec + (float)$sec;
+
+        if (@$this->config->showbenches) {
+            $this->benches[] = $$t2 - $t1;
         }
 
         return $results;
@@ -1327,7 +760,7 @@ class block_dashboard extends block_base {
      * provides ability to defer cache update to croned delayed period.
      */
     static public function crontask() {
-        global $CFG, $DB, $SITE;
+        global $CFG, $DB, $SITE, $PAGE;
 
         $config = get_config('block_dashboard');
 
@@ -1390,14 +823,15 @@ class block_dashboard extends block_base {
                             $sql = str_replace('<%%PARAMS%%>', '', $sql);
 
                             mtrace('   ... refreshing for instance '.$dsh->id);
-                            $results = $instance->fetch_dashboard_data($sql, $limit, $offset, true, true /* with mtracing */);
+                            $status = $instance->fetch_dashboard_data($sql, $results, $limit, $offset, true, true /* with mtracing */);
 
                             if (empty($results)) {
                                 mtrace('Empty result on query : '.$sql);
                             }
 
                             // Generate output file if required.
-                            $instance->generate_output_file($results);
+                            $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
+                            $csvrenderer->generate_output_file($this, $results);
 
                             // Ugly way to do it....
                             $blockconfig = unserialize(base64_decode($DB->get_field('block_instances', 'configdata', array('id' => $dsh->id))));
@@ -1508,6 +942,7 @@ class block_dashboard extends block_base {
 
         // Filtering query.
         $outputfilters = explode(';', @$this->config->filters);
+        $this->filters = $outputfilters;
         $outputfilterlabels = explode(';', @$this->config->filterlabels);
         dashboard_normalize($outputfilters, $outputfilterlabels); // Normalizes labels to keys.
         $this->filterfields = new StdClass;
@@ -1823,6 +1258,12 @@ class block_dashboard extends block_base {
 
         if (!empty($filterinputs)) {
             foreach ($filterinputs as $key => $value) {
+
+                if ($value == '*') {
+                    // Strip out catch all options.
+                    continue;
+                }
+
                 $radical = preg_replace('/filter\d+_/','', $key);
                 $cond = isset($this->filterfields->filtercanonicalfield[$radical]);
                 $sqlfiltername = ($cond) ? $this->filterfields->filtercanonicalfield[$radical] : $radical;
@@ -1855,9 +1296,7 @@ class block_dashboard extends block_base {
     public function get_required_javascript() {
         global $CFG, $PAGE;
 
-        parent::get_required_javascript();
-
-        $PAGE->requires->jquery_plugin('jqplotjquery', 'local_vflibs');
+        $PAGE->requires->jquery();
         $PAGE->requires->jquery_plugin('jqplot', 'local_vflibs');
         $PAGE->requires->css('/local/vflibs/jquery/jqplot/jquery.jqplot.css');
 
@@ -1872,6 +1311,60 @@ class block_dashboard extends block_base {
         require_once $graphlibs.'/googleplotlib.php';
         require_once $graphlibs.'/timelinelib.php';
         timeline_require_js($graphwww);
+        $PAGE->requires->js_call_amd('block_dashboard/dashboard', 'init');
+    }
+
+    public function prepare_linear_table(&$table, &$result, &$lastvalue) {
+
+        $tabledata = array();
+
+        $colcount = 0;
+        foreach (array_keys($this->output) as $field) {
+            if (empty($field)) {
+                continue;
+            }
+
+            // Did we ask for cumulative results ?
+
+            $cumulativeix = null;
+            if (preg_match('/S\((.+?)\)/', $field, $matches)) {
+                $field = $matches[1];
+                $cumulativeix = $this->instance->id.'_'.$field;
+            }
+
+            if (!empty($this->outputf[$field])) {
+                $datum = dashboard_format_data($this->outputf[$field], @$result->$field, $cumulativeix, $result);
+            } else {
+                $datum = dashboard_format_data(null, @$result->$field, $cumulativeix, $result);
+            }
+
+            // Process coloring if required.
+            if (!empty($this->config->colorfield) &&
+                    ($this->config->colorfield == $field)) {
+                $datum = dashboard_colour_code($this, $datum, $this->colourcoding);
+            }
+
+            $cleanup = !empty($this->config->cleandisplay);
+            if (!empty($this->config->cleandisplayuptocolumn)) {
+                if ($colcount > $this->config->cleandisplayuptocolumn) {
+                    $cleanup = false;
+                }
+            }
+
+            if ($cleanup) {
+                if (!array_key_exists($field, $lastvalue) ||
+                        ($lastvalue[$field] != $datum)) {
+                    $lastvalue[$field] = $datum;
+                    $tabledata[] = $datum;
+                } else {
+                    $tabledata[] = ''; // If same as above, add blank.
+                }
+            } else {
+                $tabledata[] = $datum;
+            }
+            $colcount++;
+        }
+        $table->data[] = $tabledata;
     }
 
 }

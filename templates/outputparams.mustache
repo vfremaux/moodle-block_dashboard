@@ -1,0 +1,149 @@
+{{!
+    This file is part of The Course Module Navigation Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/outputparams
+
+    Block template for query description form
+
+    Classes required for JS:
+    * none
+
+}}
+<div id="dashboardsettings-panel-outputparams" class="dashboardsettings-panel off">
+<fieldset>
+<legend>{{stroutputparams}}</legend>
+
+<table class="dashboard-setup">
+    <tr valign="top">
+        <td align="center" colspan="4">
+            {{{strconfigreminderonsep}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigtabletype}}}: {{{helpiconconfigtabletype}}}</b>
+        </td>
+
+        <td align="left">
+            {{{tabletypeselect}}}
+        </td>
+
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigoutputfields}}}: {{{helpiconconfigoutputfields}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="outputfields" size="30" value="{{fields}}" />
+        </td>
+
+        <td align="right" rowspan="2">
+            <b>{{{strconfigoutputfieldslabels}}}:</b>
+        </td>
+
+        <td align="left" rowspan="2">
+            <textarea name="fieldlabels" cols="30" rows="5" >{{{fieldlabels}}}</textarea>
+        </td>
+    </tr>
+
+    <tr>
+        <td align="right">
+            <b>{{{strconfigoutputformats}}}: {{{helpiconconfigoutputformats}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="outputformats" size="30" value="{{formats}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigpagesize}}}: {{{helpiconconfigpagesize}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="pagesize" size="10" value="{{pagesize}}" />
+        </td>
+
+        <td align="left" colspan="2">
+            <input type="checkbox" name="bigresult" value="1" {{{bigresult}}} /> 
+            <span style="font-size:0.8em">{{{strbigresult}}}</span>
+            {{{helpiconconfigbigresult}}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigcaching}}}: {{{helpiconconfigcaching}}}</b>
+        </td>
+
+        <td align="left">
+            <input type="radio" name="uselocalcaching" value="0" {{{uselocalcachingunchecked}}} /> {{strno}}
+             - <input type="radio" name="uselocalcaching" value="1" {{{uselocalcachingchecked}}} /> {{stryes}}
+        </td>
+
+        <td align="right">
+            <b>{{{strconfigcachingttl}}}:</b>
+        </td>
+
+        <td align="left">
+            <input type="text" style="width:4.5em" name="cachingttl" size="10" value="{{cachingttl}}" /> {{strminutes}}
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigcleandisplay}}}:</b>
+        </td>
+
+        <td align="left">
+            <input type="radio" name="cleandisplay" value="0" {{{cleandisplayunchecked}}} /> {{strno}}
+            - <input type="radio" name="cleandisplay" value="1" {{{cleandisplaychecked}}} /> {{stryes}}
+        </td>
+
+        <td align="left" colspan="2">
+            <span style="font-size:0.8em">{{{strcleandisplayuptocolumn}}}:</span>
+            <input size="2" maxlength="2" style="width:2.5em" type="text" name="cleandisplayuptocolumn" value="{{cleandisplayuptocolumn}}" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigsortable}}}:</b>
+        </td>
+        <td align="left">
+            <input type="radio" name="sortable" value="0" {{{sortableunchecked}}} /> {{strno}}
+            - <input type="radio" name="sortable" value="1" {{{sortablechecked}}} /> {{stryes}}
+        </td>
+    </tr>
+    <tr>
+        <td align="right">
+            <b>{{{strconfigsplitsumsonsort}}}: {{{helpiconconfigsplitsumsonsort}}}</b>
+        </td>
+        <td align="left">
+            <input type="text" name="splitsumsonsort" value="{{splitsumsonsort}}" />
+        </td>
+    </tr>
+
+</table>
+</fieldset>
+
+<br/>
+</div>

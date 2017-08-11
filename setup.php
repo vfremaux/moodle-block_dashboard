@@ -22,7 +22,6 @@
  */
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/block_dashboard.php');
-require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_setup_renderer.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/dashboard/js/module.js', true);
@@ -58,6 +57,8 @@ $PAGE->navbar->add(get_string('setup', 'block_dashboard'));
 $PAGE->set_url(new moodle_url('/blocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $blockid)));
 $PAGE->set_title($SITE->shortname);
 $PAGE->set_heading($SITE->shortname);
+$PAGE->set_pagelayout('admin');
+$PAGE->requires->js_call_amd('block_dashboard/setup', 'init');
 
 $renderer = $PAGE->get_renderer('block_dashboard', 'setup');
 $renderer->set_block($theblock);
@@ -105,10 +106,10 @@ echo $renderer->query_params();
 echo $renderer->output_params();
 echo $renderer->tabular_params();
 echo $renderer->treeview_params();
+echo $renderer->sums_and_filters();
 echo $renderer->graph_params();
 echo $renderer->google_params();
 echo $renderer->timeline_params();
-echo $renderer->summators();
 if (block_dashboard_supports_feature('result/colouring')) {
     echo $renderer->tablecolor_mapping();
 }

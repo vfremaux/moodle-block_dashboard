@@ -31,116 +31,119 @@ $string['dashboard:export'] = 'Exporter les données (web service)';
 
 $string['backtocourse'] = 'Revenir au cours';
 $string['bar'] = 'Barres';
-$string['bigresult'] = '<span style="font-size:0.8em">Désactiver la sécurité</span>';
+$string['bigresult'] = 'Désactiver la sécurité';
 $string['blockname'] = 'Tableaux de bord';
+$string['cacheddata'] = 'Données du cache de requête';
 $string['checktohide'] = 'Cocher la case pour cacher le titre';
+$string['choicevalue'] = 'Choix';
+$string['cleandisplayuptocolumn'] = 'Ne pas nettoyer après la colonne n°&nbsp;';
 $string['cleararea'] = 'Vider la zone de fichiers';
 $string['colon'] = 'Deux points';
 $string['coma'] = 'Virgule';
-$string['configcaching'] = 'Activation du cache de résultats';
-$string['configcachingttl'] = 'TTL du cache';
-$string['configcleandisplay'] = 'Nettoyer la table';
+$string['configcaching'] = 'Activation du cache de résultats&nbsp;';
+$string['configcachingttl'] = 'TTL du cache&nbsp;';
+$string['configcleandisplay'] = 'Nettoyer la table&nbsp;';
 $string['configcoloredvalues'] = 'Valeurs de contrôle des couleurs';
 $string['configcolorfield'] = 'Champ de controle des couleurs';
 $string['configcolors'] = 'Couleurs';
 $string['configcopy'] = 'Importer la configuration d\'un tableau de bord';
-$string['configcronfrequency'] = 'Fréquence';
+$string['configcronfrequency'] = 'Fréquence&nbsp;';
 $string['configcronmode'] = 'Mode de programmation du raffraichissement';
-$string['configcrontime'] = 'Heure';
+$string['configcrontime'] = 'Heure&nbsp;';
 $string['configdashboardparams'] = 'Paramètres du tableau de bord';
 $string['configdata'] = 'Données GoogleMaps';
 $string['configdelayedrefresh'] = 'Raffraichissement différé des données de tableau de bord.';
-$string['configdisplay'] = 'Eléments d\'affichage';
+$string['configdisplay'] = 'Eléments d\'affichage&nbsp;';
 $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
 $string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
-$string['configfileformat'] = 'Type de fichier de sortie';
+$string['configfileformat'] = 'Type de fichier de sortie&nbsp;';
 $string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
-$string['configfileoutput'] = 'Champs de sortie sur fichier';
-$string['configfileoutputformats'] = 'Formattage des données';
-$string['configfilepathadminoverride'] = 'Emplacement spécial';
-$string['configfilesqlouttable'] = 'Nom de la table SQL (sortie SQL)';
-$string['configfilterdefaults'] = 'Défaut pour les filtres';
-$string['configfilterlabels'] = 'Label des filtres';
-$string['configfilteroptions'] = 'Options pour les filtres';
+$string['configfileoutput'] = 'Champs de sortie sur fichier&nbsp;';
+$string['configfileoutputformats'] = 'Formattage des données&nbsp;';
+$string['configfilepathadminoverride'] = 'Emplacement spécial&nbsp;';
+$string['configfilesqlouttable'] = 'Nom de la table SQL (sortie SQL)&nbsp;';
+$string['configfilterdefaults'] = 'Défaut pour les filtres&nbsp;';
+$string['configfilterlabels'] = 'Label des filtres&nbsp;';
+$string['configfilteroptions'] = 'Options pour les filtres&nbsp;';
 $string['configfilters'] = 'Filtres';
-$string['configgraphheight'] = 'Hauteur du graphe';
-$string['configgraphtype'] = 'Type de graphe';
-$string['configgraphwidth'] = 'Largeur du graphe';
+$string['configgraphheight'] = 'Hauteur du graphe&nbsp;';
+$string['configgraphtype'] = 'Type de graphe&nbsp;';
+$string['configgraphwidth'] = 'Largeur du graphe&nbsp;';
 $string['confighidetitle'] = 'Cacher le titre du bloc';
 $string['confighierarchic'] = 'Affichage de données hiérarchiques';
-$string['confighorizformat'] = 'Formatage des clefs  horizontales';
-$string['confighorizkey'] = 'Clef horizontale';
-$string['confighorizlabel'] = 'Label de la série horizontale';
-$string['confighorodatefiles'] = 'Horodater les fichiers';
+$string['confighorizformat'] = 'Formatage des clefs horizontales&nbsp;';
+$string['confighorizkey'] = 'Clef horizontale&nbsp;';
+$string['confighorizlabel'] = 'Label de la série horizontale&nbsp;';
+$string['confighorodatefiles'] = 'Horodater les fichiers&nbsp;';
 $string['configimportexport'] = 'Import/Export de la configuration';
-$string['configlat'] = 'Latitude';
-$string['configlayout'] = 'Publier les données dans le bloc ';
-$string['configlocation'] = 'Emplacement';
-$string['configlowerbandunit'] = 'Echelle de la bande inférieure';
-$string['configmakefile'] = 'Générer la sortie';
-$string['configmaptype'] = 'Type de carte';
-$string['confignumsums'] = 'Champs sommateurs';
-$string['confignumsumsformats'] = 'Format des sommes';
-$string['confignumsumslabels'] = 'Titre des sommes';
-$string['configoutputfields'] = 'Colonnes de sorties';
-$string['configoutputfieldslabels'] = 'Nom des colonnes de sortie';
-$string['configoutputformats'] = 'Format des données de sorties';
-$string['configpagesize'] = 'Taille de pagination';
-$string['configparent'] = 'Série de la liaison hiérarchique';
-$string['configquery'] = 'Requête';
-$string['configqueryresults'] = 'Pivoter les données';
+$string['configlat'] = 'Latitude&nbsp;';
+$string['configlayout'] = 'Publier les données dans le bloc&nbsp;';
+$string['configlocation'] = 'Emplacement&nbsp;';
+$string['configlowerbandunit'] = 'Echelle de la bande inférieure&nbsp;';
+$string['configmakefile'] = 'Générer la sortie&nbsp;';
+$string['configmaptype'] = 'Type de carte&nbsp;';
+$string['confignumsums'] = 'Champs sommateurs&nbsp;';
+$string['confignumsumsformats'] = 'Format des sommes&nbsp;';
+$string['confignumsumslabels'] = 'Titre des sommes&nbsp;';
+$string['configoutputfields'] = 'Colonnes de sorties&nbsp;';
+$string['configoutputfieldslabels'] = 'Nom des colonnes de sortie&nbsp;';
+$string['configoutputformats'] = 'Format des données de sorties&nbsp;';
+$string['configpagesize'] = 'Taille de pagination&nbsp;';
+$string['configparams'] = 'Les paramètres utilisateur permettent à l\'exploitant du tableau de bord de rentrer des paramètres pour modifier le comportement de la requête et son domaine de sortie.';
+$string['configparent'] = 'Série de la liaison hiérarchique&nbsp;';
+$string['configquery'] = 'Requête&nbsp;';
+$string['configqueryrotate'] = 'Pivoter les données&nbsp;';
 $string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Ne pas oublier que le séparateur est <b>nécessairement</b> un ;</span>';
 $string['configrotatecolumns'] = 'Faire une rotation de ';
-$string['configrotatepivot'] = ' autour du pivot ';
 $string['configrotatenewkeys'] = ' sur les clefs ';
-$string['configsendadminnotification'] = 'Envoyer des notifications administrateur sur cron';
-$string['configserieslabels'] = 'Titre des séries';
-$string['configshowdata'] = 'Montrer les données';
-$string['configshowfilterqueries'] = 'Montrer les requêtes des filtres (debug)';
-$string['configshowgraph'] = 'Montrer le graphe';
-$string['configshowlegend'] = 'Montrer la légende';
-$string['configshowlowerband'] = 'Afficher la bande inférieure';
-$string['configshownumsums'] = 'Montrer les sommateurs';
-$string['configshowquery'] = 'Montrer la requête (debug)';
-$string['configsortable'] = 'Table triable';
-$string['configspliton'] = 'Dissocier la table sur la série';
-$string['configsplitsumsonsort'] = 'Colonne de séparation de sous-totaux';
+$string['configrotatepivot'] = ' autour du pivot ';
+$string['configsendadminnotification'] = 'Envoyer des notifications administrateur sur cron&nbsp;';
+$string['configserieslabels'] = 'Titre des séries&nbsp;';
+$string['configshowdata'] = 'Montrer les données&nbsp;';
+$string['configshowfilterqueries'] = 'Montrer les requêtes des filtres (debug)&nbsp;';
+$string['configshowgraph'] = 'Montrer le graphe&nbsp;';
+$string['configshowlegend'] = 'Montrer la légende&nbsp;';
+$string['configshowlowerband'] = 'Afficher la bande inférieure&nbsp;';
+$string['configshownumsums'] = 'Montrer les sommateurs&nbsp;';
+$string['configshowquery'] = 'Montrer la requête (debug)&nbsp;';
+$string['configsortable'] = 'Table triable&nbsp;';
+$string['configspliton'] = 'Dissocier la table sur la série&nbsp;';
+$string['configsplitsumsonsort'] = 'Colonne de séparation de sous-totaux&nbsp;';
 $string['configtablesplit_help'] = 'Si défini, les valeurs différentes de cette série de données sépareront les résultats en tables différentes';
-$string['configtabletype'] = 'Type de table';
-$string['configtarget'] = 'Système cible';
-$string['configtickspacing'] = 'Espacement entre marques';
-$string['configtitle'] = 'Titre du bloc';
-$string['configtreeoutput'] = 'Séries de l\'arbre';
-$string['configtreeoutputformats'] = 'Formats des séries de l\'arbre';
-$string['configupperbandunit'] = 'Echelle de la bande supérieure';
+$string['configtabletype'] = 'Type de table&nbsp;';
+$string['configtarget'] = 'Système cible&nbsp;';
+$string['configtickspacing'] = 'Espacement entre marques&nbsp;';
+$string['configtitle'] = 'Titre du bloc&nbsp;';
+$string['configtreeoutput'] = 'Séries de l\'arbre&nbsp;';
+$string['configtreeoutputformats'] = 'Formats des séries de l\'arbre&nbsp;';
+$string['configupperbandunit'] = 'Echelle de la bande supérieure&nbsp;';
 $string['configure'] = 'Configurer';
-$string['configverticalformats'] = 'Formatage des clefs verticales';
-$string['configverticalkeys'] = 'Clef(s) verticales';
-$string['configverticallabels'] = 'Label des séries verticales';
-$string['configxaxisfield'] = 'Champ des abscisses';
-$string['configxaxislabel'] = 'Nom d\'axe X';
-$string['configyaxislabel'] = 'Nom d\'axe Y';
-$string['configyaxisscale'] = 'Type d\'échelle Y';
-$string['configyaxistickangle'] = 'Angle des étiquettes X';
-$string['configymax'] = 'Axe y : max';
-$string['configymin'] = 'Axe y : min';
+$string['configverticalformats'] = 'Formatage des clefs verticales&nbsp;';
+$string['configverticalkeys'] = 'Clef(s) verticales&nbsp;';
+$string['configverticallabels'] = 'Label des séries verticales&nbsp;';
+$string['configxaxisfield'] = 'Champ des abscisses (axe X)&nbsp;';
+$string['configxaxislabel'] = 'Nom d\'axe X&nbsp;';
+$string['configyaxislabel'] = 'Nom d\'axe Y&nbsp;';
+$string['configyaxisscale'] = 'Type d\'échelle Y&nbsp;';
+$string['configyaxistickangle'] = 'Angle des étiquettes X&nbsp;';
+$string['configymax'] = 'Max axe Y&nbsp;';
+$string['configymin'] = 'Min axe Y&nbsp;';
 $string['configyseries'] = 'Séries de données';
-$string['configyseries'] = 'Séries de données';
-$string['configyseriesformats'] = 'Formats de données des séries';
-$string['configzoom'] = 'Zoom';
+$string['configyseriesformats'] = 'Formats de données des séries&nbsp;';
+$string['configzoom'] = 'Zoom&nbsp;';
 $string['csv'] = 'Enregistrements CSV';
-$string['csvfieldseparator'] = 'Séparateur de champs';
-$string['csvfieldseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)';
-$string['csvlineseparator'] = 'Séparateur de lignes';
-$string['csvlineseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)';
+$string['csvfieldseparator'] = 'Séparateur de champs&nbsp;';
+$string['csvfieldseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)&nbsp;';
+$string['csvlineseparator'] = 'Séparateur de lignes&nbsp;';
+$string['csvlineseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)&nbsp;';
 $string['csvwithoutheader'] = 'Enregistrements CSV sans ligne d\'en-tête';
-$string['daily'] = 'Tous les jours';
-$string['dashboard_big_result_threshold'] = 'Sécurité "gros résultat" ';
-$string['dashboard_cron_enabled'] = 'Activation du cron ';
-$string['dashboard_cron_freq'] = 'Fréquence hebdomadaire ';
-$string['dashboard_cron_hour'] = 'Heure ';
-$string['dashboard_cron_min'] = 'Minutes ';
+$string['daily'] = 'Tous les jours&nbsp;';
+$string['dashboard_big_result_threshold'] = 'Sécurité "gros résultat"&nbsp;';
+$string['dashboard_cron_enabled'] = 'Activation du cron&nbsp;';
+$string['dashboard_cron_freq'] = 'Fréquence hebdomadaire&nbsp;';
+$string['dashboard_cron_hour'] = 'Heure&nbsp;';
+$string['dashboard_cron_min'] = 'Minutes&nbsp;';
 $string['dashboard_enable_isediting_security'] = 'Active la sécurisation en mode édition. En mode sécurisé, les requêtes ne sont pas exécutées tant que le cours est en mode édition.';
 $string['dashboard_extra_db_db'] = 'Connexion accessoire (Postgre) : base ';
 $string['dashboard_extra_db_host'] = 'Connexion accessoire (Postgre) : hôte ';
@@ -148,29 +151,31 @@ $string['dashboard_extra_db_password'] = 'Connexion accessoire (Postgre) : mot d
 $string['dashboard_extra_db_port'] = 'Connexion accessoire (Postgre) : port ';
 $string['dashboard_extra_db_user'] = 'Connexion accessoire (Postgre) : login ';
 $string['dashboard_output_encoding'] = 'Encodage de sortie ';
-$string['dashboard_output_field_separator'] = 'Séparateur de champs de sortie ';
-$string['dashboard_output_line_separator'] = 'Séparateur de lignes de sortie ';
+$string['dashboard_output_field_separator'] = 'Séparateur de champs de sortie&nbsp;';
+$string['dashboard_output_line_separator'] = 'Séparateur de lignes de sortie&nbsp;';
 $string['dashboardlayout'] = 'Mise en page du tableau de bord';
 $string['dashboards'] = 'Tableaux de bord';
 $string['dashboardstoragearea'] = 'Zone de fichiers du tableau de bord';
 $string['datalocations'] = 'Géolocaliseurs';
 $string['datarefresh'] = 'Raffraichissement de données';
-$string['datatitles'] = 'Titre des marques';
-$string['datatypes'] = 'Types de données';
+$string['datatitles'] = 'Titre des marques&nbsp;';
+$string['datatypes'] = 'Types de données&nbsp;';
+$string['daterangevalue'] = 'Plage de date';
+$string['datevalue'] = 'Date';
 $string['day'] = 'Jour';
 $string['dofilter'] = 'Filtrer';
 $string['donut'] = 'Donut';
 $string['dropconfig'] = 'Copier la configuration';
-$string['plugindist'] = 'Distribution du plugin';
+$string['editingnoexecute'] = ' Le tableau de bord ne peut pas exécuter de requêtes en mode édition.';
 $string['emulatecommunity'] = 'Emuler la version communautaire';
 $string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire. Certaines fonctionnalités ne seront plus disponibles.';
 $string['enabled'] = ' activé ';
-$string['eventdesc'] = 'Série des descriptions d\'événement';
-$string['eventend'] = 'Série des fins de plage';
-$string['eventlink'] = 'Série des cibles de liens';
-$string['eventstart'] = 'Série des débuts de plage';
+$string['eventdesc'] = 'Série des descriptions d\'événement&nbsp;';
+$string['eventend'] = 'Série des fins de plage&nbsp;';
+$string['eventlink'] = 'Série des cibles de liens&nbsp;';
+$string['eventstart'] = 'Série des débuts de plage&nbsp;';
 $string['eventtaskprocessed'] = 'Tâche de tableau de bord exécutée';
-$string['eventtitles'] = 'Série des titres';
+$string['eventtitles'] = 'Série des titres&nbsp;';
 $string['exportall'] = 'Exporter toutes les données';
 $string['exportconfig'] = 'Obtenir la configuration';
 $string['exportdataastable'] = 'Exporter les données en tableau';
@@ -179,7 +184,9 @@ $string['extradbparams'] = 'Paramètres de la connexion accessoire';
 $string['filegenerated'] = 'Le fichier a été généré';
 $string['fileoutput'] = 'Sortie sur fichier';
 $string['filesview'] = 'Voir la zone de fichiers';
-$string['filters'] = 'Filtres';
+$string['filternotretrievable'] = 'Données de filtre non récupérables';
+$string['filegenerationfailed'] = 'Le fichier n\'a pas pu être généré';
+$string['filters'] = 'Filtres&nbsp;';
 $string['friday'] = 'Vendredi';
 $string['from'] = 'de';
 $string['generalparams'] = 'Accéder à la définition du tableau de bord';
@@ -197,6 +204,7 @@ $string['invalidorobsoletefilterquery'] = 'Requête de filtre obsolete ou invali
 $string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
+$string['listvalue'] = 'Liste';
 $string['log'] = 'Logarithmique';
 $string['maptypehybrid'] = 'Vue combinée';
 $string['maptyperoadmap'] = 'Carte routière';
@@ -206,8 +214,10 @@ $string['mins'] = 'minute(s)';
 $string['monday'] = 'Lundi';
 $string['month'] = 'Mois';
 $string['newdashboard'] = 'Nouveau tableau de bord';
+$string['nodata'] = 'Aucune donnée disponible.';
+$string['nofiles'] = 'Pas de fichiers';
 $string['noquerystored'] = 'Pas de requête enregistrée';
-$string['norefresh'] = 'Pas de raffraichissement';
+$string['norefresh'] = 'Pas de raffraichissement&nbsp;';
 $string['notretrievable'] = 'Les données ne peuvent être affichées. Vous êtes probablement en mode édition et il n\'existe aucun cache de données disponible. Cette situation est forcée afin de prévenir une perte de contrôle sur le paramétrage du tableau de bord en cas de requête erronée.';
 $string['obsoletequery'] = 'Cette requête semble être écrite pour Moodel 1.9 et est incompatible avec la base de donnée actuelle.';
 $string['ofbiz_dashboard'] = 'Tableaux de bord Ofbiz';
@@ -215,11 +225,13 @@ $string['outputfilegeneration'] = 'Extraction de données';
 $string['outputfiltered'] = 'Générer le fichier de sortie (filtré)';
 $string['outputparams'] = 'Configuration des données de sorties';
 $string['pie'] = 'Camenberts';
+$string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Tableau de bord';
 $string['publishinblock'] = 'Dans l\'espace du bloc';
 $string['publishinpage'] = 'Dans une page séparée';
 $string['querydesc'] = 'Définition de requête';
-$string['queryparams'] = 'Paramêtres utilisateur';
+$string['queryparams'] = 'Paramètres utilisateur';
+$string['rangevalue'] = 'Plage de valeurs';
 $string['saturday'] = 'Samedi';
 $string['savechangesandconfig'] = 'Enregistrer et continuer la configuration';
 $string['savechangesandview'] = 'Enregistrer et afficher';
@@ -227,14 +239,19 @@ $string['securityparams'] = 'Paramètres de sécurité et de performance';
 $string['semicolon'] = 'Point-virgule';
 $string['setup'] = 'Configuration';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
+$string['sqlparamlabel'] = 'Libellé';
+$string['sqlparamtype'] = 'Type';
+$string['sqlparamvalues'] = 'Valeurs';
+$string['sqlparamvar'] = 'Champ SQL';
 $string['subtotal'] = 'Sous-total';
-$string['summatorsparams'] = 'Configuration des sommateurs';
+$string['sumsandfiltersparams'] = 'Sommes et filtres';
 $string['sunday'] = 'Dimanche';
 $string['tab'] = 'Tabulation';
 $string['tablecolormapping'] = 'Colorisation des lignes de table';
 $string['tabular'] = 'Table croisée';
 $string['tabularparams'] = 'Paramètres supplémentaires affichage croisé';
 $string['task_exportdata'] = 'Export automatisé de données';
+$string['textvalue'] = 'Texte';
 $string['thursday'] = 'Jeudi';
 $string['timegraph'] = 'Courbes temporelle';
 $string['timeline'] = 'Données temporelle';
@@ -249,6 +266,7 @@ $string['viewdashboard'] = 'Voir le tableau de bord';
 $string['wednesday'] = 'Mercredi';
 $string['week'] = 'Semaine';
 $string['year'] = 'Année';
+$string['sums'] = 'Sommateurs';
 
 $string['configdelayedrefresh_help'] = '
 <p>Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
@@ -268,7 +286,6 @@ $string['configfilesqlouttable_help'] = '
 <p>Dans le cas où vous choisissez de sortir des instructions SQL, vous devez mentionner le nom de la table d\'arrivée pour les insertions. </p>
 ';
 
-$string['configfilepathadminoverride'] = 'Only administrators can choose where to put the file.';
 $string['configfilepathadminoverride_help'] = 'Les administrateurs peuvent avoir besoin de générer les fichiers de sortie
 dans des chemins non contrôllés par Moodle';
 
@@ -396,77 +413,83 @@ de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".
 ';
 
 $string['configfilteroptions_help'] = '
-<p>Certaines options complémentaires peuvent être appliquées aux filtres, sous forme de marqueurs dans une chaîne d\'options.</p>
+Certaines options complémentaires peuvent être appliquées aux filtres, sous forme de marqueurs dans une chaîne d\'options.
 
-<h4>Valeurs</h4>
+## Valeurs
 
-<ul>
-    <li><b>m</b> : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".</li>
-    <li><b>s</b> : (single) Interdit l\'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé
-    sur "FIRST" si aucun défaut n\'est défini. Un filtre en mode "s" exclut le précédent.</li>
-    <li><b>x</b> : (crossthrough) Invalide le prétraitement de requête pour la recherche des modalités de filtre.
-    Ceci peut être activé sur certaines requêtes complexes (UNIONS, requêtes multi-imbriquées), mais le résultat
-    ne peut être garanti.</li>
-</ul>
+* __m__ : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".
+* __s_ : (single) Interdit l\'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé
+sur "FIRST" si aucun défaut n\'est défini. Un filtre en mode "s" exclut le précédent.
+* __x__ : (crossthrough) Invalide le prétraitement de requête pour la recherche des modalités de filtre.
+Ceci peut être activé sur certaines requêtes complexes (UNIONS, requêtes multi-imbriquées), mais le résultat
+ne peut être garanti.
+* __g__ : Filtre Global. si cette option est utilisée sur plusieurs blocs tableau de bord affichés sur la même page,
+alors les valeurs de tous les filtres globaux portant la même définition de champ se synchronisent.
 
-<h4>Cas de plusieurs filtres</h4>
+## Cas de plusieurs filtres
 
-<p>Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent
-également faire aparaitre une liste de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".</p> 
+Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent
+également faire aparaitre une liste de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".
 
-<h4>Exemple</h4>
+## Exemple
 
-<p>Soit les filtres :</p>
-<pre>year;month;day</pre>
+Soit les filtres :
 
-<p>les options</p>
+    year;month;day
 
-<pre>s;m;</pre>
+les options
 
-<p>permettront la sélection d\'une et une seule année d\'extraction, une sélection de mois, et n\'importe quel jour OU tous les jours.</p>
+    s;m;
+
+permettront la sélection d\'une et une seule année d\'extraction, une sélection de mois, et n\'importe quel jour OU tous les jours.
 ';
 
 $string['configgmdata_help'] = '
-<p>La prise en charge d\'affichage de données sur une carte GoogleMaps suppose la disponibilité d\'information
-    disposant de coordonnées de géolocalisaiton, ou de mentions d\'adresse transposable. Le bloc dashboard 
-    peut prendre en charge la transposition d\'adresses en coordonnées de localisation et mettra en cache
-    ces informations.</p>
-<p>La conversion de données d\'adresse en coordonnées de géolocalisation est soumise aux conditions de service
+La prise en charge d\'affichage de données sur une carte GoogleMaps suppose la disponibilité d\'information
+disposant de coordonnées de géolocalisaiton, ou de mentions d\'adresse transposable. Le bloc dashboard 
+peut prendre en charge la transposition d\'adresses en coordonnées de localisation et mettra en cache
+ces informations.
+
+La conversion de données d\'adresse en coordonnées de géolocalisation est soumise aux conditions de service
     de l\'API de géocodage de Google. La conversion "gratuite" pour un utilisateur non enregistré ne
-peut excéder 2500 appels par jour. Consulter la documentation sur l\'<a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >API de géocodage de Google</a> pour plus d\'information.</p>
+peut excéder 2500 appels par jour. Consulter la documentation sur
+l\'<a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >API de
+géocodage de Google</a> pour plus d\'information.
 
-<h4>Paramétrage des données de carte</h4>
+## Paramétrage des données de carte
 
-<p>Les données géolocalisables sont implantées sur la carte comme des marqueurs. Ces marqueurs peuvent être définis :</p>
-<ul><li>Comme un quadruplet : Titre, Latitude, Longitude, Type</li>
-	<li>Comme un sextuplet : Titre, Adresse, Code Postal, Ville, Région, Type</li>
-</ul>
-<p>Les définitions des champs sont :</p>
-<ul><li><i>Titre</i> : Le label texte du marqueur</li>
-	<li><i>Latitude</i> : La latitude de géolocalisation (flottant)</li>
-	<li><i>Longitude</i> : La longitude de géolocalisation (flottant)</li>
-	<li><i>Adresse</i> : Les données de voie, numéro</li>
-	<li><i>Code postal</i> : Le code postal ou Zip code pour les pays anglosaxons</li>
-	<li><i>Ville</i> : La ville</li>
-	<li><i>Type</i> : Un label de type, permettant la sélection d\'une icone graphique particulière</li>
-</ul>	
+Les données géolocalisables sont implantées sur la carte comme des marqueurs. Ces marqueurs peuvent être définis :
 
-<p>Les champs de paramétrage permettent de désigner les champs de sortie de requête qui fournissent ces informations.
-Les champs de paramétrage prennent en général un ou plusieurs nom (ou alias) de colonne de résultat.</p>
-<ul>
-    <li><i>Champs de titre</i> : Le nom de la colonne de sortie fournissant le label texte</li>
-    <li><i>Champs de localisation</i> : 
-        <ul>
-            <li><u>Cas 1</u> : Le nom de LA colonne de sortie fournissant la paire de géolocation sous forme d\'une paire à virgule : "lat,lng"</li>
-            <li><u>Cas 2</u> : la liste des noms de colonnes qui fournissent successivement (et dans l\'ordre) :
-            l\'information d\'adresse, le code postal, la ville, et le code de région (*)</li>
-        </ul>
-    </li>
-    <li><i>Champs de type</i> : Le nom de la colonne de sortie fournissant la classification des marqueurs</li>
+* Comme un quadruplet : Titre, Latitude, Longitude, Type</li>
+* Comme un sextuplet : Titre, Adresse, Code Postal, Ville, Région, Type</li>
 
-<p>(*) Il est possible de donner des valeurs constantes ici, en encadrant la valeur de liste par des quotes : </p>
-<pre>address;cp;city;\'FR\'</pre>
-<p>par exemple, fournira toujours le code de région à la valeur \'FR\'.</p>
+Les valeurs attendues sont :
+
+* Titre : Le label texte du marqueur
+* Latitude : La latitude de géolocalisation (flottant)
+* Longitude : La longitude de géolocalisation (flottant)
+* Adresse : Les données de voie, numéro
+* Code postal : Le code postal ou Zip code pour les pays anglosaxons
+* Ville : La ville
+* Type : Un label de type, permettant la sélection d\'une icone graphique particulière
+
+## Configuration des champs
+
+Les champs de paramétrage permettent de désigner les champs de sortie de requête qui fournissent ces informations.
+Les champs de paramétrage prennent en général un ou plusieurs nom (ou alias) de colonne de résultat.
+
+* Champs de titre : Le nom de la colonne de sortie fournissant le label texte
+* Champs de localisation :
+** __Cas 1__ : Le nom de LA colonne de sortie fournissant la paire de géolocation sous forme d\'une paire à virgule : "lat,lng"
+** __Cas 2__ : la liste des noms de colonnes qui fournissent successivement (et dans l\'ordre) :
+            l\'information d\'adresse, le code postal, la ville, et le code de région (*)
+* Champs de type : Le nom de la colonne de sortie fournissant la classification des marqueurs
+
+(*) Il est possible de donner des valeurs constantes ici, en encadrant la valeur de liste par des quotes :
+
+    address;cp;city;\'FR\'
+
+par exemple, fournira toujours le code de région à la valeur \'FR\'.
 ';
 
 $string['configoutputfields_help'] = '
@@ -667,3 +690,27 @@ sous certaines conditions, afin de soutenir l\'effort de développement, amélio
 <p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
 <ul><li><a href="http://service.activeprolearn.com/local/shop/front/view.php?id=1">ActiveProLearn SAS</a></li>
 <li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>';
+
+$string['configqueryrotate_help'] = '
+# Pivotement des données
+
+Parce qu\'un résultat de requête SQL ne peut avoir un nombre de colonnes de sorties variables, ce mode d\'interrogation
+de données n\'est pas approprié pour interroger des données matricielles. Le pivotement de données est une manière
+de transformer une sortie d\'enregistrement "à plat" en une matrice dimensonnée dynamiquement. Cette technique est par
+exemple utile lorque vous voulez alimenter plusieurs séries de courbes distinctes dans un graphe à partir des
+résultats d\'une requête simple. Le pivotement utilise une colonne de "dimension" dite colonne "pivot" pour 
+ranger les données des autres colonnes dans une grille conservant les autres dimensions, mais dont l\'autre dimension est 
+formée par les valeurs distinctes du pivot.
+
+Pour des exemples concrets d\'un pivot de données consulter la documentation en ligne <a href="http://www.mylearningfactory.com/"></a>
+
+';
+
+$string['configserieslabels_help'] = '
+# Labels des séries Y
+
+Lorsque vous affichez plusieurs séries de données dans un graphe (ou affichez un camembert ou un donut). Les séries
+prennent par défaut le nom des valeurs de l\'axe des abscisses (X). vous pouvez utiliser ce champ pour fournir des
+libellés alternatifs pour les valeurs de l\'axe X. La liste doit faire figurer les labels dans l\'ordre d\'arrivée
+des valeurs d\'abscisses.
+';

@@ -1,0 +1,71 @@
+{{!
+    This file is part of The Dashboard Block
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template block-dashboard/dashbaord
+
+    Block template for main block content output
+
+    Classes required for JS:
+    * none
+
+}}
+<div class="dashboard-panel">
+
+{{{dhtmlxcalendarstyle}}}
+
+{{#errormsg}}
+   {{{errormsg}}}
+{{/errormsg}}
+
+{{^errormsg}}
+{{{warningmsg}}}
+
+{{{debug}}}
+
+{{{filterandparams}}}
+
+{{{data}}}
+
+{{#graph}}
+<div class="dashboard-graph-box">
+  {{{graph}}}
+</div>
+{{/graph}}
+
+{{{controlbuttons}}}
+
+{{#query}}
+<div class="dashboard-query-box">
+    <pre>{{{query}}}</pre>
+</div>
+{{/query}}
+
+{{#benches}}
+<div class="dashboard-benches-box">
+<table width="100%" class="dashboard-benches">
+{{#benchrows}}
+    <tr>
+        <td class="param">{{name}}</td>
+        <td class="value">{{value}} sec</td>
+    </tr>
+{{/benchrows}}
+</table>
+</div>
+{{/benches}}
+
+{{/errormsg}}
+</div>
