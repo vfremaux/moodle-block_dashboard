@@ -517,7 +517,7 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
 }
 
 /**
- * Creates an output file somewhere and fill it with output content.
+ * Creates an output file somewhere and fills it with output content.
  */
 function dashboard_output_file(&$theblock, $str) {
     global $CFG;
@@ -525,9 +525,14 @@ function dashboard_output_file(&$theblock, $str) {
     if (!empty($theblock->config->filepathadminoverride)) {
         // An admin has configured, can be anywhere in moodledata so be carefull !
         $outputfile = $CFG->dataroot.'/'.$theblock->config->filepathadminoverride.'/'.$theblock->config->filelocation;
-        $FILE = fopen($outputfile, 'wb');
-        fputs($FILE, $str);
-        fclose($FILE);
+        mtrace("   ... writing to ".$outputpile."\n");
+        mtrace("   ... Note that settings will not allow file being accessible in the dashbaord fielarea\n");
+        if ($FILE = fopen($outputfile, 'wb')) {
+            fputs($FILE, $str);
+            fclose($FILE);
+            return true;
+        }
+        return false;
     } else {
         $location = (empty($theblock->config->filelocation)) ? '/' : $theblock->config->filelocation;
         $cond = preg_match('/^\//', $theblock->config->filelocation);
