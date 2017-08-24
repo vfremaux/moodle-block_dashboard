@@ -827,11 +827,11 @@ class block_dashboard extends block_base {
 
                             if (empty($results)) {
                                 mtrace('Empty result on query : '.$sql);
+                            } else {
+                                // Generate output file if required.
+                                $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
+                                $csvrenderer->generate_output_file($instance, $results);
                             }
-
-                            // Generate output file if required.
-                            $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
-                            $csvrenderer->generate_output_file($this, $results);
 
                             // Ugly way to do it....
                             $blockconfig = unserialize(base64_decode($DB->get_field('block_instances', 'configdata', array('id' => $dsh->id))));
