@@ -104,7 +104,7 @@ if ($results) {
         $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
         echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
     } else {
-        $params = array('id' => $theblock->instance->id, 'id' => $courseid);
+        $params = array('blockid' => $theblock->instance->id, 'id' => $courseid);
         $buttonurl = new moodle_url('/blocks/dashboard/view.php', $params);
         echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
     }
