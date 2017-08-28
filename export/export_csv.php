@@ -24,7 +24,7 @@
 
 require('../../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
-require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_csv_renderer.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/output/csv_renderer.php');
 
 $debug = optional_param('debug', false, PARAM_BOOL);
 if (!$debug) {
