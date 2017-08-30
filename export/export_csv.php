@@ -85,7 +85,7 @@ if (!empty($sort)) {
 
 $filteredsql = $theblock->protect($theblock->filteredsql);
 
-$theblock->results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // Get all data.
+$theblock->fetch_dashboard_data($filteredsql, $theblock->results, '', '', true); // Get all data.
 
 if ($theblock->results) {
     // Output csv file.
