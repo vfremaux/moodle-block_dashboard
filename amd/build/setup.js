@@ -29,14 +29,14 @@ define(['jquery', 'core/log'], function ($, log) {
 
         init: function(args) {
 
-            // Attach tabs handler to all tabs in page.
+            // Attach togglestate handler to all handles in page.
             $('.dashboard-setup-tablink').on('click', this.openpanel);
 
             $('.dashboard-setup #menutabletype').on('change', this.showtabletypes);
 
             $('.dashboard-setup #menugraphtype').on('change', this.showgraphtypes);
 
-            log.debug('Block dashboard AMD initialized');
+            log.debug('Block dashboard AMD setup initialized');
 
         },
 
@@ -45,7 +45,7 @@ define(['jquery', 'core/log'], function ($, log) {
             that = $(this);
             regex = /tablink-([a-z0-9]+)/;
             matchs = regex.exec(that.attr('id'));
-            panelid = parseInt(matchs[1]);
+            panelid = matchs[1];
 
             $('.dashboardsettings-panel').attr('class', 'dashboardsettings-panel off');
             $('#dashboardsettings-panel-' + panelid).attr('class', 'dashboardsettings-panel on');
@@ -60,20 +60,20 @@ define(['jquery', 'core/log'], function ($, log) {
             option = $(that.attr('id') + ' options:selected').val();
             switch (option) {
                 case 'linear': {
-                    $('#dashboardsettings-panel-tabularparams').attr('class', 'dashboardsettings-panel off');
-                    $('#dashboardsettings-panel-treeviewparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-tabularparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-treeviewparams').attr('class', 'dashboardsettings-panel off');
                     break;
                 }
 
                 case 'tabular': {
-                    $('#dashboardsettings-panel-tabularparams').attr('class', 'dashboardsettings-panel on');
-                    $('#dashboardsettings-panel-treeviewparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-teb-tabularparams').attr('class', 'dashboardsettings-panel on');
+                    $('#setting-tab-treeviewparams').attr('class', 'dashboardsettings-panel off');
                     break;
                 }
 
                 case 'treeview': {
-                    $('#dashboardsettings-panel-tabularparams').attr('class', 'dashboardsettings-panel off');
-                    $('#dashboardsettings-panel-treeviewparams').attr('class', 'dashboardsettings-panel on');
+                    $('#setting-tab-tabularparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-treeviewparams').attr('class', 'dashboardsettings-panel on');
                     break;
                 }
             }
@@ -81,26 +81,27 @@ define(['jquery', 'core/log'], function ($, log) {
 
         showgraphtypes: function (e) {
             that = $(this);
-            option = $(that.attr('id') + ' options:selected').val();
+            option = $('#' + that.attr('id') + ' option:selected').attr('value');
+            log.debug('Graph type' + option);
             switch (option) {
 
                 case 'googlemap': {
-                    $('#dashboardsettings-panel-googleparams').attr('class', 'dashboardsettings-panel on');
-                    $('#dashboardsettings-panel-timelineparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-googleparams').attr('class', 'dashboardsettings-panel on');
+                    $('#setting-tab-timelineparams').attr('class', 'dashboardsettings-panel off');
                     break;
                 }
 
                 case 'timeline': {
-                    $('#dashboardsettings-panel-googleparams').attr('class', 'dashboardsettings-panel off');
-                    $('#dashboardsettings-panel-timelineparams').attr('class', 'dashboardsettings-panel on');
+                    $('#setting-tab-googleparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-timelineparams').attr('class', 'dashboardsettings-panel on');
                     break;
                 }
 
                 default:
-                    $('#dashboardsettings-panel-googleparams').attr('class', 'dashboardsettings-panel off');
-                    $('#dashboardsettings-panel-timelineparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-googleparams').attr('class', 'dashboardsettings-panel off');
+                    $('#setting-tab-timelineparams').attr('class', 'dashboardsettings-panel off');
             }
-        },
+        }
 
     };
 });
