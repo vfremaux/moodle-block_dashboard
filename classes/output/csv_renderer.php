@@ -90,7 +90,7 @@ class csv_renderer extends \plugin_renderer_base {
                 $outputformats = explode(';', $theblock->config->outputformats);
             }
             dashboard_normalize($outputfields, $outputformats); // Normalizes labels to keys.
-            $this->outputf = array_combine($outputfields, $outputformats);
+            $theblock->outputf = array_combine($outputfields, $outputformats);
 
             mtrace('   ... generating file for instance '.$theblock->instance->id.' in format '.$theblock->config->fileformat);
             if (!empty($theblock->outputf)) {
@@ -148,7 +148,7 @@ class csv_renderer extends \plugin_renderer_base {
                         }
                         $valuegroup = implode(",", $values);
                         $colgroup = implode(",", $colnames);
-                        $statement = "INSERT INTO {$this->config->filesqlouttable}($colgroup) VALUES ($valuegroup);\n";
+                        $statement = "INSERT INTO {$theblock->config->filesqlouttable}($colgroup) VALUES ($valuegroup);\n";
                         $filestr .= $statement;
                         $reccount++;
                     }
