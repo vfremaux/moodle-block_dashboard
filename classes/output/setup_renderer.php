@@ -247,14 +247,14 @@ class setup_renderer extends \plugin_renderer_base {
             'daterange' => get_string('daterangevalue', 'block_dashboard'),
         );
 
-        for ($i = 1 ; $i < 5 ; $i ++) {
+        for ($i = 1; $i < 5; $i ++) {
             $param = new StdClass;
             $param->varkey = 'sqlparamvar'.$i;
             $param->labelkey = 'sqlparamlabel'.$i;
             $param->valueskey = 'sqlparamvalues'.$i;
 
-            $param->varkeyvalue = $theblock->config->{$param->varkey};
-            $param->labelkeyvalue = $theblock->config->{$param->labelkey};
+            $param->varkeyvalue = @$theblock->config->{$param->varkey};
+            $param->labelkeyvalue = @$theblock->config->{$param->labelkey};
 
             $typekey = 'sqlparamtype'.$i;
             $typevalue = @$theblock->config->{$typekey};
