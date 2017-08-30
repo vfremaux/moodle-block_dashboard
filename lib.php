@@ -118,6 +118,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
             } elseif (count($matches) == 2) {
                 $data = $matches[1];
             } // else let data as is
+
             return $data;
         }
 

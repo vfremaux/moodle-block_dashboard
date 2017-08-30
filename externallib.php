@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/externallib.php");
 require_once($CFG->libdir.'/blocklib.php');
-require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_csv_renderer.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/output/csv_renderer.php');
 
 /**
  * Dasboard block external functions

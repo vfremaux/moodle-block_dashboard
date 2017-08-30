@@ -152,7 +152,7 @@
 
 require('../../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
-require_once($CFG->dirroot.'/blocks/dashboard/classes/output/block_dashboard_csv_renderer.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/output/csv_renderer.php');
 
 $debug = optional_param('debug', false, PARAM_BOOL);
 if (!$debug) {
@@ -213,7 +213,7 @@ if (!empty($sort)) {
 
 $filteredsql = $theblock->protect($theblock->filteredsql);
 
-$theblock->results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // Get all data.
+$theblock->fetch_dashboard_data($filteredsql, $theblock->results, '', '', true); // Get all data.
 
 if ($theblock->results) {
     // Output csv file.
