@@ -35,6 +35,7 @@ $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
+$string['cachefilterqueryerror'] = 'Error in cache query';
 $string['cacheddata'] = 'Data from query cache';
 $string['cleararea'] = 'Clear all file area';
 $string['cleandisplayuptocolumn'] = 'Do not clean after column index';

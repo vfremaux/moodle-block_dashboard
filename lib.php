@@ -430,7 +430,7 @@ function dashboard_output_file(&$theblock, $str) {
     if (!empty($theblock->config->filepathadminoverride)) {
         // An admin has configured, can be anywhere in moodledata so be carefull !
         $outputfile = $CFG->dataroot.'/'.$theblock->config->filepathadminoverride.'/'.$theblock->config->filelocation;
-        mtrace("   ... writing to ".$outputpile."\n");
+        mtrace("   ... writing to ".$outputfile."\n");
         mtrace("   ... Note that settings will not allow file being accessible in the dashbaord fielarea\n");
         if ($FILE = fopen($outputfile, 'wb')) {
             fputs($FILE, $str);
@@ -441,7 +441,7 @@ function dashboard_output_file(&$theblock, $str) {
     } else {
         $location = (empty($theblock->config->filelocation)) ? '/' : $theblock->config->filelocation;
         $cond = preg_match('/^\//', $theblock->config->filelocation);
-        $location = ($cond) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation ;
+        $location = ($cond) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation;
 
         $filerecord = new StdClass();
         $filerecord->component = 'block_dashboard';

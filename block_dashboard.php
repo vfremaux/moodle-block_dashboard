@@ -24,6 +24,9 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/filter_query_exception.class.php');
+require_once($CFG->dirroot.'/blocks/dashboard/classes/filter_query_cache_exception.class.php');
+require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 require_once($CFG->dirroot.'/blocks/dashboard/extradblib.php');
 require_once($CFG->dirroot.'/local/vflibs/jqplotlib.php');
 if (block_dashboard_supports_feature('result/rotate')) {
@@ -40,6 +43,8 @@ class block_dashboard extends block_base {
     public $paramvalues; // Collects effective param values set by user.
 
     public $filters; // Stores filter definitions.
+
+    public $filteredsql; // Stores filter filtered sql.
 
     public $params; // Stores user parameter definitions.
 
@@ -417,6 +422,7 @@ class block_dashboard extends block_base {
         }
 
         $filtersql = $this->protect($filtersql);
+        $this->filteredsql = $filtersql;
 
         // Filter values return from cache.
         if (isset($FILTERSET) && array_key_exists($fielddef, $FILTERSET) && empty($specialvalue)) {
@@ -450,7 +456,11 @@ class block_dashboard extends block_base {
                                                 $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) ||
                                                         $forcereload)) {
             $params = array('querykey' => $sqlkey, 'access' => $this->config->target);
-            $DB->delete_records('block_dashboard_filter_cache', $params);
+            try {
+                $DB->delete_records('block_dashboard_filter_cache', $params);
+            } catch (Exception $e) {
+                throw new \block_dashboard\filter_query_cache_exception();
+            }
             list($usec, $sec) = explode(' ', microtime());
             $t1 = (float)$usec + (float)$sec;
 
@@ -460,14 +470,22 @@ class block_dashboard extends block_base {
                     $bench->name = 'Filter pre-query '.$fielddef;
                     $bench->start = time();
                 }
-                $FILTERSET[$fielddef] = $DB->get_records_sql($filtersql);
+                try {
+                    $FILTERSET[$fielddef] = $DB->get_records_sql($filtersql);
+                } catch (Exception $e) {
+                    throw new \block_dashboard\filter_query_exception();
+                }
                 if (@$this->config->showbenches) {
                     $bench->end = time();
                     $this->benches[] = $bench;
                 }
             } else {
                 if (!isediting() || empty($config->enable_isediting_security)) {
-                    $FILTERSET[$fielddef] = extra_db_query($filtersql, false, true, $error);
+                    try {
+                        $FILTERSET[$fielddef] = extra_db_query($filtersql, false, true, $error);
+                    } catch (Exception $e) {
+                        throw new \block_dashboard\filter_query_exception();
+                    }
                     if ($error) {
                         $this->content->text .= $error;
                     }
@@ -804,7 +822,7 @@ class block_dashboard extends block_base {
                 if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug || ($nowdt['yday'] == 0)) {
                     // We wait the programmed time is passed, and check we are an allowed day to run and no query is already running.
                     if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug || ($nowdt['yday'] == 0)) {
-                        if (($nowdt['hours'] * 60 + $nowdt['minutes'] >= $chour *60 + $cmin &&
+                        if (($nowdt['hours'] * 60 + $nowdt['minutes'] >= $chour * 60 + $cmin &&
                                 !@$instance->config->isrunning) ||
                                         $crondebug) {
                             $instance->config->isrunning = true;
