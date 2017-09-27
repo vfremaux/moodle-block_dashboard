@@ -116,7 +116,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         if (!empty($theblock->config->filters)) {
             try {
                 $filterquerystring = $theblock->prepare_filters();
-            } catch (Exception $e) {
+            } catch (\block_dashboard\filter_query_exception $e) {
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
                 $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
@@ -124,6 +124,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 $template->errormsg .= '</div>';
                 $template->errormsg .= $OUTPUT->notification(get_string('invalidorobsoletefilterquery', 'block_dashboard'));
                 return $this->render_from_template('block_dashboard/dashboard', $template);
+            } catch (\block_dashboard\filter_query_cache_exception $e) {
+                $filtersql = $theblock->filteredsql;
+                $template->errormsg = '<div class="dashboard-query-box">';
+                $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
+                $template->errormsg .= $DB->get_last_error();
+                $template->errormsg .= '</div>';
+                $template->errormsg .= $OUTPUT->notification(get_string('cachefilterqueryerror', 'block_dashboard'));
             }
         } else {
             $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
@@ -563,7 +570,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         // Showing graph.
-        if ($theblock->config->showgraph && !empty($theblock->config->graphtype)) {
+        if (!empty($theblock->config->showgraph) && !empty($theblock->config->graphtype)) {
             $graphdesc = $theblock->dashboard_graph_properties();
 
             if ($theblock->config->graphtype != 'googlemap' && $theblock->config->graphtype != 'timeline') {
