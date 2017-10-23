@@ -1855,9 +1855,7 @@ class block_dashboard extends block_base {
     public function get_required_javascript() {
         global $CFG, $PAGE;
 
-        parent::get_required_javascript();
-
-        $PAGE->requires->jquery_plugin('jqplotjquery', 'local_vflibs');
+        $PAGE->requires->jquery();
         $PAGE->requires->jquery_plugin('jqplot', 'local_vflibs');
         $PAGE->requires->css('/local/vflibs/jquery/jqplot/jquery.jqplot.css');
 
