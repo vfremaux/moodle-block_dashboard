@@ -136,7 +136,7 @@ class csv_renderer extends \plugin_renderer_base {
                 if ($theblock->config->fileformat == 'SQL') {
                     if (empty($theblock->config->filesqlouttable)) {
                         mtrace('SQL required for output but no SQL table name given');
-                        continue;
+                        return;
                     }
                     $colnames = array();
                     foreach($theblock->outputf as $key => $format) {
