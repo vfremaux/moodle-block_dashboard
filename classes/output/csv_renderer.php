@@ -83,9 +83,15 @@ class csv_renderer extends \plugin_renderer_base {
 
             // Output from query.
             if (!empty($theblock->config->fileoutput)) {
+                if (function_exists('debug_trace')) {
+                    debug_trace('Task generating '.$theblock->instance->id.' in format '.$theblock->config->fileformat.' using File Output Definitions');
+                }
                 $outputfields = explode(';', $theblock->config->fileoutput);
                 $outputformats = explode(';', $theblock->config->fileoutputformats);
             } else {
+                if (function_exists('debug_trace')) {
+                    debug_trace('Task generating '.$theblock->instance->id.' in format '.$theblock->config->fileformat.' using Screen Output Definitions');
+                }
                 $outputfields = explode(';', $theblock->config->outputfields);
                 $outputformats = explode(';', $theblock->config->outputformats);
             }
@@ -130,7 +136,7 @@ class csv_renderer extends \plugin_renderer_base {
                 if ($theblock->config->fileformat == 'SQL') {
                     if (empty($theblock->config->filesqlouttable)) {
                         mtrace('SQL required for output but no SQL table name given');
-                        continue;
+                        return;
                     }
                     $colnames = array();
                     foreach($theblock->outputf as $key => $format) {
