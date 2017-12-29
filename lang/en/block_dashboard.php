@@ -30,6 +30,7 @@ $string['dashboard:systempathaccess'] = 'Can configure output in system data pat
 $string['dashboard:export'] = 'Export data (web service)';
 
 $string['backtocourse'] = 'Back to course';
+$string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
 $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
