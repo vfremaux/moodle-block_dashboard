@@ -1309,14 +1309,14 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         if ($sortfield != $fieldname) {
-            $pix = '<img src="'.$this->output->pix_url('sinactive', 'block_dashboard').'" />';
+            $pix = $this->output->pix_icon('sinactive', '', 'block_dashboard');
             $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
         } else {
             if ($dir == 'DESC') {
-                $pix = '<img src="'.$this->output->pix_url('sdesc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sdesc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
             } else {
-                $pix = '<img src="'.$this->output->pix_url('sasc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sasc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' DESC">'.$pix.'</a>';
             }
         }
