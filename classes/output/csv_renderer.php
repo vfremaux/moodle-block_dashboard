@@ -65,7 +65,8 @@ class csv_renderer extends \plugin_renderer_base {
                 }
                 $row[] = $datum;
             }
-            if ($theblock->config->exportcharset == 'utf8') {
+            if ($theblock->config->exportcharset == 'iso') {
+                debug_trace("Converting generated CSV to ISO");
                 $str .= utf8_decode(implode($config->csv_field_separator, $row));
             } else {
                 $str .= implode($config->csv_field_separator, $row);
@@ -79,13 +80,29 @@ class csv_renderer extends \plugin_renderer_base {
 
         $config = get_config('block_dashboard');
 
+        if (empty($theblock->config->makefile)) {
+            mtrace(" File generation not enabled");
+            return;
+        }
+
+        if (empty($results)) {
+            mtrace(" No results ");
+            return;
+        }
+
         if (!empty($theblock->config->makefile) && !empty($results)) {
 
             // Output from query.
             if (!empty($theblock->config->fileoutput)) {
+                if (function_exists('debug_trace')) {
+                    debug_trace('Task generating '.$theblock->instance->id.' in format '.$theblock->config->fileformat.' using File Output Definitions');
+                }
                 $outputfields = explode(';', $theblock->config->fileoutput);
                 $outputformats = explode(';', $theblock->config->fileoutputformats);
             } else {
+                if (function_exists('debug_trace')) {
+                    debug_trace('Task generating '.$theblock->instance->id.' in format '.$theblock->config->fileformat.' using Screen Output Definitions');
+                }
                 $outputfields = explode(';', $theblock->config->outputfields);
                 $outputformats = explode(';', $theblock->config->outputformats);
             }
@@ -130,7 +147,7 @@ class csv_renderer extends \plugin_renderer_base {
                 if ($theblock->config->fileformat == 'SQL') {
                     if (empty($theblock->config->filesqlouttable)) {
                         mtrace('SQL required for output but no SQL table name given');
-                        continue;
+                        return;
                     }
                     $colnames = array();
                     foreach($theblock->outputf as $key => $format) {
@@ -180,7 +197,7 @@ class csv_renderer extends \plugin_renderer_base {
 
         return $str;
     }
-    
+
     /**
      * Recursive worker for CSV table writing
      */
@@ -283,24 +300,24 @@ class csv_renderer extends \plugin_renderer_base {
      */
     function dashboard_print_table_header_csv(&$str, &$theblock, &$hcols) {
         global $CFG;
-    
+
         $config = get_config('block_dashboard');
-    
+
         $vlabels = array_values($theblock->vertkeys->labels);
-    
+
         $row = array();
         foreach ($theblock->vertkeys->labels as $vk => $vlabel) {
             $row[] = $vlabel;
         }
-    
+
         foreach ($hcols as $hc) {
             $row[] = $hc;
         }
-    
+
         if (isset($theblock->config->horizsums)) {
             $row[] = get_string('total', 'block_dashboard');
         }
-    
+
         if ($theblock->config->exportcharset == 'utf8') {
             $str .= utf8_decode(implode($config->csv_field_separator, $row));
         } else {

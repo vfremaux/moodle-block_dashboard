@@ -193,7 +193,7 @@ $theblock->prepare_params();
 // Fetch data.
 
 if (!empty($theblock->config->filters)) {
-    $theblock->prepare_filters();
+    $theblock->prepare_filters($_POST);
 } else {
     $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }

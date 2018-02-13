@@ -21,12 +21,15 @@ function showmoreoptions(selectobj){
 	
 }
 
+<<<<<<< HEAD
 function open_panel(panelid){	
 	$('.dashboardsettings-panel').attr('class', 'dashboardsettings-panel off');			
 	$('#dashboardsettings-panel-'+panelid).attr('class', 'dashboardsettings-panel on');
 	$('.setting-tab').removeClass('here');
 	$('#setting-tab-'+panelid).addClass('here');
 }
+=======
+>>>>>>> MOODLE_34_STABLE
 
 var autosubmit = 1;
 

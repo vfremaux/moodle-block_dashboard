@@ -288,7 +288,11 @@ class setup_renderer extends \plugin_renderer_base {
         $template->strconfigoutputformats = get_string('configoutputformats', 'block_dashboard');
 
         if (isset($theblock->config) && isset($theblock->config->outputformats)) {
+<<<<<<< HEAD
             $template->formats = htmlentities($theblock->config->outputformats, ENT_QUOTES, 'UTF-8');
+=======
+            $template->formats = $theblock->config->outputformats;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigpagesize = $this->output->help_icon('configpagesize', 'block_dashboard');
@@ -400,14 +404,22 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->verticalformats = '';
         if (isset($theblock->config) && isset($theblock->config->verticalformats)) {
+<<<<<<< HEAD
             $template->verticalformats = htmlentities($theblock->config->verticalformats, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->verticalformats = $theblock->config->verticalformats;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->strconfighorizformat = get_string('confighorizformat', 'block_dashboard');
 
         $template->horizformat = '';
         if (isset($theblock->config) && isset($theblock->config->horizformat)) {
+<<<<<<< HEAD
             $template->horizformat = htmlentities($theblock->config->horizformat, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->horizformat = $theblock->config->horizformat;
+>>>>>>> MOODLE_34_STABLE
         }
         $template->helpiconconfigtablesplit = $this->output->help_icon('configtablesplit', 'block_dashboard');
         $template->strconfigspliton = get_string('configspliton', 'block_dashboard');
@@ -440,14 +452,22 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->verticallabels = '';
         if (isset($theblock->config) && isset($theblock->config->verticallabels)) {
+<<<<<<< HEAD
             $template->verticallabels = htmlentities($theblock->config->verticallabels, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->verticallabels = $theblock->config->verticallabels;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->strconfighorizlabel = get_string('confighorizlabel', 'block_dashboard');
 
         $template->horizlabel = '';
         if (isset($theblock->config) && isset($theblock->config->horizlabel)) {
+<<<<<<< HEAD
             $template->horizlabel = htmlentities($theblock->config->horizlabel, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->horizlabel = $theblock->config->horizlabel;
+>>>>>>> MOODLE_34_STABLE
         }
 
         return $this->render_from_template('block_dashboard/tabularoutput', $template);
@@ -524,7 +544,11 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->yseriesformats = '';
         if (isset($theblock->config) && isset($theblock->config->yseriesformats)) {
+<<<<<<< HEAD
             $template->yseriesformats = htmlentities($theblock->config->yseriesformats, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->yseriesformats = $theblock->config->yseriesformats;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigexplicitscaling = $this->output->help_icon('configexplicitscaling', 'block_dashboard');
@@ -566,7 +590,11 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->serieslabels = '';
         if (isset($theblock->config) && isset($theblock->config->serieslabels)) {
+<<<<<<< HEAD
             $template->serieslabels = htmlentities($theblock->config->serieslabels, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->serieslabels = $theblock->config->serieslabels;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->strconfigyaxislabel = get_string('configyaxislabel', 'block_dashboard');
@@ -794,7 +822,11 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filters)) {
             $filters = $theblock->config->filters;
         }
+<<<<<<< HEAD
         $template->filters = htmlentities($filters, ENT_QUOTES, 'UTF-8');
+=======
+        $template->filters = $filters;
+>>>>>>> MOODLE_34_STABLE
 
         $template->strconfigfilterlabels = get_string('configfilterlabels', 'block_dashboard');
 
@@ -811,7 +843,11 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filterdefaults)) {
             $filterdefaults = $theblock->config->filterdefaults;
         }
+<<<<<<< HEAD
         $template->filterdefaults = htmlentities($filterdefaults, ENT_QUOTES, 'UTF-8');
+=======
+        $template->filterdefaults = $filterdefaults;
+>>>>>>> MOODLE_34_STABLE
 
         $template->helpiconconfigfilteroptions = $this->output->help_icon('configfilteroptions', 'block_dashboard');
         $template->strconfigfilteroptions = get_string('configfilteroptions', 'block_dashboard');
@@ -820,7 +856,11 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filteroptions)) {
             $filteroptions = $theblock->config->filteroptions;
         }
+<<<<<<< HEAD
         $template->filteroptions = htmlentities($filteroptions, ENT_QUOTES, 'UTF-8');
+=======
+        $template->filteroptions = $filteroptions;
+>>>>>>> MOODLE_34_STABLE
 
         // Sums.
 
@@ -835,7 +875,11 @@ class setup_renderer extends \plugin_renderer_base {
         }
 
         if (isset($theblock->config) && isset($theblock->config->numsumformats)) {
+<<<<<<< HEAD
             $template->numsumformats = htmlentities($theblock->config->numsumformats, ENT_NOQUOTES, 'UTF-8');
+=======
+            $template->numsumformats = $theblock->config->numsumformats;
+>>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigformatting = $this->output->help_icon('configformatting', 'block_dashboard');

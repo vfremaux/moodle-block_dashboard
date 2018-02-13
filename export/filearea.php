@@ -116,7 +116,11 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
     foreach ($dirs as $dir) {
         $exportdir = new StdClass;
         $dirinfo = $dir->get_params();
+<<<<<<< HEAD
         $exportdir->nodeiconurl = $OUTPUT->pix_url('f/folder');
+=======
+        $exportdir->nodeiconurl = $OUTPUT->image_url('f/folder', 'core');
+>>>>>>> MOODLE_34_STABLE
         $exportdir->url = $url.'&path='.$dirinfo['filepath'];
         $exportdir->name = $dir->get_visible_name();
         $template->exportdirs[] = $exportdir;
@@ -125,6 +129,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
     $template->exportfiles = array();
     foreach ($files as $file) {
         $info = $file->get_params();
+<<<<<<< HEAD
         $exportfile = new StdClass;
         $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
                                                          $info['itemid'], $info['filepath'], $info['filename']);
@@ -133,6 +138,17 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
         $exportfile->name = $file->get_visible_name();
         $exportfile->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());
         $template->exportfiles[] = $exportfile;
+=======
+        $exportfiletpl = new StdClass;
+        $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
+                                                         $info['itemid'], $info['filepath'], $info['filename']);
+        $exportfiletpl->nodeiconurl = $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype()));
+        $exportfiletpl->url = $pluginfileurl;
+        $exportfiletpl->name = $file->get_visible_name();
+        // $exportfiletpl->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());
+        $exportfiletpl->filedate = date('Y-m-d H:i:s', $file->get_timecreated());
+        $template->exportfiles[] = $exportfiletpl;
+>>>>>>> MOODLE_34_STABLE
     }
 } else {
     $template->strnofiles = $OUTPUT->notification(get_string('nofiles', 'block_dashboard'));
@@ -143,6 +159,10 @@ echo $renderer->render_filearea($template);
 if (($browsepath != '/') || $fileinfo){
     echo $OUTPUT->single_button($url.'&what=clear', get_string('cleararea', 'block_dashboard'));
 }
+
+$buttonurl = new moodle_url('/blocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $instanceid));
+echo $OUTPUT->single_button($buttonurl, get_string('backtoview', 'block_dashboard'));
+
 $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
 echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
 

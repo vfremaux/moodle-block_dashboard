@@ -60,7 +60,7 @@ class block_dashboard_external extends external_api {
     }
 
     /**
-     * Get blocks data
+     * Get blocks data as a csv file content.
      *
      * @param int $courseid course id
      * @param array $options These options are not used yet, might be used in later version
@@ -86,7 +86,7 @@ class block_dashboard_external extends external_api {
         $theblock->prepare_params();
         // Fetch data.
 
-        // Reassemble fitlers from WS input.
+        // Reassemble filters from WS input.
         $filterinput = null;
         if (!empty($filters)) {
             foreach ($filters as $filter) {

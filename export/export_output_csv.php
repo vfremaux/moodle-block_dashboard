@@ -61,7 +61,7 @@ $theblock->prepare_config();
 // Fetch data.
 
 if (!empty($theblock->config->filters)) {
-    $theblock->prepare_filters();
+    $theblock->prepare_filters($_POST);
 } else {
     $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }
@@ -98,7 +98,11 @@ if ($results) {
 
     } else {
         echo '</pre>';
+<<<<<<< HEAD
         echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyfailure');
+=======
+        echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyproblem');
+>>>>>>> MOODLE_34_STABLE
     }
     if ($theblock->config->inblocklayout) {
         $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));

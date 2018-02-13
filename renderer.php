@@ -116,7 +116,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
         if (!empty($theblock->config->filters)) {
             try {
                 $filterquerystring = $theblock->prepare_filters();
+<<<<<<< HEAD
             } catch (Exception $e) {
+=======
+            } catch (\block_dashboard\filter_query_exception $e) {
+>>>>>>> MOODLE_34_STABLE
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
                 $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
@@ -124,6 +128,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 $template->errormsg .= '</div>';
                 $template->errormsg .= $OUTPUT->notification(get_string('invalidorobsoletefilterquery', 'block_dashboard'));
                 return $this->render_from_template('block_dashboard/dashboard', $template);
+<<<<<<< HEAD
+=======
+            } catch (\block_dashboard\filter_query_cache_exception $e) {
+                $filtersql = $theblock->filteredsql;
+                $template->errormsg = '<div class="dashboard-query-box">';
+                $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
+                $template->errormsg .= $DB->get_last_error();
+                $template->errormsg .= '</div>';
+                $template->errormsg .= $OUTPUT->notification(get_string('cachefilterqueryerror', 'block_dashboard'));
+>>>>>>> MOODLE_34_STABLE
             }
         } else {
             $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
@@ -563,7 +577,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         // Showing graph.
+<<<<<<< HEAD
         if ($theblock->config->showgraph && !empty($theblock->config->graphtype)) {
+=======
+        if (!empty($theblock->config->showgraph) && !empty($theblock->config->graphtype)) {
+>>>>>>> MOODLE_34_STABLE
             $graphdesc = $theblock->dashboard_graph_properties();
 
             if ($theblock->config->graphtype != 'googlemap' && $theblock->config->graphtype != 'timeline') {
@@ -906,6 +924,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $template->inblocklayout = @$theblock->config->inblocklayout;
         $template->blockidparam = optional_param('blockid', 0, PARAM_INT);
+<<<<<<< HEAD
 
         if ($COURSE->format == 'page') {
             require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
@@ -932,6 +951,38 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $template->params = $this->params($theblock);
         }
 
+=======
+
+        if ($COURSE->format == 'page') {
+            require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
+            $pageid = optional_param('page', false, PARAM_INT);
+            $template->ispageformatpage = !empty($pageid);
+            if ($page = course_page::get_current_page($COURSE->id)) {
+                $template->pageid = $page->id;
+            }
+        }
+
+        if ($sort == 'id DESC') {
+            $sort = '';
+        }
+        $template->sort = $sort;
+
+        $template->strdofilter = get_string('dofilter', 'block_dashboard');
+
+        $template->autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
+
+        if (!empty($theblock->config->filters)) {
+            // Fill template with filters.
+            $this->filters($theblock, $template);
+            if (!empty($template->hasmultiple)) {
+                $template->autosubmit = false;
+            }
+        }
+        if (!empty($theblock->params)) {
+            $template->params = $this->params($theblock);
+        }
+
+>>>>>>> MOODLE_34_STABLE
         return $this->render_from_template('block_dashboard/filterandparamsform', $template);
     }
 
@@ -943,9 +994,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
      *
      * Javascript handler is provided when preparing form overrounding.
      */
+<<<<<<< HEAD
     public function filters(&$theblock) {
 
         $str = '';
+=======
+    public function filters(&$theblock, &$template) {
+>>>>>>> MOODLE_34_STABLE
 
         $alllabels = array_keys($theblock->filterfields->labels);
 
@@ -956,10 +1011,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            $cond = isset($theblock->filterfields->translations[$afield]);
-            $fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+            $filtertpl = new StdClass;
 
-            $filterresults = $theblock->filter_get_results($afield, $fieldname, false, false, $str);
+            $cond = isset($theblock->filterfields->translations[$afield]);
+            $filtertpl->fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+
+            $filterresults = $theblock->filter_get_results($afield, $filtertpl->fieldname, false, false, $str);
 
             if ($filterresults) {
                 $filteropts = array();
@@ -969,12 +1026,15 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
                 foreach (array_values($filterresults) as $value) {
                     // Removes table scope explicitators.
+<<<<<<< HEAD
                     $radical = preg_replace('/^.*\./', '', $fieldname);
+=======
+                    $radical = preg_replace('/^.*\./', '', $filtertpl->fieldname);
+>>>>>>> MOODLE_34_STABLE
                     $filteropts[$value->$radical] = $value->$radical;
                 }
-                $str .= '<span class="dashboard-filter">'.$theblock->filterfields->labels[$afield].':</span>';
-                $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
-                $arrayform = ($multiple) ? '[]' : '';
+                $filtertpl->multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
+                $arrayform = ($filtertpl->multiple) ? '[]' : '';
 
                 if (!is_array(@$theblock->filtervalues[$radical])) {
                     $unslashedvalue = stripslashes(@$theblock->filtervalues[$radical]);
@@ -985,25 +1045,39 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 // Build the select options.
                 $attrs = array();
 
+<<<<<<< HEAD
                 if ($multiple) {
                     $attrs['multiple'] = 1;
                     $attrs['size'] = 5;
+=======
+                if ($filtertpl->multiple) {
+                    $template->hasmultiple = true;
+                    $filtertpl->multiple = true;
+                    $attrs['multiple'] = 1;
+                    $attrs['size'] = 8;
+>>>>>>> MOODLE_34_STABLE
                 }
 
                 if ($theblock->is_filter_global($afield)) {
                     $key = "filter0_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
+<<<<<<< HEAD
                     $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 } else {
                     $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
                     $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+=======
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+                } else {
+                    $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
+                    $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+>>>>>>> MOODLE_34_STABLE
                 }
-                $str .= "&nbsp;&nbsp;";
             }
+            $template->filters[] = $filtertpl;
         }
-
-        return $str;
     }
 
     /**
@@ -1083,6 +1157,78 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param string $javascripthandler if empty, no onchange handler is required. Filter change
      * is triggered by an explicit button.
      */
+<<<<<<< HEAD
+    public function params(&$theblock) {
+
+        $template = new Stdclass;
+        $template->strfrom = get_string('from', 'block_dashboard');
+        $template->strto = get_string('to', 'block_dashboard');
+
+        foreach ($theblock->params as $key => $param) {
+
+            $param->paramkey = preg_replace('/[.() *]/', '', $key).'_'.$theblock->instance->id;
+
+            switch ($param->type) {
+
+                case 'choice':
+                    $param->choice = true;
+                    $values = explode("\n", $param->values);
+                    $param->value0checked = ($param->value == $values[0]) ? 'checked="checked"' : '';
+                    $param->value1checked = ($param->value == $values[1]) ? 'checked="checked"' : '';
+                    $param->quotedvalue0 = htmlentities($values[0], ENT_QUOTES, 'UTF-8');
+                    $param->value0 = $values[0];
+                    $param->quotedvalue1 = htmlentities($values[1], ENT_QUOTES, 'UTF-8');
+                    $param->value1 = $values[1];
+                    break;
+
+                case 'text':
+                    $param->text = true;
+                    $param->quotedvalue = htmlentities($param->value, ENT_QUOTES, 'UTF-8');
+                    break;
+
+                case 'list':
+                    $param->list = true;
+                    $param->options = array();
+                    foreach ($param->values as $v) {
+                        $option = new Stdclass;
+                        $option->selected = ($v == $param->value) ? ' selected="selected" ' : '';
+                        $option->value = htmlentities($v, ENT_QUOTES, 'UTF-8');
+                        $option->label = $v;
+                        $param->options[] = $options;
+                    }
+                    break;
+
+                case 'range':
+                    $param->range = true;
+                    $param->quotedvaluefrom = htmlentities($param->valuefrom, ENT_QUOTES, 'UTF-8');
+                    $param->quotedvalueto = htmlentities($param->valueto, ENT_QUOTES, 'UTF-8');
+                    break;
+
+                case 'date':
+                    $param->date = true;
+                    break;
+
+                case 'daterange':
+                    $param->daterange = true;
+                    break;
+            }
+
+            $template->params[] = $param;
+        }
+
+        return $this->render_from_template('block_dashboard/param', $template);
+    }
+
+    /**
+     * if there are some user params, print widgets for them. If one of them is a daterange, 
+     * then cancel the javascripthandler as we will need to explictely submit.
+     *
+     * @param objectref $theblock a dashboard block instance
+     * @param string $javascripthandler if empty, no onchange handler is required. Filter change
+     * is triggered by an explicit button.
+     */
+=======
+>>>>>>> MOODLE_34_STABLE
     public function old_params(&$theblock) {
 
         $str = '';
@@ -1299,14 +1445,14 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         if ($sortfield != $fieldname) {
-            $pix = '<img src="'.$this->output->pix_url('sinactive', 'block_dashboard').'" />';
+            $pix = $this->output->pix_icon('sinactive', '', 'block_dashboard');
             $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
         } else {
             if ($dir == 'DESC') {
-                $pix = '<img src="'.$this->output->pix_url('sdesc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sdesc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
             } else {
-                $pix = '<img src="'.$this->output->pix_url('sasc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sasc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' DESC">'.$pix.'</a>';
             }
         }

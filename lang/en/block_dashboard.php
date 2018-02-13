@@ -40,6 +40,7 @@ $string['dashboard:export'] = 'Export data (web service)';
 >>>>>>> MOODLE_33_STABLE
 
 $string['backtocourse'] = 'Back to course';
+$string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
 $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
@@ -47,10 +48,14 @@ $string['blockname'] = 'Dashboard';
 $string['bigresult'] = '"Big Results" protection';
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
+<<<<<<< HEAD
 $string['configbigresult'] = '<span style="font-size:0.8em">Enable Big Result option</span>';
 =======
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
+=======
+$string['cachefilterqueryerror'] = 'Error in cache query';
+>>>>>>> MOODLE_34_STABLE
 $string['cacheddata'] = 'Data from query cache';
 $string['cleararea'] = 'Clear all file area';
 $string['cleandisplayuptocolumn'] = 'Do not clean after column index';
@@ -130,8 +135,11 @@ $string['configoutputfieldslabels'] = 'Output fields labels';
 $string['configoutputformats'] = 'Output data formatting';
 $string['configpagesize'] = 'Result paging size';
 <<<<<<< HEAD
+<<<<<<< HEAD
 $string['configparams'] = 'User param definitions';
 =======
+=======
+>>>>>>> MOODLE_34_STABLE
 $string['configparams'] = 'User parameters are values that are given by the dashboard end user to alter the query behaviour or output range.';
 $string['configparent'] = 'Parent';
 >>>>>>> MOODLE_33_STABLE
