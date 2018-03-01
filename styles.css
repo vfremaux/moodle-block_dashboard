@@ -173,35 +173,10 @@ div.dashboard-special{
    left:-40px !important;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-.off{
-	display:none !important;
-}
-
-.on{
-	display:block;
-}
-
-.dashboard-sql-params{
-    margin-top:2px;
-	font-size:0.75em;
-	display:inline;
-}
-
-#dashboardsettings-menu LI{
-	line-height:1.7em;
-=======
 .dashboardsettings-panel.off{
     display:none !important;
 }
 
-=======
-.dashboardsettings-panel.off{
-    display:none !important;
-}
-
->>>>>>> MOODLE_34_STABLE
 .dashboardsettings-panel.on{
     display:block;
 }
@@ -274,8 +249,4 @@ table.dashboard-setup td {
 
 #dashboardsettings-menu .setting-tab.off {
     display:none;
-<<<<<<< HEAD
->>>>>>> MOODLE_33_STABLE
-=======
->>>>>>> MOODLE_34_STABLE
 }

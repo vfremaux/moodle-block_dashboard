@@ -27,21 +27,12 @@ require('../../config.php');
 
 $courseid = required_param('id', PARAM_INT);
 
-<<<<<<< HEAD
-if ($courseid != SITEID){
-	if (!$course = $DB->get_record('course', array('id' => "$courseid"))){
-		print_error('invalidcourseid');
-	}
-	
-	require_login($course);
-=======
 // Security.
 if ($courseid != SITEID) {
     if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
         print_error('invalidcourseid');
     }
     require_login($course);
->>>>>>> MOODLE_33_STABLE
 }
 
 $options = stripslashes(urldecode(required_param('options', PARAM_TEXT)));

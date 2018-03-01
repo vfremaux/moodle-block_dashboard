@@ -1,19 +1,4 @@
 <?php
-<<<<<<< HEAD
-
-	if (!defined('MOODLE_INTERNAL')) die ('Sorry, but you cannot use this script this way');
-
-	$data = $_POST;
-	
-	unset($data['submit']);
-	
-	$theBlock->config = (object) $data;
-	$theBlock->instance_config_save($theBlock->config);
-	
-	if (!empty($submitandreturn)){
-		redirect($CFG->wwwroot.'/course/view.php?id='.$courseid);
-	}
-=======
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -68,4 +53,3 @@ if ($saveview) {
 
     redirect(new moodle_url('/blocks/dashboard/view.php', array('id' => $COURSE->id, 'blockid' => $blockid)));
 }
->>>>>>> MOODLE_33_STABLE
