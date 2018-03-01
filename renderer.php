@@ -933,7 +933,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $template->autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
 
         if (!empty($theblock->config->filters)) {
-            $template->filters = $this->filters($theblock);
+            // Fill template with filters.
+            $this->filters($theblock, $template);
+            if (!empty($template->hasmultiple)) {
+                $template->autosubmit = false;
+            }
         }
         if (!empty($theblock->params)) {
             $template->params = $this->params($theblock);
@@ -950,9 +954,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
      *
      * Javascript handler is provided when preparing form overrounding.
      */
-    public function filters(&$theblock) {
-
-        $str = '';
+    public function filters(&$theblock, &$template) {
 
         $alllabels = array_keys($theblock->filterfields->labels);
 
@@ -963,10 +965,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            $cond = isset($theblock->filterfields->translations[$afield]);
-            $fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+            $filtertpl = new StdClass;
 
-            $filterresults = $theblock->filter_get_results($afield, $fieldname, false, false, $str);
+            $cond = isset($theblock->filterfields->translations[$afield]);
+            $filtertpl->fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+
+            $filterresults = $theblock->filter_get_results($afield, $filtertpl->fieldname, false, false, $str);
 
             if ($filterresults) {
                 $filteropts = array();
@@ -976,12 +980,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
                 foreach (array_values($filterresults) as $value) {
                     // Removes table scope explicitators.
-                    $radical = preg_replace('/^.*\./', '', $fieldname);
+                    $radical = preg_replace('/^.*\./', '', $filtertpl->fieldname);
                     $filteropts[$value->$radical] = $value->$radical;
                 }
-                $str .= '<span class="dashboard-filter">'.$theblock->filterfields->labels[$afield].':</span>';
-                $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
-                $arrayform = ($multiple) ? '[]' : '';
+                $filtertpl->multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
+                $arrayform = ($filtertpl->multiple) ? '[]' : '';
 
                 if (!is_array(@$theblock->filtervalues[$radical])) {
                     $unslashedvalue = stripslashes(@$theblock->filtervalues[$radical]);
@@ -992,25 +995,25 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 // Build the select options.
                 $attrs = array();
 
-                if ($multiple) {
+                if ($filtertpl->multiple) {
+                    $template->hasmultiple = true;
+                    $filtertpl->multiple = true;
                     $attrs['multiple'] = 1;
-                    $attrs['size'] = 5;
+                    $attrs['size'] = 8;
                 }
 
                 if ($theblock->is_filter_global($afield)) {
                     $key = "filter0_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 } else {
                     $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 }
-                $str .= "&nbsp;&nbsp;";
             }
+            $template->filters[] = $filtertpl;
         }
-
-        return $str;
     }
 
     /**
