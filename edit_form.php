@@ -90,6 +90,7 @@ class block_dashboard_edit_form extends block_edit_form {
     }
 
     public function set_data($defaults) {
+
         if (!empty($this->block->config)) {
             if (!empty($this->block->config->sqlparams)) {
                 foreach ($this->block->config->sqlparams as $paramid => $paramdef) {

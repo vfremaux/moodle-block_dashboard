@@ -56,6 +56,7 @@ define(['jquery', 'core/log'], function ($, log) {
 
             $('.dashboard-param-daterange').each(function() {
                 id = $(this).attr('id');
+                id = id.replace('_from', '');
                 that.calendars[id] = new dhtmlXCalendarObject([id + '_from', id + '_to']);
                 that.calendars[id].loadUserLanguage(lang + '_utf8');
                 that.calendars[id].setSkin('dhx_web');
