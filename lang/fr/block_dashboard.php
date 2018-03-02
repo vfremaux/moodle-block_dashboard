@@ -30,6 +30,7 @@ $string['dashboard:systempathaccess'] = 'Peut générer des fichiers dans tout l
 $string['dashboard:export'] = 'Exporter les données (web service)';
 
 $string['backtocourse'] = 'Revenir au cours';
+$string['backtoview'] = 'Revenir au résultat de requête';
 $string['bar'] = 'Barres';
 $string['bigresult'] = 'Désactiver la sécurité';
 $string['blockname'] = 'Tableaux de bord';

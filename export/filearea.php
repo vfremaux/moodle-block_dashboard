@@ -125,14 +125,15 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
     $template->exportfiles = array();
     foreach ($files as $file) {
         $info = $file->get_params();
-        $exportfile = new StdClass;
+        $exportfiletpl = new StdClass;
         $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
                                                          $info['itemid'], $info['filepath'], $info['filename']);
-        $exportfile->nodeiconurl = $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype()));
-        $exportfile->url = $pluginfileurl;
-        $exportfile->name = $file->get_visible_name();
-        $exportfile->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());
-        $template->exportfiles[] = $exportfile;
+        $exportfiletpl->nodeiconurl = $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype()));
+        $exportfiletpl->url = $pluginfileurl;
+        $exportfiletpl->name = $file->get_visible_name();
+        // $exportfiletpl->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());
+        $exportfiletpl->filedate = date('Y-m-d H:i:s', $file->get_timecreated());
+        $template->exportfiles[] = $exportfiletpl;
     }
 } else {
     $template->strnofiles = $OUTPUT->notification(get_string('nofiles', 'block_dashboard'));
@@ -143,6 +144,10 @@ echo $renderer->render_filearea($template);
 if (($browsepath != '/') || $fileinfo){
     echo $OUTPUT->single_button($url.'&what=clear', get_string('cleararea', 'block_dashboard'));
 }
+
+$buttonurl = new moodle_url('/blocks/dashboard/view.php', array('id' => $courseid, 'blockid' => $instanceid));
+echo $OUTPUT->single_button($buttonurl, get_string('backtoview', 'block_dashboard'));
+
 $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));
 echo $OUTPUT->single_button($buttonurl, get_string('backtocourse', 'block_dashboard'));
 

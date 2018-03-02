@@ -164,7 +164,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
         }
 
         // All other cases fallback to sprintf.
-        $data = sprintf($format, $data);
+        $data = @sprintf($format, $data);
 
         if ($negativeenhance && $data < 0) {
             $data = '<span style="color:red;font-weight:bold">'.$data.'</span>';
@@ -427,11 +427,15 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
 function dashboard_output_file(&$theblock, $str) {
     global $CFG;
 
+    if ($theblock->config->exportcharset == 'iso') {
+        $str = utf8_decode($str);
+    }
+
     if (!empty($theblock->config->filepathadminoverride)) {
         // An admin has configured, can be anywhere in moodledata so be carefull !
         $outputfile = $CFG->dataroot.'/'.$theblock->config->filepathadminoverride.'/'.$theblock->config->filelocation;
-        mtrace("   ... writing to ".$outputpile."\n");
-        mtrace("   ... Note that settings will not allow file being accessible in the dashbaord fielarea\n");
+        mtrace("   ... writing to ".$outputfile."\n");
+        mtrace("   ... Note that settings will not allow file being accessible in the dashbaord filearea\n");
         if ($FILE = fopen($outputfile, 'wb')) {
             fputs($FILE, $str);
             fclose($FILE);
@@ -441,7 +445,7 @@ function dashboard_output_file(&$theblock, $str) {
     } else {
         $location = (empty($theblock->config->filelocation)) ? '/' : $theblock->config->filelocation;
         $cond = preg_match('/^\//', $theblock->config->filelocation);
-        $location = ($cond) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation ;
+        $location = ($cond) ? $theblock->config->filelocation : '/'.$theblock->config->filelocation;
 
         $filerecord = new StdClass();
         $filerecord->component = 'block_dashboard';

@@ -23,21 +23,46 @@
 // jshint unused: true, undef:true
 define(['jquery', 'core/log'], function ($, log) {
 
-    var autosubmit = 1;
-
     return {
 
         init: function(args) {
 
+            that = this;
+
+            that.calendars = [];
+
+            var lang = $('html').attr('lang').replace(/-/g, '_').substr(0,2);
+
             // Attach filter handles if autosubmit.
-            $('.dashboard-filter-autosubmit').each( function(i, spanobj) {
+            $('.dashboard-filter-autosubmit').each( function() {
                 regex = /dashboard-auto-([0-9]+)/;
-                matchs = regex.exec(buttonobj.attr('id'));
+                matchs = regex.exec($(this).attr('id'));
                 blockid = matchs[1];
 
-                $('.dashboard-filter-element').bind('onchange', this.submitdashboardfilter);
+                $('.dashboard-filter-element-' + blockid).on('change', that.submitdashboardfilter);
             })
-            log.debug('Block dashboard initialized');
+
+            $('.dashboard-filter-submitters').each( function() {
+                $(this).on('click', that.submitdashboardfilter);
+            })
+
+            // Capture all data params and attach a dhtmlxCalendar.
+            $('.dashboard-param-date').each(function() {
+                id = $(this).attr('id');
+                that.calendars[id] = new dhtmlXCalendarObject(id);
+                that.calendars[id].loadUserLanguage(lang + '_utf8');
+                that.calendars[id].setSkin('dhx_web');
+            })
+
+            $('.dashboard-param-daterange').each(function() {
+                id = $(this).attr('id');
+                id = id.replace('_from', '');
+                that.calendars[id] = new dhtmlXCalendarObject([id + '_from', id + '_to']);
+                that.calendars[id].loadUserLanguage(lang + '_utf8');
+                that.calendars[id].setSkin('dhx_web');
+            })
+
+            log.debug('Block dashboard AMD initialized');
 
         },
 
@@ -45,8 +70,9 @@ define(['jquery', 'core/log'], function ($, log) {
 
             // That is the Jquery representant of the changed form element.
             that = $(this);
-            regex = /filter([0-9]+)_/;
+            regex = /(?:filter|filtersubmit)([0-9]+)_/;
             matchs = regex.exec(that.attr('name'));
+
             if (matchs) {
                 blockid = matchs[1];
                 $('#dashboard-form-' + blockid).submit();
