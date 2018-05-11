@@ -36,7 +36,9 @@ function block_dashboard_supports_feature($feature) {
             'pro' => array(
                 'format' => array('xls', 'csv'),
                 'config' => array('importexport'),
-                'result' => array('rotation', 'export'),
+                'graph' => array('google', 'timeline'),
+                'data' => array('treeview', 'extrapostgresource'),
+                'result' => array('rotation', 'export', 'colouring'),
             ),
             'community' => array(
                 'format' => array('csv'),

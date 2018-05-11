@@ -255,6 +255,10 @@ $string['invalidorobsoletequery'] = 'Invalid or obsolete query.';
 $string['line'] = 'Lines';
 $string['linear'] = 'Linear';
 $string['listvalue'] = 'Value List';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['log'] = 'Logarithmic';
 $string['maptypehybrid'] = 'Hybrid view';
 $string['maptyperoadmap'] = 'Road map';
@@ -767,4 +771,10 @@ $string['configserieslabels_help'] = '
 When plotting data series into graphs, Y series will by default be named with the X serie values. You may use this field to
 provide alternate labels for on screen printing. Labels should be given as a semicolon separated list in the order of
 the X serie values.
+';
+
+$string['tablecolormapping_help'] = '
+You may choose to colorize results (textual) in one output column using value filters mapped to HTML color definitions :
+  - in the left side text area enter an evaluation expression replacing value by %% (f.e. %% == 0).
+  - in the right side text area, enter the html colour code.
 ';
