@@ -35,7 +35,6 @@ $capabilities = array(
 
     'block/dashboard:myaddinstance' => array(
         'riskbitmask' => RISK_SPAM | RISK_XSS,
-<<<<<<< HEAD
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -45,24 +44,10 @@ $capabilities = array(
     ),
 
     'block/dashboard:systempathaccess' => array(
-=======
->>>>>>> MOODLE_33_STABLE
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
-<<<<<<< HEAD
-=======
-            'manager' => CAP_ALLOW
-        )
-    ),
-
-    'block/dashboard:systempathaccess' => array(
-
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
->>>>>>> MOODLE_33_STABLE
             'manager' => CAP_ALLOW
         )
     ),
@@ -72,8 +57,6 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
-<<<<<<< HEAD
-=======
             'manager' => CAP_ALLOW
         )
     ),
@@ -83,7 +66,6 @@ $capabilities = array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
->>>>>>> MOODLE_33_STABLE
             'manager' => CAP_ALLOW
         )
     ),
