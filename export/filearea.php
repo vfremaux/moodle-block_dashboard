@@ -116,7 +116,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
     foreach ($dirs as $dir) {
         $exportdir = new StdClass;
         $dirinfo = $dir->get_params();
-        $exportdir->nodeiconurl = $OUTPUT->pix_url('f/folder');
+        $exportdir->nodeiconurl = $OUTPUT->image_url('f/folder');
         $exportdir->url = $url.'&path='.$dirinfo['filepath'];
         $exportdir->name = $dir->get_visible_name();
         $template->exportdirs[] = $exportdir;
@@ -128,7 +128,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
         $exportfiletpl = new StdClass;
         $pluginfileurl = moodle_url::make_pluginfile_url($info['contextid'], $info['component'], $info['filearea'],
                                                          $info['itemid'], $info['filepath'], $info['filename']);
-        $exportfiletpl->nodeiconurl = $OUTPUT->pix_url(file_mimetype_icon($file->get_mimetype()));
+        $exportfiletpl->nodeiconurl = $OUTPUT->image_url(file_mimetype_icon($file->get_mimetype()));
         $exportfiletpl->url = $pluginfileurl;
         $exportfiletpl->name = $file->get_visible_name();
         // $exportfiletpl->filedate = strftime('%Y-%m-%d %H:%i:%s', $file->get_timecreated());

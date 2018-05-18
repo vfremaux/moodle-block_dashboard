@@ -405,7 +405,7 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->verticalformats = '';
         if (isset($theblock->config) && isset($theblock->config->verticalformats)) {
-            $template->verticalformats = $theblock->config->verticalformats;
+            $template->verticalformats = htmlentities($theblock->config->verticalformats, ENT_QUOTES, 'UTF-8');
         }
 
         $template->strconfighorizformat = get_string('confighorizformat', 'block_dashboard');

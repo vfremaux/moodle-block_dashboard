@@ -350,11 +350,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                             continue;
                         }
                         $vkeyvalue = $result->$vkey;
-                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                        $vkeyvalue = dashboard_format_data($theblock->vertkeys->formats[$vkey], $vkeyvalue, null, $result);
+                        $matrix[] = "['".str_replace("'", "\'", $vkeyvalue)."']";
                     }
                     $hkey = $theblock->config->horizkey;
                     $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrix[] = "['".str_replace("'", "\'", $hkeyvalue)."']";
                     $matrixst = "\$m".implode($matrix);
                     if (!in_array($hkeyvalue, $hcols)) {
                         $hcols[] = $hkeyvalue;
@@ -1193,14 +1194,14 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         if ($sortfield != $fieldname) {
-            $pix = '<img src="'.$this->output->pix_url('sinactive', 'block_dashboard').'" />';
+            $pix = $this->output->pix_icon('sinactive', '', 'block_dashboard');
             $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
         } else {
             if ($dir == 'DESC') {
-                $pix = '<img src="'.$this->output->pix_url('sdesc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sdesc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
             } else {
-                $pix = '<img src="'.$this->output->pix_url('sasc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sasc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' DESC">'.$pix.'</a>';
             }
         }
