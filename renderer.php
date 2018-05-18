@@ -116,11 +116,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         if (!empty($theblock->config->filters)) {
             try {
                 $filterquerystring = $theblock->prepare_filters();
-<<<<<<< HEAD
-            } catch (Exception $e) {
-=======
             } catch (\block_dashboard\filter_query_exception $e) {
->>>>>>> MOODLE_34_STABLE
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
                 $template->errormsg .= '<pre>FILTER: '.$filtersql.'</pre>';
@@ -128,8 +124,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 $template->errormsg .= '</div>';
                 $template->errormsg .= $OUTPUT->notification(get_string('invalidorobsoletefilterquery', 'block_dashboard'));
                 return $this->render_from_template('block_dashboard/dashboard', $template);
-<<<<<<< HEAD
-=======
             } catch (\block_dashboard\filter_query_cache_exception $e) {
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
@@ -137,7 +131,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 $template->errormsg .= $DB->get_last_error();
                 $template->errormsg .= '</div>';
                 $template->errormsg .= $OUTPUT->notification(get_string('cachefilterqueryerror', 'block_dashboard'));
->>>>>>> MOODLE_34_STABLE
             }
         } else {
             $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
@@ -357,11 +350,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                             continue;
                         }
                         $vkeyvalue = $result->$vkey;
-                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                        $vkeyvalue = dashboard_format_data($theblock->vertkeys->formats[$vkey], $vkeyvalue, null, $result);
+                        $matrix[] = "['".str_replace("'", "\'", $vkeyvalue)."']";
                     }
                     $hkey = $theblock->config->horizkey;
                     $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrix[] = "['".str_replace("'", "\'", $hkeyvalue)."']";
                     $matrixst = "\$m".implode($matrix);
                     if (!in_array($hkeyvalue, $hcols)) {
                         $hcols[] = $hkeyvalue;
@@ -568,20 +562,28 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
             } else if (@$theblock->config->tabletype == 'tabular') {
                 // Forget table and use $m matrix for making display.
-                $template->data = $this->cross_table($theblock, $m, $hcols, $theblock->config->horizkey, $theblock->vertkeys, $theblock->config->horizlabel, true);
+                $template->data = $this->cross_table($theblock,
+                                                     $m,
+                                                     $hcols,
+                                                     $theblock->config->horizkey,
+                                                     $theblock->vertkeys,
+                                                     $theblock->config->horizlabel,
+                                                     true);
                 $template->controlbuttons = $this->tabular_buttons($theblock, $filterquerystring);
             } else {
-                $template->data = $this->tree_view($theblock, $treedata, $theblock->treeoutput, $theblock->output, $theblock->outputf, $theblock->colourcoding, true);
+                $template->data = $this->tree_view($theblock,
+                                                   $treedata,
+                                                   $theblock->treeoutput,
+                                                   $theblock->output,
+                                                   $theblock->outputf,
+                                                   $theblock->colourcoding,
+                                                   true);
                 $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring);
             }
         }
 
         // Showing graph.
-<<<<<<< HEAD
-        if ($theblock->config->showgraph && !empty($theblock->config->graphtype)) {
-=======
         if (!empty($theblock->config->showgraph) && !empty($theblock->config->graphtype)) {
->>>>>>> MOODLE_34_STABLE
             $graphdesc = $theblock->dashboard_graph_properties();
 
             if ($theblock->config->graphtype != 'googlemap' && $theblock->config->graphtype != 'timeline') {
@@ -597,8 +599,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 if (empty($theblock->config->timelineeventstart) || empty($theblock->config->timelineeventend)) {
                     $template->graph = $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
                 } else {
-                    $template->graph = timeline_print_graph($theblock, 'dashboard'.$theblock->instance->id, $theblock->config->graphwidth,
-                                                  $theblock->config->graphheight, $data, true);
+                    $template->graph = timeline_print_graph($theblock,
+                                                            'dashboard'.$theblock->instance->id,
+                                                            $theblock->config->graphwidth,
+                                                            $theblock->config->graphheight,
+                                                            $data,
+                                                            true);
                 }
             }
         }
@@ -750,157 +756,32 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param arrayref $outputformats formats for above
      * @param arrayref $colourcoding an array of colour coding rules issued from table scope colourcoding settings
      */
+
     public function tree_view(&$theblock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding) {
-        static $level = 1;
+        global $PAGE;
 
-        $str = '';
-
-        asort($tree);
-
-        $str .= '<ul class="dashboard-tree'.$level.'">';
-        $level++;
-        foreach ($tree as $key => $node) {
-            $nodestrs = array();
-            foreach ($treeoutput as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodestrs[] = $datum;
-            }
-            $nodecontent = implode(' ', $nodestrs);
-            $nodedata = array();
-            foreach ($outputformats as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodedata[] = $datum;
-            }
-            $nodedatastr = implode(' ', $nodedata);
-            $str .= "<li>$nodecontent <div style=\"float:right\">$nodedatastr</div></li>";
-            if (!empty($node->childs)) {
-                $str .= $this->tree_view($theblock, $node->childs, $treeoutput, $outputfields, $outputformats, $colorcoding);
-            }
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $level--;
-        $str .= '</ul>';
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        return $str;
+        return $prorenderer->tree_view($theblock, $tree, $treeoutput, $outputfields, $outputformats, $colorcoding);
     }
 
     /**
      * prints and format data for googlemap plotting.
      */
     public function googlemaps_data(&$theblock, &$data, &$graphdesc) {
+        global $PAGE;
 
-        $str = '';
-
-        if (!empty($config->datalocations)) {
-            // Data comes from query and locating information from datalocations field mapping.
-            $googlelocs = explode(";", $theblock->config->datalocations);
-            if (!empty($data)) {
-                foreach ($data as $d) {
-                    $t = $d->{$theblock->config->datatitles};
-                    if (count($googlelocs) == 1) {
-                        list($lat,$lng) = explode(',', $d->{$theblock->config->datalocations});
-                        $type = $d->{$theblock->config->datatypes};
-                        $gmdata[] = array('title' => $t, 'lat' => 0 + $lat, 'lng' => 0 + $lng, 'markerclass' => $type);
-                    } else if (count($googlelocs) == 4) {
-                        // We expect an address,postcode,city,region field list. If some data is quoted, take it as "constant".
-                        $addresselms = explode(';', $theblock->config->datalocations);
-                        $addressfield = trim($addresselms[0]);
-                        $postcodefield = trim($addresselms[1]);
-                        $cityfield = trim($addresselms[2]);
-                        $regionfield = trim($addresselms[3]);
-                        $address = $d->{$addressfield};
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $postcodefield, $matches)) {
-                            $postcode = $matches[1];
-                        } else {
-                            $postcode = $d->{$postcodefield};
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $cityfield, $matches)) {
-                            $city = $matches[1];
-                        } else {
-                            $city = preg_replace('/cedex.*/i', '', $d->{$cityfield}); // remove postal alterations
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $regionfield, $matches)) {
-                            $region = $matches[1];
-                        } else {
-                            $region = $d->{$regionfield};
-                        }
-                        $googleerrors = array();
-                        if ($location = googlemaps_get_geolocation($region, $address, $postcode, $city, $googleerrors)) {
-                            list($lat,$lng) = explode(',', $location);
-                            $type = $d->{$theblock->config->datatypes};
-                            $gmdata[] = array('title' => $t, 'lat' => $lat, 'lng' => $lng, 'markerclass' => $type);
-                        }
-                    } else {
-                        $str .= '<span class="error">'.get_string('googlelocationerror', 'block_dashboard').'</span>';
-                        break;
-                    }
-                }
-            }
-        } else {
-            $str .= " This is a demo set !! ";
-            /**
-             * demo
-             */
-            $gmdata = array(
-                array('lat' => 48.020587,
-                      'lng' => 0.151405,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'Via formation'),
-                array('lat' => 47.894823,
-                      'lng' => 1.904798,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'FormaSanté'),
-                array('lat' => 48.091582,
-                      'lng' => -1.789484,
-                      'markerclass' => 'hq',
-                      'title' => 'CLPS Siege'),
-                array('lat' => 48.392852,
-                      'lng' => -4.444313,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Brest'),
-                array('lat' => 47.663075,
-                      'lng' => -2.711906,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Vannes'),
-                array('lat' => 47.093953,
-                      'lng' => 5.497713,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'INFA Franche-Comte'),
-                array('lat' => 48.565703,
-                      'lng' => 7.734375,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Alsace'),
-                array('lat' => 49.274973,
-                      'lng' => 2.444458,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Picardie'),
-            );
+        if (!block_dashboard_supports_feature('graph/google')) {
+            return 'Not supported in this distribution';
         }
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= googlemaps_embed_graph('dashboard'.$theblock->instance->id, @$theblock->config->lat, @$theblock->config->lng, @$theblock->config->graphwidth, $theblock->config->graphheight, $graphdesc, $gmdata, true);
-
-        return $str;
+        return $prorenderer->googlemaps_data($theblock, $data, $graphdesc);
     }
 
     /**
@@ -924,34 +805,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $template->inblocklayout = @$theblock->config->inblocklayout;
         $template->blockidparam = optional_param('blockid', 0, PARAM_INT);
-<<<<<<< HEAD
-
-        if ($COURSE->format == 'page') {
-            require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
-            $pageid = optional_param('page', false, PARAM_INT);
-            $template->ispageformatpage = !empty($pageid);
-            if ($page = course_page::get_current_page($COURSE->id)) {
-                $template->pageid = $page->id;
-            }
-        }
-
-        if ($sort == 'id DESC') {
-            $sort = '';
-        }
-        $template->sort = $sort;
-
-        $template->strdofilter = get_string('dofilter', 'block_dashboard');
-
-        $template->autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
-
-        if (!empty($theblock->config->filters)) {
-            $template->filters = $this->filters($theblock);
-        }
-        if (!empty($theblock->params)) {
-            $template->params = $this->params($theblock);
-        }
-
-=======
 
         if ($COURSE->format == 'page') {
             require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
@@ -982,7 +835,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $template->params = $this->params($theblock);
         }
 
->>>>>>> MOODLE_34_STABLE
         return $this->render_from_template('block_dashboard/filterandparamsform', $template);
     }
 
@@ -994,13 +846,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
      *
      * Javascript handler is provided when preparing form overrounding.
      */
-<<<<<<< HEAD
-    public function filters(&$theblock) {
-
-        $str = '';
-=======
     public function filters(&$theblock, &$template) {
->>>>>>> MOODLE_34_STABLE
 
         $alllabels = array_keys($theblock->filterfields->labels);
 
@@ -1026,11 +872,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
                 foreach (array_values($filterresults) as $value) {
                     // Removes table scope explicitators.
-<<<<<<< HEAD
-                    $radical = preg_replace('/^.*\./', '', $fieldname);
-=======
                     $radical = preg_replace('/^.*\./', '', $filtertpl->fieldname);
->>>>>>> MOODLE_34_STABLE
                     $filteropts[$value->$radical] = $value->$radical;
                 }
                 $filtertpl->multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
@@ -1045,35 +887,21 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 // Build the select options.
                 $attrs = array();
 
-<<<<<<< HEAD
-                if ($multiple) {
-                    $attrs['multiple'] = 1;
-                    $attrs['size'] = 5;
-=======
                 if ($filtertpl->multiple) {
                     $template->hasmultiple = true;
                     $filtertpl->multiple = true;
                     $attrs['multiple'] = 1;
                     $attrs['size'] = 8;
->>>>>>> MOODLE_34_STABLE
                 }
 
                 if ($theblock->is_filter_global($afield)) {
                     $key = "filter0_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-<<<<<<< HEAD
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
-                } else {
-                    $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
-                    $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
-=======
                     $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 } else {
                     $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
                     $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
->>>>>>> MOODLE_34_STABLE
                 }
             }
             $template->filters[] = $filtertpl;
@@ -1157,78 +985,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param string $javascripthandler if empty, no onchange handler is required. Filter change
      * is triggered by an explicit button.
      */
-<<<<<<< HEAD
-    public function params(&$theblock) {
-
-        $template = new Stdclass;
-        $template->strfrom = get_string('from', 'block_dashboard');
-        $template->strto = get_string('to', 'block_dashboard');
-
-        foreach ($theblock->params as $key => $param) {
-
-            $param->paramkey = preg_replace('/[.() *]/', '', $key).'_'.$theblock->instance->id;
-
-            switch ($param->type) {
-
-                case 'choice':
-                    $param->choice = true;
-                    $values = explode("\n", $param->values);
-                    $param->value0checked = ($param->value == $values[0]) ? 'checked="checked"' : '';
-                    $param->value1checked = ($param->value == $values[1]) ? 'checked="checked"' : '';
-                    $param->quotedvalue0 = htmlentities($values[0], ENT_QUOTES, 'UTF-8');
-                    $param->value0 = $values[0];
-                    $param->quotedvalue1 = htmlentities($values[1], ENT_QUOTES, 'UTF-8');
-                    $param->value1 = $values[1];
-                    break;
-
-                case 'text':
-                    $param->text = true;
-                    $param->quotedvalue = htmlentities($param->value, ENT_QUOTES, 'UTF-8');
-                    break;
-
-                case 'list':
-                    $param->list = true;
-                    $param->options = array();
-                    foreach ($param->values as $v) {
-                        $option = new Stdclass;
-                        $option->selected = ($v == $param->value) ? ' selected="selected" ' : '';
-                        $option->value = htmlentities($v, ENT_QUOTES, 'UTF-8');
-                        $option->label = $v;
-                        $param->options[] = $options;
-                    }
-                    break;
-
-                case 'range':
-                    $param->range = true;
-                    $param->quotedvaluefrom = htmlentities($param->valuefrom, ENT_QUOTES, 'UTF-8');
-                    $param->quotedvalueto = htmlentities($param->valueto, ENT_QUOTES, 'UTF-8');
-                    break;
-
-                case 'date':
-                    $param->date = true;
-                    break;
-
-                case 'daterange':
-                    $param->daterange = true;
-                    break;
-            }
-
-            $template->params[] = $param;
-        }
-
-        return $this->render_from_template('block_dashboard/param', $template);
-    }
-
-    /**
-     * if there are some user params, print widgets for them. If one of them is a daterange, 
-     * then cancel the javascripthandler as we will need to explictely submit.
-     *
-     * @param objectref $theblock a dashboard block instance
-     * @param string $javascripthandler if empty, no onchange handler is required. Filter change
-     * is triggered by an explicit button.
-     */
-=======
->>>>>>> MOODLE_34_STABLE
     public function old_params(&$theblock) {
 
         $str = '';
@@ -1360,23 +1116,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function tree_buttons($theblock, $filterquerystring) {
-        global $COURSE;
+    public function tree_buttons(&$theblock, &$filterquerystring) {
+        global $PAGE;
 
-        // passed to each buttons.
-        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
-
-        $str = '<div class="dashboard-table-buttons">';
-
-        $str .= $this->allexport_button($theblock);
-        if (empty($theblock->config->filepathadminoverride)) {
-            $str .= $this->fileview_button($theblock);
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= '</div>';
-
-        return $str;
+        return $prorenderer->tree_buttons($theblock, $filterquerystring, $this);
     }
 
     protected function allexport_button($theblock) {

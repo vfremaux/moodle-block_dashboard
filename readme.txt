@@ -62,14 +62,14 @@ Given a full query, the dashboard block mashes up :
 # Library locations
 ########################################
 
-Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_27_STABLE.zip
+Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_XX_STABLE.zip
 and add the ocntent to the moodle/local directory
 
 Those libs are NOT moodle libs but additional public opensource libraries i use in several components as
-extra framework. 
+extra framework.
 
-# Install additive for running timelines
-########################################
+# Install additive for running timelines (PRO version)
+######################################################
 
 @TODO : Review this with better JS provisioning calls
 
@@ -82,4 +82,4 @@ Add this statement :
 
 As latest possible statement in footer.
 
-Enjoy nice plotting... 
+Enjoy nice plotting...

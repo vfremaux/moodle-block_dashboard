@@ -21,13 +21,13 @@ Given a full query, the dashboard block mashes up :
    + Linear (records) data table
    + Tabular (cross dimension) tables
    + Treeview (on hierarchical mapped results)
-   
+
 - Graphic plotting using JQPlot
    + Line graphs
    + Bar graphs
    + Pie graphs
    + Donuts graphs
-   
+
 - Geographic plotting (using GoogleMaps API)
    + Google Maps + query data plotting
    + Possibility to change icons and plor mutiple class data using course files
@@ -56,7 +56,6 @@ Given a full query, the dashboard block mashes up :
 # Install
 #########
 
-
 1. Deploy the block in Moodle/blocks as usual
 
 2. Activate notifications to install the data model
@@ -76,8 +75,8 @@ and add the ocntent to the moodle/local directory
 Those libs are NOT moodle libs but additional public opensource libraries i use in several components as
 extra framework. 
 
-# Install additive for running timelines
-========================================
+# Install additive for running timelines (PRO Version)
+######################################################
 
 @TODO : Review this with better JS provisioning calls
 
@@ -90,4 +89,4 @@ Add this statement :
 
 As latest possible statement in footer.
 
-Enjoy nice plotting... 
+Enjoy nice plotting...

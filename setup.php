@@ -1,52 +1,4 @@
 <?php
-<<<<<<< HEAD
-
-	include '../../config.php';
-	
-	$PAGE->requires->js('/blocks/dashboard/js/jquery-1.8.2.min.js', true);
-	$PAGE->requires->js('/blocks/dashboard/js/module.js', true);
-
-	$courseid = required_param('id', PARAM_INT);
-	$blockid = required_param('instance', PARAM_INT);
-
-	if (!$course = $DB->get_record('course', array('id' => $courseid))){
-		print_error('invalidcourseid');
-	}
-	
-	require_login($course);
-	
-    if (!$instance = $DB->get_record('block_instances', array('id' => $blockid))){
-        print_error('invalidblockid');
-    }
-
-    $theBlock = block_instance('dashboard', $instance);
-	$context = context_block::instance($theBlock->instance->id);	
-
-	require_capability('block/dashboard:configure', $context);
-
-	if (($submit = optional_param('submit','', PARAM_TEXT)) || ($submitandreturn = optional_param('submitandreturn','', PARAM_TEXT))){
-		include 'setup.controller.php';
-	}
-	
-	$PAGE->navbar->add(get_string('dashboards', 'block_dashboard'), NULL);
-	$PAGE->navbar->add(@$theBlock->config->title, NULL);
-	$PAGE->set_url($CFG->wwwroot.'/bocks/dashboard/view.php?id='.$courseid.'&blockid='.$blockid);
-	$PAGE->set_title($SITE->shortname);
-	$PAGE->set_heading($SITE->shortname);
-	echo $OUTPUT->header();
-
-	echo $OUTPUT->box_start();
-
-
-	echo '<form name="setup" action="#" method="post">';
-	
-	include 'setup_instance.html';
-	
-	echo '</form>';
-
-	echo $OUTPUT->box_end();
-	echo $OUTPUT->footer();
-=======
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -65,11 +17,12 @@
 /**
  * @package block_dashboard
  * @category blocks
- * @author Valery Fremaux (valery@club-internet.fr)
+ * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/block_dashboard.php');
+require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/dashboard/js/module.js', true);
@@ -108,7 +61,12 @@ $PAGE->set_heading($SITE->shortname);
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_call_amd('block_dashboard/setup', 'init');
 
-$renderer = $PAGE->get_renderer('block_dashboard', 'setup');
+if (block_dashboard_supports_feature('emulate/community') == 'pro') {
+    include_once($CFG->dirroot.'/blocks/dashboard/pro/classes/output/setup_renderer.php');
+    $renderer = new \block_dashboard\output\setup_pro_renderer($PAGE, 'html');
+} else {
+    $renderer = $PAGE->get_renderer('block_dashboard', 'setup');
+}
 $renderer->set_block($theblock);
 
 echo $OUTPUT->header();
@@ -153,11 +111,17 @@ echo $renderer->query_description();
 echo $renderer->query_params();
 echo $renderer->output_params();
 echo $renderer->tabular_params();
-echo $renderer->treeview_params();
+if (block_dashboard_supports_feature('data/treeview')) {
+    echo $renderer->treeview_params();
+}
 echo $renderer->sums_and_filters();
 echo $renderer->graph_params();
-echo $renderer->google_params();
-echo $renderer->timeline_params();
+if (block_dashboard_supports_feature('graph/google')) {
+    echo $renderer->google_params();
+}
+if (block_dashboard_supports_feature('graph/timeline')) {
+    echo $renderer->timeline_params();
+}
 if (block_dashboard_supports_feature('result/colouring')) {
     echo $renderer->tablecolor_mapping();
 }
@@ -169,4 +133,3 @@ echo '</form>';
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
->>>>>>> MOODLE_33_STABLE

@@ -98,11 +98,7 @@ if ($results) {
 
     } else {
         echo '</pre>';
-<<<<<<< HEAD
-        echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyfailure');
-=======
         echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyproblem');
->>>>>>> MOODLE_34_STABLE
     }
     if ($theblock->config->inblocklayout) {
         $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));

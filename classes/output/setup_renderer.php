@@ -92,12 +92,17 @@ class setup_renderer extends \plugin_renderer_base {
         $tabs[] = array('queryparams', get_string('queryparams', 'block_dashboard'), true);
         $tabs[] = array('outputparams', get_string('outputparams', 'block_dashboard'), true);
         $tabs[] = array('tabularparams', get_string('tabularparams', 'block_dashboard'), ($cond1) ? true : false);
-        $tabs[] = array('treeviewparams', get_string('treeviewparams', 'block_dashboard'), ($cond2) ? true : false);
+        if (block_dashboard_supports_feature('data/treeview')) {
+            $tabs[] = array('treeviewparams', get_string('treeviewparams', 'block_dashboard'), ($cond2) ? true : false);
+        }
         $tabs[] = array('sumsandfiltersparams', get_string('sumsandfiltersparams', 'block_dashboard'), true);
         $tabs[] = array('graphparams', get_string('graphparams', 'block_dashboard'), true);
-        $tabs[] = array('googleparams', get_string('googleparams', 'block_dashboard'), ($cond3) ? true : false);
-        $tabs[] = array('timelineparams', get_string('timelineparams', 'block_dashboard'), ($cond4) ? true : false);
-
+        if (block_dashboard_supports_feature('graph/google')) {
+            $tabs[] = array('googleparams', get_string('googleparams', 'block_dashboard'), ($cond3) ? true : false);
+        }
+        if (block_dashboard_supports_feature('graph/timeline')) {
+            $tabs[] = array('timelineparams', get_string('timelineparams', 'block_dashboard'), ($cond4) ? true : false);
+        }
         if (block_dashboard_supports_feature('result/colouring')) {
             $tabs[] = array('tablecolormapping', get_string('tablecolormapping', 'block_dashboard'), true);
         }
@@ -288,11 +293,7 @@ class setup_renderer extends \plugin_renderer_base {
         $template->strconfigoutputformats = get_string('configoutputformats', 'block_dashboard');
 
         if (isset($theblock->config) && isset($theblock->config->outputformats)) {
-<<<<<<< HEAD
-            $template->formats = htmlentities($theblock->config->outputformats, ENT_QUOTES, 'UTF-8');
-=======
             $template->formats = $theblock->config->outputformats;
->>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigpagesize = $this->output->help_icon('configpagesize', 'block_dashboard');
@@ -404,22 +405,14 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->verticalformats = '';
         if (isset($theblock->config) && isset($theblock->config->verticalformats)) {
-<<<<<<< HEAD
-            $template->verticalformats = htmlentities($theblock->config->verticalformats, ENT_NOQUOTES, 'UTF-8');
-=======
-            $template->verticalformats = $theblock->config->verticalformats;
->>>>>>> MOODLE_34_STABLE
+            $template->verticalformats = htmlentities($theblock->config->verticalformats, ENT_QUOTES, 'UTF-8');
         }
 
         $template->strconfighorizformat = get_string('confighorizformat', 'block_dashboard');
 
         $template->horizformat = '';
         if (isset($theblock->config) && isset($theblock->config->horizformat)) {
-<<<<<<< HEAD
-            $template->horizformat = htmlentities($theblock->config->horizformat, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->horizformat = $theblock->config->horizformat;
->>>>>>> MOODLE_34_STABLE
         }
         $template->helpiconconfigtablesplit = $this->output->help_icon('configtablesplit', 'block_dashboard');
         $template->strconfigspliton = get_string('configspliton', 'block_dashboard');
@@ -452,60 +445,17 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->verticallabels = '';
         if (isset($theblock->config) && isset($theblock->config->verticallabels)) {
-<<<<<<< HEAD
-            $template->verticallabels = htmlentities($theblock->config->verticallabels, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->verticallabels = $theblock->config->verticallabels;
->>>>>>> MOODLE_34_STABLE
         }
 
         $template->strconfighorizlabel = get_string('confighorizlabel', 'block_dashboard');
 
         $template->horizlabel = '';
         if (isset($theblock->config) && isset($theblock->config->horizlabel)) {
-<<<<<<< HEAD
-            $template->horizlabel = htmlentities($theblock->config->horizlabel, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->horizlabel = $theblock->config->horizlabel;
->>>>>>> MOODLE_34_STABLE
         }
 
         return $this->render_from_template('block_dashboard/tabularoutput', $template);
-    }
-
-    public function treeview_params() {
-
-        $theblock = $this->theblock;
-
-        $template = new StdClass();
-
-        $template->strtreeviewparams = get_string('treeviewparams', 'block_dashboard');
-
-        $template->helpiconconfighierarchic = $this->output->help_icon('confighierarchic', 'block_dashboard');
-        $template->strconfigparent = get_string('configparent', 'block_dashboard');
-
-        $template->parentserie = '';
-        if (isset($theblock->config) && isset($theblock->config->parentserie)) {
-            $template->parentserie = $theblock->config->parentserie;
-        }
-
-        $template->helpiconconfigtreeoutput = $this->output->help_icon('configtreeoutput', 'block_dashboard');
-        $template->strconfigtreeoutput = get_string('configtreeoutput', 'block_dashboard');
-
-        $template->treeoutput = '';
-        if (isset($theblock->config) && isset($theblock->config->treeoutput)) {
-            $template->treeoutput = $theblock->config->treeoutput;
-        }
-
-        $template->helpiconconfigformatting = $this->output->help_icon('configformatting', 'block_dashboard');
-        $template->strconfigtreeoutputformats = get_string('configtreeoutputformats', 'block_dashboard');
-
-        $template->treeoutputformats = '';
-        if (isset($theblock->config) && isset($theblock->config->treeoutputformats)) {
-            $template->treeoutputformats = $theblock->config->treeoutputformats;
-        }
-
-        return $this->render_from_template('block_dashboard/treeoutput', $template);
     }
 
     public function graph_params() {
@@ -544,11 +494,7 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->yseriesformats = '';
         if (isset($theblock->config) && isset($theblock->config->yseriesformats)) {
-<<<<<<< HEAD
-            $template->yseriesformats = htmlentities($theblock->config->yseriesformats, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->yseriesformats = $theblock->config->yseriesformats;
->>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigexplicitscaling = $this->output->help_icon('configexplicitscaling', 'block_dashboard');
@@ -590,11 +536,7 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->serieslabels = '';
         if (isset($theblock->config) && isset($theblock->config->serieslabels)) {
-<<<<<<< HEAD
-            $template->serieslabels = htmlentities($theblock->config->serieslabels, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->serieslabels = $theblock->config->serieslabels;
->>>>>>> MOODLE_34_STABLE
         }
 
         $template->strconfigyaxislabel = get_string('configyaxislabel', 'block_dashboard');
@@ -624,8 +566,12 @@ class setup_renderer extends \plugin_renderer_base {
             'donut' => get_string('donut', 'block_dashboard'),
             'timegraph' => get_string('timegraph', 'block_dashboard'),
             'timeline' => get_string('timeline', 'block_dashboard'),
-            'googlemap' => get_string('googlemap', 'block_dashboard'),
         );
+
+        if (block_dashboard_supports_feature('graph/google')) {
+            $graphtypes['googlemap'] = get_string('googlemap', 'block_dashboard');
+        }
+
         $graphtype = 0;
         if (isset($theblock->config) && isset($theblock->config->graphtype)) {
             $graphtype = $theblock->config->graphtype;
@@ -660,150 +606,6 @@ class setup_renderer extends \plugin_renderer_base {
         return $this->render_from_template('block_dashboard/graphparams', $template);
     }
 
-    public function google_params() {
-
-        $theblock = $this->theblock;
-
-        $template = new StdClass();
-
-        $template->strgoogleparams = get_string('googleparams', 'block_dashboard');
-
-        $template->helpiconconfigmaptype = $this->output->help_icon('configmaptype', 'block_dashboard');
-        $template->strconfigmaptype = get_string('configmaptype', 'block_dashboard');
-
-        $template->helpiconconfigzoom = $this->output->help_icon('configzoom', 'block_dashboard');
-        $template->strconfigzoom = get_string('configzoom', 'block_dashboard');
-
-        $template->helpiconconfiggmdata = $this->output->help_icon('configgmdata', 'block_dashboard');
-        $template->strconfigdata = get_string('configdata', 'block_dashboard');
-
-        $maptypeopts = array(
-            'ROADMAP' => get_string('maptyperoadmap', 'block_dashboard'),
-            'SATELLITE' => get_string('maptypesatellite', 'block_dashboard'),
-            'HYBRID' => get_string('maptypehybrid', 'block_dashboard'),
-            'TERRAIN' => get_string('maptypeterrain', 'block_dashboard'),
-        );
-        $maptype = 'ROADMAP';
-        if (isset($theblock->config) && isset($theblock->config->maptype)) {
-            $maptype = $theblock->config->maptype;
-        }
-        $template->maptypeselect = html_writer::select($maptypeopts, 'maptype', $maptype);
-
-        $template->zoom = '6';
-        if (isset($theblock->config) && isset($theblock->config->zoom)) {
-            $template->zoom = $theblock->config->zoom;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->datatitles)) {
-            $template->datatitles = $theblock->config->datatitles;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->datalocations)) {
-            $template->datalocations = $theblock->config->datalocations;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->datatypes)) {
-            $template->datatypes = $theblock->config->datatypes;
-        }
-
-        $template->strdatatitles = get_string('datatitles', 'block_dashboard');
-        $template->strdatalocations = get_string('datalocations', 'block_dashboard');
-        $template->strdatatypes = get_string('datatypes', 'block_dashboard');
-
-        $template->strconfiglocation = get_string('configlocation', 'block_dashboard');
-        $template->lat = '0';
-        $template->lng = '0';
-        if (isset($theblock->config) && isset($theblock->config->lat)) {
-            $template->lat = $theblock->config->lat;
-        }
-        if (isset($theblock->config) && isset($theblock->config->lng)) {
-            $template->lng = $theblock->config->lng;
-        }
-
-        return $this->render_from_template('block_dashboard/googleparams', $template);
-    }
-
-    public function timeline_params() {
-
-        $theblock = $this->theblock;
-
-        $template = new StdClass();
-
-        $template->str = get_string('timelineparams', 'block_dashboard');
-        $template->helpiconconfigbands = $this->output->help_icon('configbands', 'block_dashboard');
-        $template->strconfigshowlowerband = get_string('configshowlowerband', 'block_dashboard');
-
-        if (!empty($theblock->config->showlowerband)) {
-            $template->showlowerbandchecked = 'checked="checked"';
-        } else {
-            $template->showlowerbandunchecked = 'checked="checked"';
-        }
-        $template->stryes = get_string('yes');
-        $template->strno = get_string('no');
-
-        $template->helpiconconfigtimeunits = $this->output->help_icon('configtimeunits', 'block_dashboard');
-        $template->strconfigupperbandunit = get_string('configupperbandunit', 'block_dashboard');
-
-        $upperbandunit = 'MONTH';
-        if (isset($theblock->config) && isset($theblock->config->upperbandunit)) {
-            $upperbandunit = $theblock->config->upperbandunit;
-        }
-        $upperunits = array('MONTH' => get_string('month', 'block_dashboard'),
-            'WEEK' => get_string('week', 'block_dashboard'),
-            'DAY' => get_string('day', 'block_dashboard'),
-            'HOUR' => get_string('hour', 'block_dashboard'));
-        $template->upperbandunitselect = html_writer::select($upperunits, 'upperbandunit', $upperbandunit);
-
-        $template->helpiconconfigtimeunits = $this->output->help_icon('configtimeunits', 'block_dashboard');
-        $template->strconfiglowerbandunit = get_string('configlowerbandunit', 'block_dashboard');
-
-        $lowerbandunit = 'YEAR';
-        if (isset($theblock->config) && isset($theblock->config->lowerbandunit)) {
-            $lowerbandunit = $theblock->config->lowerbandunit;
-        }
-        $lowerunits = array('YEAR' => get_string('year', 'block_dashboard'),
-            'MONTH' => get_string('month', 'block_dashboard'),
-            'WEEK' => get_string('week', 'block_dashboard'),
-            'DAY' => get_string('day', 'block_dashboard'));
-        $template->lowerbandunitselect = html_writer::select($lowerunits, 'lowerbandunit', $lowerbandunit);
-
-        $template->helpiconconfigeventmapping = $this->output->help_icon('configeventmapping', 'block_dashboard');
-        $template->strconfigeventmapping = get_string('configeventmapping', 'block_dashboard');
-
-        if (isset($theblock->config) && isset($theblock->config->timelineeventtitle)) {
-            $template->eventtitle = $theblock->config->timelineeventtitle;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->timelineeventstart)) {
-            $template->eventstart = $theblock->config->timelineeventstart;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->timelineeventend)) {
-            $template->eventend = $theblock->config->timelineeventend;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->timelineeventlink)) {
-            $template->eventlink = $theblock->config->timelineeventlink;
-        }
-
-        if (isset($theblock->config) && isset($theblock->config->timelineeventdesc)) {
-            $template->eventdesc = $theblock->config->timelineeventdesc;
-        }
-
-        $template->streventtitles = get_string('eventtitles', 'block_dashboard');
-        $template->streventstart = get_string('eventstart', 'block_dashboard');
-        $template->streventend = get_string('eventend', 'block_dashboard');
-        $template->streventlink = get_string('eventlink', 'block_dashboard');
-        $template->streventdesc = get_string('eventdesc', 'block_dashboard');
-
-        $template->strconfigcolors = get_string('configcolors', 'block_dashboard');
-        $template->strconfigcolorfield = get_string('configcolorfield', 'block_dashboard');
-
-        $template->strconfigcoloredvalues = get_string('configcoloredvalues', 'block_dashboard');
-
-        return $this->render_from_template('block_dashboard/timelineparams', $template);
-    }
-
     public function sums_and_filters() {
 
         $theblock = $this->theblock;
@@ -822,11 +624,7 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filters)) {
             $filters = $theblock->config->filters;
         }
-<<<<<<< HEAD
-        $template->filters = htmlentities($filters, ENT_QUOTES, 'UTF-8');
-=======
         $template->filters = $filters;
->>>>>>> MOODLE_34_STABLE
 
         $template->strconfigfilterlabels = get_string('configfilterlabels', 'block_dashboard');
 
@@ -843,11 +641,7 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filterdefaults)) {
             $filterdefaults = $theblock->config->filterdefaults;
         }
-<<<<<<< HEAD
-        $template->filterdefaults = htmlentities($filterdefaults, ENT_QUOTES, 'UTF-8');
-=======
         $template->filterdefaults = $filterdefaults;
->>>>>>> MOODLE_34_STABLE
 
         $template->helpiconconfigfilteroptions = $this->output->help_icon('configfilteroptions', 'block_dashboard');
         $template->strconfigfilteroptions = get_string('configfilteroptions', 'block_dashboard');
@@ -856,11 +650,7 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->filteroptions)) {
             $filteroptions = $theblock->config->filteroptions;
         }
-<<<<<<< HEAD
-        $template->filteroptions = htmlentities($filteroptions, ENT_QUOTES, 'UTF-8');
-=======
         $template->filteroptions = $filteroptions;
->>>>>>> MOODLE_34_STABLE
 
         // Sums.
 
@@ -875,11 +665,7 @@ class setup_renderer extends \plugin_renderer_base {
         }
 
         if (isset($theblock->config) && isset($theblock->config->numsumformats)) {
-<<<<<<< HEAD
-            $template->numsumformats = htmlentities($theblock->config->numsumformats, ENT_NOQUOTES, 'UTF-8');
-=======
             $template->numsumformats = $theblock->config->numsumformats;
->>>>>>> MOODLE_34_STABLE
         }
 
         $template->helpiconconfigformatting = $this->output->help_icon('configformatting', 'block_dashboard');
@@ -892,20 +678,6 @@ class setup_renderer extends \plugin_renderer_base {
         }
 
         return $this->render_from_template('block_dashboard/sumsandfilters', $template);
-    }
-
-    public function tablecolor_mapping() {
-
-        $theblock = $this->theblock;
-
-        $template = new StdClass();
-
-        $template->strtablecolormapping = get_string('tablecolormapping', 'block_dashboard');
-        $template->strconfigcolors = get_string('configcolors', 'block_dashboard');
-        $template->strconfigcolorfield = get_string('configcolorfield', 'block_dashboard');
-        $template->strconfigcoloredvalues = get_string('configcoloredvalues', 'block_dashboard');
-
-        return $this->render_from_template('block_dashboard/colormapping', $template);
     }
 
     public function data_refresh() {

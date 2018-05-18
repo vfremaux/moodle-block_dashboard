@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-<?php // $Id: block_dashboard.php,v 1.2 2012-09-12 20:23:37 vf Exp $
-
-// Capabilitites
-=======
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -28,40 +23,25 @@
  */
 
 // Capabilitites.
->>>>>>> MOODLE_33_STABLE
 $string['dashboard:addinstance'] = 'Can add an instance';
 $string['dashboard:myaddinstance'] = 'Can add an instance to My Page';
 $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard:systempathaccess'] = 'Can configure output in system data path';
-<<<<<<< HEAD
-
-=======
 $string['dashboard:export'] = 'Export data (web service)';
->>>>>>> MOODLE_33_STABLE
 
 $string['backtocourse'] = 'Back to course';
 $string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
 $string['bigresult'] = '"Big Results" protection';
 $string['blockname'] = 'Dashboard';
-<<<<<<< HEAD
-$string['bigresult'] = '"Big Results" protection';
 $string['checktohide'] = 'Check box to hide title';
 $string['choicevalue'] = 'Choice';
-<<<<<<< HEAD
-$string['configbigresult'] = '<span style="font-size:0.8em">Enable Big Result option</span>';
-=======
-$string['checktohide'] = 'Check box to hide title';
-$string['choicevalue'] = 'Choice';
-=======
 $string['cachefilterqueryerror'] = 'Error in cache query';
->>>>>>> MOODLE_34_STABLE
 $string['cacheddata'] = 'Data from query cache';
 $string['cleararea'] = 'Clear all file area';
 $string['cleandisplayuptocolumn'] = 'Do not clean after column index';
 $string['configbands'] = 'Hide show time bands';
 $string['configbigresult'] = 'Enable Big Result option';
->>>>>>> MOODLE_33_STABLE
 $string['configcache'] = 'Result Cache Settings';
 $string['configcaching'] = 'Cache enabling';
 $string['configcachingttl'] = 'Cache TTL';
@@ -82,13 +62,7 @@ $string['configdashboardparams'] = 'Dashboard data settings';
 $string['configdata'] = 'GoogleMaps Markers Data';
 $string['configdatatitles'] = 'Data titles';
 $string['configdatatypes'] = 'Data types';
-<<<<<<< HEAD
-$string['configdahsboardparams'] = 'Dashboard data settings';
 $string['configdisplay'] = 'Setup elements for display';
-$string['generalparams'] = 'Access to dashboard settings';
-=======
-$string['configdisplay'] = 'Setup elements for display';
->>>>>>> MOODLE_33_STABLE
 $string['configenablehorizsums'] = 'Enable horiz sums';
 $string['configenablevertsums'] = 'Enable vertical sums';
 $string['configeventmapping'] = 'Data mapping for events';
@@ -134,15 +108,8 @@ $string['configoutputfields'] = 'Output fields';
 $string['configoutputfieldslabels'] = 'Output fields labels';
 $string['configoutputformats'] = 'Output data formatting';
 $string['configpagesize'] = 'Result paging size';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['configparams'] = 'User param definitions';
-=======
-=======
->>>>>>> MOODLE_34_STABLE
 $string['configparams'] = 'User parameters are values that are given by the dashboard end user to alter the query behaviour or output range.';
 $string['configparent'] = 'Parent';
->>>>>>> MOODLE_33_STABLE
 $string['configparentserie'] = 'Parent serie';
 $string['configquery'] = 'Query';
 $string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Never forget the field separator is <b>necessarily</b> a ;</span>';
@@ -163,10 +130,7 @@ $string['configsortable'] = 'Sortable table';
 $string['configspliton'] = 'Split table on serie';
 $string['configsplitsumsonsort'] = 'Split-sums column';
 $string['configsplitsumsonsort_help'] = '';
-<<<<<<< HEAD
-=======
 $string['configsummators'] = 'Summarizers';
->>>>>>> MOODLE_33_STABLE
 $string['configsums'] = 'Local sums settings';
 $string['configtable'] = 'Table settings';
 $string['configtablesplit'] = 'Data table split field';
@@ -274,11 +238,8 @@ $string['filegenerationfailed'] = 'File failed to be generated';
 $string['filternotretrievable'] = 'Filter not retrievable';
 $string['friday'] = 'Friday';
 $string['from'] = 'from';
-<<<<<<< HEAD
-=======
 $string['generalparams'] = 'Access to dashboard settings';
 $string['generatedexports'] = 'Generated exports';
->>>>>>> MOODLE_33_STABLE
 $string['globalcron'] = 'Global cron settings';
 $string['googlelocationerror'] = 'Google location error';
 $string['googlemap'] = 'Google Map';
@@ -287,8 +248,6 @@ $string['graphparams'] = 'Graph settings';
 $string['guestsnotallowed'] = 'Guests are not allowed';
 $string['hour'] = 'Hour';
 $string['hours'] = 'Hours';
-$string['invalidorobsoletequery'] = 'Invalid or obsolete query : {$a}';
-$string['invalidorobsoletefilterquery'] = 'Invalid or obsolete filterquery';
 $string['importconfig'] = 'Import config';
 $string['instancecron'] = 'Instance cron settings';
 $string['invalidorobsoletefilterquery'] = 'Invalid or obsolete filterquery.';
@@ -296,6 +255,10 @@ $string['invalidorobsoletequery'] = 'Invalid or obsolete query.';
 $string['line'] = 'Lines';
 $string['linear'] = 'Linear';
 $string['listvalue'] = 'Value List';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['log'] = 'Logarithmic';
 $string['maptypehybrid'] = 'Hybrid view';
 $string['maptyperoadmap'] = 'Road map';
@@ -314,7 +277,6 @@ $string['obsoletequery'] = 'Query seems being written for old Moodle 1.9 databas
 $string['outputfilegeneration'] = 'Output file generation';
 $string['outputfiltered'] = 'Generate output file (filtered)';
 $string['outputparams'] = 'Query output settings';
-$string['obsoletequery'] = 'Query seems being written for old Moodle 1.9 database.';
 $string['pageexport'] = 'Page export';
 $string['pie'] = 'Pie';
 $string['plotgraphparams'] = 'Plotted graph settings';
@@ -325,12 +287,8 @@ $string['querydesc'] = 'Query definition';
 $string['queryparams'] = 'Query user parameters';
 $string['rangevalue'] = 'Range';
 $string['saturday'] = 'Saturday';
-<<<<<<< HEAD
-$string['savechangesandreturn'] = 'Save and return to course';
-=======
 $string['savechangesandconfig'] = 'Save and continue configuration';
 $string['savechangesandview'] = 'Save and view';
->>>>>>> MOODLE_33_STABLE
 $string['securityparams'] = 'Security and performance settings';
 $string['setup'] = 'Setup';
 $string['sqlinserts'] = 'SQL INSERTs';
@@ -344,10 +302,7 @@ $string['sunday'] = 'Sunday';
 $string['tablecolormapping'] = 'Output table color mapping';
 $string['tabular'] = 'Tabular';
 $string['tabularparams'] = 'Tabular layout extra settings';
-<<<<<<< HEAD
-=======
 $string['task_exportdata'] = 'Data automated export';
->>>>>>> MOODLE_33_STABLE
 $string['textvalue'] = 'Text';
 $string['thursday'] = 'Thursday';
 $string['timegraph'] = 'Time curves';
@@ -366,8 +321,6 @@ $string['week'] = 'Week';
 $string['year'] = 'Year';
 $string['sums'] = 'Summators';
 
-<<<<<<< HEAD
-=======
 $string['configbands_help'] = 'A time line graph has two timebands one over the other. The second timeband has more precision.';
 $string['configtimeunits_help'] = 'Setup the time units and scale for each band.';
 
@@ -397,16 +350,11 @@ $string['configfilesqlouttable_help'] = '
 
 $string['configfilepathadminoverride_help'] = 'Administrators may need to generate the files outside the Moodle controlled area';
 
->>>>>>> MOODLE_33_STABLE
 $string['configformatting_help'] = '
 <p>This parameters allow to give a formatting instruction to data, based on the typical "sprintf"
     syntax.</p>
 <p>When formatting a semi-column separated list, the formatting list should present an identical number
-<<<<<<< HEAD
-	of formatting statements. An empty formatting string will pass through the original information.</p> 
-=======
     of formatting statements. An empty formatting string will pass through the original information.</p> 
->>>>>>> MOODLE_33_STABLE
 
 <h4>Example:</h4>
 <p>Using a query that defines a frequentation ratio</p>
@@ -431,21 +379,12 @@ clause</p>
 <p>Using the query</p>
 
 <pre>
-<<<<<<< HEAD
-	SELECT
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
-	   count(l.id) as queries
-	FROM
-		mdl_log l
-=======
     SELECT
        DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
        DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
        count(l.id) as queries
     FROM
         mdl_log l
->>>>>>> MOODLE_33_STABLE
     GROUP BY
         year,month
 </pre>
@@ -456,55 +395,14 @@ clause</p>
 <p>To setup distinct filters for resp. year and month, you should write:</p>
 <pre>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year<b>;</b>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y-%m\') as month</pre>
 
-<<<<<<< HEAD
-<p>Beware : when using two filters, each of them provides its value list independently. Thus some filtering combination could result in "no values" ar all.</p>
-=======
 <p>Beware : when using two filters, each of them provides its value list independently. Thus some filtering combination
 could result in "no values" ar all.</p>
->>>>>>> MOODLE_33_STABLE
 
 <h4>Query configuration</h4>
 
 <p>Filters operate on query results depending on a  "&lt;%%FILTERS%%&gt;" marker that can complete or replace a WHERE clause.</p>
 <p><u>Valid location samples:</u></p>
 <pre>
-<<<<<<< HEAD
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	WHERE
-		t1.id = t2.t1key
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-
-<p><u>Invalid location samples:</u></p>
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	GROUP BY
-	    data2
-	   <span style="color:red">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-=======
     SELECT
       data1,data2
     FROM
@@ -540,7 +438,6 @@ could result in "no values" ar all.</p>
     ORDER BY
        data1
 </pre>
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configfilterdefaults_help'] = '
@@ -556,17 +453,6 @@ avoid to browse back to the "all data" situation.</p>
 <h4>Several filters</h4>
 
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
-<<<<<<< HEAD
-(";" separated). Non used values should be left as "empty strings".</p> 
-
-<h4>Special values</h4>
-
-<p>Some values allow having a dynamic effect in defaults:</p> 
-<ul>
-	<li>"LAST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for most recent).</li>
-	<li>"FIRST" : preset the filtering with the last value in list. (applied to ASC ordered dates, will stand for oldest).</li>
-</ul>                                                           
-=======
 (";" separated). Non used values should be left as "empty strings".</p>
 
 <h4>Special values</h4>
@@ -580,7 +466,6 @@ avoid to browse back to the "all data" situation.</p>
 
 $string['configxaxis_help'] = '
     Defines serie for Xaxis
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configfilteroptions_help'] = '
@@ -589,28 +474,17 @@ $string['configfilteroptions_help'] = '
 enablers that may be present (enabled) or absent (disabled).</p>
 <h4>Values</h4>
 <ul>
-<<<<<<< HEAD
-	<li><b>m</b> : (multiple) makes the selector multiple so that set of possible values or ranges can be asked for.</li>
-	<li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined. Un filtre en mode "s" exclut le précédent.</li>
-	<li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values. You may try to disable this processing with the "x" option on. Sometimes it works.</li>
-</ul>                                                           
-=======
     <li><b>m</b> : (multiple) makes the selector multiple so that set of possible values or ranges can be asked for.</li>
     <li><b>s</b> : (single) avoid using the "*" wildcard. When enabled the default is forced to "FIRST" if undefined.
     Un filtre en mode "s" exclut le précédent.</li>
     <li><b>x</b> : (crossthrough) some queries strutures (f.e. UNION) do not admit the query transform usually processed to get filter values.
     You may try to disable this processing with the "x" option on. Sometimes it works.</li>
 </ul>
->>>>>>> MOODLE_33_STABLE
 
 <h4>Several filters</h4>
 
 <p>When several filters are setup using  ";" separator, then default values should also be defined as a list
-<<<<<<< HEAD
-(";" separated). Non used values should be left as "empty strings".</p> 
-=======
 (";" separated). Non used values should be left as "empty strings".</p>
->>>>>>> MOODLE_33_STABLE
 
 <h4>Example</h4>
 
@@ -631,34 +505,6 @@ $string['configeventmapping_help'] = '';
 $string['configgmdata_help'] = '
 <h3>Geolocated information</h3>
 
-<<<<<<< HEAD
-<p>PLotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
-	or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
-	coordinate and will cache this information.</p>
-<p>Geocoding is subject to Google Geocoding API terms of service. Free unregistered conversion rate is limited to 2500 requests per day. Read the <a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >Geocoding API of Google</a> for more information.</p>
-
-<h4>Geographic data settings</h4>
-
-<p>Geolocated information are plotted on map as graphical markers. Markers can be defined as :</p>
-<ul>
-<li>A quadruplet: Title, Latitude, Longitude, Marker Class</li>
-<li>A sextuplet: Title, Address, Post code, City, Region Code, Marker Class</li>
-</ul>
-
-<p>Information fields have following specification:</p>
-
-<ul>
-<li><i>Title</i>: Textual label of the marker</li>
-<li><i>Latitude</i>: floating point latitude</li>
-<li><i>Longitude</i>: floating point longitude</li>
-<li><i>Address</i>: road information</li>
-<li><i>Post code</i>: Official post or zip code</li>
-<li><i>City</i>: City name</li>
-<li><i>Marker Class</i>: A classname, that will bind to a graphical icon</li>
-</ul>	
-
-<p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or more field (or alias) names separated by semicolons (";").</p>
-=======
 <p>Plotting geolocated information onto a GoogleMap assumes geographic information is available either as gelocation coordinates
     or address information. The dashboard block can handle the transposition of human readable address elements into a gelocation
     coordinate and will cache this information.</p>
@@ -688,30 +534,18 @@ for more information.</p>
 
 <p>Setting fields let you bind required information to request output fields. Setting outputs will usually accept one or
 more field (or alias) names separated by semicolons (";").</p>
->>>>>>> MOODLE_33_STABLE
 <ul>
 <li><i>Title input</i>: Query output fieldname providing the textual label</li>
 <li><i>Location input</i>: 
 <ul>
-<<<<<<< HEAD
-<li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point values : "lat,lng" (ex : 47.098456,1.4534456)</li>
-<li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order : address, post code, city, and region code (*)</li>
-=======
 <li><u>Case 1</u>: THE output column name providing the geolocation couple as a comma pair of floating point
 values : "lat,lng" (ex : 47.098456,1.4534456)</li>
 <li><u>Case 2</u>: A semicolon separated list of query output fieldnames (or aliases) that provide in order:
 address, post code, city, and region code (*)</li>
->>>>>>> MOODLE_33_STABLE
 </ul>
 </li>
 <li><i>Marker type input</i>: The query output fieldname that provides a class label</li>
 </ul>
-<<<<<<< HEAD
-	
-<p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
-<pre>address;cp;city;"GB"</pre>
-<p>will always provide the value "GB" as region code.</p>
-=======
 
 <p>(*) Some constant values can be given for city, post code and region code, using quoted values in place of field name: </p>
 <pre>address;cp;city;"GB"</pre>
@@ -720,19 +554,14 @@ address, post code, city, and region code (*)</li>
 
 $string['confighierarchic_help'] = '
 Hierarchic rendering
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configoutputfields_help'] = '
 <h3>Data output</h3>
 
 <p>Specifies which output fields will be used in the output table (display data).</p>
-<<<<<<< HEAD
-<p>Fields must be mentionned using real or aliased column identity. SQL statement must be represented by a named alias. Multiple output columns must be separated by semi-columns (;).</p>
-=======
 <p>Fields must be mentionned using real or aliased column identity. SQL statement must be represented by a named alias.
 Multiple output columns must be separated by semi-columns (;).</p>
->>>>>>> MOODLE_33_STABLE
 <h4>Example:</h4>
 <p>If query is: </p>
 <pre>
@@ -759,16 +588,6 @@ $string['configquery_help'] = '
 <p>Dashboard will produce a vue based on a data query submitted to the database.</p>
 <p>This query:</p>
 <ul>
-<<<<<<< HEAD
-	<li>needs define output fields (using AS aliasing)</li>
-	<li>can use JOIN or complex UNIONs in some cases</li>
-	<li>can use aggregating operators and GROUP BY clauses</li>
-	<li>should NOT have an ORDER BY if data is intended to be displayed in data tables</li>
-</ul>
-
-<h3>Placeholder for filters</h3>
-<p>If some data filtering is to be used, then a &lt;%%FILTERS%%&gt; tag needs to be inserted as placeholder in the original query as WHERE clause or for completing a WHERE clause</p>  
-=======
     <li>needs define output fields (using AS aliasing)</li>
     <li>can use JOIN or complex UNIONs in some cases</li>
     <li>can use aggregating operators and GROUP BY clauses</li>
@@ -778,7 +597,6 @@ $string['configquery_help'] = '
 <h3>Placeholder for filters</h3>
 <p>If some data filtering is to be used, then a &lt;%%FILTERS%%&gt; tag needs to be inserted as placeholder in
 the original query as WHERE clause or for completing a WHERE clause</p>
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configsplitsumonsort_help'] = '
@@ -953,4 +771,10 @@ $string['configserieslabels_help'] = '
 When plotting data series into graphs, Y series will by default be named with the X serie values. You may use this field to
 provide alternate labels for on screen printing. Labels should be given as a semicolon separated list in the order of
 the X serie values.
+';
+
+$string['tablecolormapping_help'] = '
+You may choose to colorize results (textual) in one output column using value filters mapped to HTML color definitions :
+  - in the left side text area enter an evaluation expression replacing value by %% (f.e. %% == 0).
+  - in the right side text area, enter the html colour code.
 ';

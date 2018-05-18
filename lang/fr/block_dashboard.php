@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-<?php // $Id: block_dashboard.php,v 1.2 2012-09-12 20:23:38 vf Exp $
-
-// Capabilities
-=======
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -28,39 +23,19 @@
  */
 
 // Capabilities.
->>>>>>> MOODLE_33_STABLE
 $string['dashboard:addinstance'] = 'Peut ajouter une instance';
 $string['dashboard:myaddinstance'] = 'Peut ajouter une instance à la page personnalisée';
 $string['dashboard:configure'] = 'Peut configurer le tableau de bord';
 $string['dashboard:systempathaccess'] = 'Peut générer des fichiers dans tout le système de fichiers';
-<<<<<<< HEAD
+$string['dashboard:export'] = 'Exporter les données (web service)';
 
 $string['backtocourse'] = 'Revenir au cours';
 $string['backtoview'] = 'Revenir au résultat de requête';
 $string['bar'] = 'Barres';
-<<<<<<< HEAD
-$string['bigresult'] = '<span style="font-size:0.8em">Désactiver la sécurité</span>';
-=======
-$string['dashboard:export'] = 'Exporter les données (web service)';
-
-$string['backtocourse'] = 'Revenir au cours';
-$string['bar'] = 'Barres';
-$string['bigresult'] = 'Désactiver la sécurité';
->>>>>>> MOODLE_33_STABLE
-$string['blockname'] = 'Tableaux de bord';
-$string['cacheddata'] = 'Données du cache de requête';
-$string['checktohide'] = 'Cocher la case pour cacher le titre';
-<<<<<<< HEAD
-$string['configcaching'] = 'Activation du cache de résultats';
-$string['configcachingttl'] = 'TTL du cache';
-$string['configcleandisplay'] = 'Nettoyer la table';
-=======
-=======
 $string['bigresult'] = 'Désactiver la sécurité';
 $string['blockname'] = 'Tableaux de bord';
 $string['cacheddata'] = 'Données du cache de requête';
 $string['checktohide'] = 'Cocher la case pour cacher le titre';
->>>>>>> MOODLE_34_STABLE
 $string['choicevalue'] = 'Choix';
 $string['cleandisplayuptocolumn'] = 'Ne pas nettoyer après la colonne n°&nbsp;';
 $string['cleararea'] = 'Vider la zone de fichiers';
@@ -69,56 +44,15 @@ $string['coma'] = 'Virgule';
 $string['configcaching'] = 'Activation du cache de résultats&nbsp;';
 $string['configcachingttl'] = 'TTL du cache&nbsp;';
 $string['configcleandisplay'] = 'Nettoyer la table&nbsp;';
-<<<<<<< HEAD
->>>>>>> MOODLE_33_STABLE
-=======
->>>>>>> MOODLE_34_STABLE
 $string['configcoloredvalues'] = 'Valeurs de contrôle des couleurs';
 $string['configcolorfield'] = 'Champ de controle des couleurs';
 $string['configcolors'] = 'Couleurs';
 $string['configcopy'] = 'Importer la configuration d\'un tableau de bord';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['configcronfrequency'] = 'Fréquence';
-=======
 $string['configcronfrequency'] = 'Fréquence&nbsp;';
->>>>>>> MOODLE_33_STABLE
-=======
-$string['configcronfrequency'] = 'Fréquence&nbsp;';
->>>>>>> MOODLE_34_STABLE
 $string['configcronmode'] = 'Mode de programmation du raffraichissement';
 $string['configcrontime'] = 'Heure&nbsp;';
 $string['configdashboardparams'] = 'Paramètres du tableau de bord';
 $string['configdata'] = 'Données GoogleMaps';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['configdahsboardparams'] = 'Paramètres du tableau de bord';
-$string['generalparams'] = 'Accéder à la définition du tableau de bord';
-$string['configdisplay'] = 'Eléments d\'affichage';
-$string['invalidorobsoletequery'] = 'Requête obsolete ou invalide : {$a}';
-$string['invalidorobsoletefilterquery'] = 'Requête de filtre obsolete ou invalide';
-=======
-$string['configdelayedrefresh'] = 'Raffraichissement différé des données de tableau de bord.';
-$string['configdisplay'] = 'Eléments d\'affichage&nbsp;';
->>>>>>> MOODLE_34_STABLE
-$string['configenablehorizsums'] = 'Activer les totaux horizontaux';
-$string['configenablevertsums'] = 'Activer les totaux verticaux';
-$string['configeventmapping'] = 'Mapping de données pour les événements';
-$string['configfileformat'] = 'Type de fichier de sortie&nbsp;';
-$string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
-$string['configfileoutput'] = 'Champs de sortie sur fichier&nbsp;';
-$string['configfileoutputformats'] = 'Formattage des données&nbsp;';
-$string['configfilepathadminoverride'] = 'Emplacement spécial&nbsp;';
-$string['configfilesqlouttable'] = 'Nom de la table SQL (sortie SQL)&nbsp;';
-$string['configfilterdefaults'] = 'Défaut pour les filtres&nbsp;';
-$string['configfilterlabels'] = 'Label des filtres&nbsp;';
-$string['configfilteroptions'] = 'Options pour les filtres&nbsp;';
-$string['configfilters'] = 'Filtres';
-<<<<<<< HEAD
-$string['configgraphheight'] = 'Hauteur du graphe';
-$string['configgraphtype'] = 'Type de graphe';
-$string['configgraphwidth'] = 'Largeur du graphe';
-=======
 $string['configdelayedrefresh'] = 'Raffraichissement différé des données de tableau de bord.';
 $string['configdisplay'] = 'Eléments d\'affichage&nbsp;';
 $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
@@ -137,12 +71,6 @@ $string['configfilters'] = 'Filtres';
 $string['configgraphheight'] = 'Hauteur du graphe&nbsp;';
 $string['configgraphtype'] = 'Type de graphe&nbsp;';
 $string['configgraphwidth'] = 'Largeur du graphe&nbsp;';
->>>>>>> MOODLE_33_STABLE
-=======
-$string['configgraphheight'] = 'Hauteur du graphe&nbsp;';
-$string['configgraphtype'] = 'Type de graphe&nbsp;';
-$string['configgraphwidth'] = 'Largeur du graphe&nbsp;';
->>>>>>> MOODLE_34_STABLE
 $string['confighidetitle'] = 'Cacher le titre du bloc';
 $string['confighierarchic'] = 'Affichage de données hiérarchiques';
 $string['confighorizformat'] = 'Formatage des clefs horizontales&nbsp;';
@@ -150,102 +78,6 @@ $string['confighorizkey'] = 'Clef horizontale&nbsp;';
 $string['confighorizlabel'] = 'Label de la série horizontale&nbsp;';
 $string['confighorodatefiles'] = 'Horodater les fichiers&nbsp;';
 $string['configimportexport'] = 'Import/Export de la configuration';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['configlat'] = 'Latitude';
-$string['configlayout'] = 'Publier les données dans le bloc ';
-$string['configlocation'] = 'Emplacement';
-$string['configlowerbandunit'] = 'Echelle de la bande inférieure';
-$string['configmakefile'] = 'Générer la sortie';
-$string['configmaptype'] = 'Type de carte';
-$string['confignumsums'] = 'Champs sommateurs';
-$string['confignumsumsformats'] = 'Format des sommes';
-$string['confignumsumslabels'] = 'Titre des sommes';
-$string['configoutputfields'] = 'Colonnes de sorties';
-$string['configoutputfieldslabels'] = 'Nom des colonnes de sortie';
-$string['configoutputformats'] = 'Format des données de sorties';
-$string['configpagesize'] = 'Taille de pagination';
-$string['configparent'] = 'Série de la liaison hiérarchique';
-$string['configquery'] = 'Requête';
-$string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Ne pas oublier que le séparateur est <b>nécessairement</b> un ;</span>';
-$string['configserieslabels'] = 'Titre des séries';
-$string['configshowdata'] = 'Montrer les données';
-$string['configshowfilterqueries'] = 'Montrer les requêtes des filtres (debug)';
-$string['configshowgraph'] = 'Montrer le graphe';
-$string['configshowlegend'] = 'Montrer la légende';
-$string['configshowlowerband'] = 'Afficher la bande inférieure';
-$string['configshownumsums'] = 'Montrer les sommateurs';
-$string['configshowquery'] = 'Montrer la requête (debug)';
-$string['configsortable'] = 'Table triable';
-$string['configspliton'] = 'Dissocier la table sur la série';
-$string['configsplitsumsonsort'] = 'Colonne de séparation de sous-totaux';
-$string['configtabletype'] = 'Type de table';
-$string['configtarget'] = 'Système cible';
-$string['configtickspacing'] = 'Espacement entre marques';
-$string['configtitle'] = 'Titre du bloc';
-$string['configtreeoutput'] = 'Séries de l\'arbre';
-$string['configtreeoutputformats'] = 'Formats des séries de l\'arbre';
-$string['configupperbandunit'] = 'Echelle de la bande supérieure';
-=======
-$string['configlat'] = 'Latitude&nbsp;';
-$string['configlayout'] = 'Publier les données dans le bloc&nbsp;';
-$string['configlocation'] = 'Emplacement&nbsp;';
-$string['configlowerbandunit'] = 'Echelle de la bande inférieure&nbsp;';
-$string['configmakefile'] = 'Générer la sortie&nbsp;';
-$string['configmaptype'] = 'Type de carte&nbsp;';
-$string['confignumsums'] = 'Champs sommateurs&nbsp;';
-$string['confignumsumsformats'] = 'Format des sommes&nbsp;';
-$string['confignumsumslabels'] = 'Titre des sommes&nbsp;';
-$string['configoutputfields'] = 'Colonnes de sorties&nbsp;';
-$string['configoutputfieldslabels'] = 'Nom des colonnes de sortie&nbsp;';
-$string['configoutputformats'] = 'Format des données de sorties&nbsp;';
-$string['configpagesize'] = 'Taille de pagination&nbsp;';
-$string['configparams'] = 'Les paramètres utilisateur permettent à l\'exploitant du tableau de bord de rentrer des paramètres pour modifier le comportement de la requête et son domaine de sortie.';
-$string['configparent'] = 'Série de la liaison hiérarchique&nbsp;';
-$string['configquery'] = 'Requête&nbsp;';
-$string['configqueryrotate'] = 'Pivoter les données&nbsp;';
-$string['configreminderonsep'] = '<span style="font-size:1.3em;color:#808080">Ne pas oublier que le séparateur est <b>nécessairement</b> un ;</span>';
-$string['configrotatecolumns'] = 'Faire une rotation de ';
-$string['configrotatenewkeys'] = ' sur les clefs ';
-$string['configrotatepivot'] = ' autour du pivot ';
-$string['configsendadminnotification'] = 'Envoyer des notifications administrateur sur cron&nbsp;';
-$string['configserieslabels'] = 'Titre des séries&nbsp;';
-$string['configshowdata'] = 'Montrer les données&nbsp;';
-$string['configshowfilterqueries'] = 'Montrer les requêtes des filtres (debug)&nbsp;';
-$string['configshowgraph'] = 'Montrer le graphe&nbsp;';
-$string['configshowlegend'] = 'Montrer la légende&nbsp;';
-$string['configshowlowerband'] = 'Afficher la bande inférieure&nbsp;';
-$string['configshownumsums'] = 'Montrer les sommateurs&nbsp;';
-$string['configshowquery'] = 'Montrer la requête (debug)&nbsp;';
-$string['configsortable'] = 'Table triable&nbsp;';
-$string['configspliton'] = 'Dissocier la table sur la série&nbsp;';
-$string['configsplitsumsonsort'] = 'Colonne de séparation de sous-totaux&nbsp;';
-$string['configtablesplit_help'] = 'Si défini, les valeurs différentes de cette série de données sépareront les résultats en tables différentes';
-$string['configtabletype'] = 'Type de table&nbsp;';
-$string['configtarget'] = 'Système cible&nbsp;';
-$string['configtickspacing'] = 'Espacement entre marques&nbsp;';
-$string['configtitle'] = 'Titre du bloc&nbsp;';
-$string['configtreeoutput'] = 'Séries de l\'arbre&nbsp;';
-$string['configtreeoutputformats'] = 'Formats des séries de l\'arbre&nbsp;';
-$string['configupperbandunit'] = 'Echelle de la bande supérieure&nbsp;';
->>>>>>> MOODLE_34_STABLE
-$string['configure'] = 'Configurer';
-$string['configverticalformats'] = 'Formatage des clefs verticales&nbsp;';
-$string['configverticalkeys'] = 'Clef(s) verticales&nbsp;';
-$string['configverticallabels'] = 'Label des séries verticales&nbsp;';
-$string['configxaxisfield'] = 'Champ des abscisses (axe X)&nbsp;';
-$string['configxaxislabel'] = 'Nom d\'axe X&nbsp;';
-$string['configyaxislabel'] = 'Nom d\'axe Y&nbsp;';
-$string['configyaxisscale'] = 'Type d\'échelle Y&nbsp;';
-$string['configyaxistickangle'] = 'Angle des étiquettes X&nbsp;';
-$string['configymax'] = 'Max axe Y&nbsp;';
-$string['configymin'] = 'Min axe Y&nbsp;';
-$string['configyseries'] = 'Séries de données';
-<<<<<<< HEAD
-$string['configyseries'] = 'Séries de données';
-$string['configyseriesformats'] = 'Formats de données des séries';
-$string['configzoom'] = 'Zoom';
-=======
 $string['configlat'] = 'Latitude&nbsp;';
 $string['configlayout'] = 'Publier les données dans le bloc&nbsp;';
 $string['configlocation'] = 'Emplacement&nbsp;';
@@ -301,38 +133,18 @@ $string['configymin'] = 'Min axe Y&nbsp;';
 $string['configyseries'] = 'Séries de données';
 $string['configyseriesformats'] = 'Formats de données des séries&nbsp;';
 $string['configzoom'] = 'Zoom&nbsp;';
->>>>>>> MOODLE_33_STABLE
-=======
-$string['configyseriesformats'] = 'Formats de données des séries&nbsp;';
-$string['configzoom'] = 'Zoom&nbsp;';
->>>>>>> MOODLE_34_STABLE
 $string['csv'] = 'Enregistrements CSV';
 $string['csvfieldseparator'] = 'Séparateur de champs&nbsp;';
 $string['csvfieldseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)&nbsp;';
 $string['csvlineseparator'] = 'Séparateur de lignes&nbsp;';
 $string['csvlineseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)&nbsp;';
 $string['csvwithoutheader'] = 'Enregistrements CSV sans ligne d\'en-tête';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['daily'] = 'Tous les jours';
-$string['dashboard_big_result_threshold'] = 'Sécurité "gros résultat" ';
-$string['dashboard_cron_enabled'] = 'Activation du cron ';
-$string['dashboard_cron_freq'] = 'Fréquence hebdomadaire ';
-$string['dashboard_cron_hour'] = 'Heure ';
-$string['dashboard_cron_min'] = 'Minutes ';
-=======
-=======
->>>>>>> MOODLE_34_STABLE
 $string['daily'] = 'Tous les jours&nbsp;';
 $string['dashboard_big_result_threshold'] = 'Sécurité "gros résultat"&nbsp;';
 $string['dashboard_cron_enabled'] = 'Activation du cron&nbsp;';
 $string['dashboard_cron_freq'] = 'Fréquence hebdomadaire&nbsp;';
 $string['dashboard_cron_hour'] = 'Heure&nbsp;';
 $string['dashboard_cron_min'] = 'Minutes&nbsp;';
-<<<<<<< HEAD
->>>>>>> MOODLE_33_STABLE
-=======
->>>>>>> MOODLE_34_STABLE
 $string['dashboard_enable_isediting_security'] = 'Active la sécurisation en mode édition. En mode sécurisé, les requêtes ne sont pas exécutées tant que le cours est en mode édition.';
 $string['dashboard_extra_db_db'] = 'Connexion accessoire (Postgre) : base ';
 $string['dashboard_extra_db_host'] = 'Connexion accessoire (Postgre) : hôte ';
@@ -378,11 +190,8 @@ $string['filegenerationfailed'] = 'Le fichier n\'a pas pu être généré';
 $string['filters'] = 'Filtres&nbsp;';
 $string['friday'] = 'Vendredi';
 $string['from'] = 'de';
-<<<<<<< HEAD
-=======
 $string['generalparams'] = 'Accéder à la définition du tableau de bord';
 $string['generatedexports'] = 'Exports générés';
->>>>>>> MOODLE_33_STABLE
 $string['globalcron'] = 'Paramètres globaux de cron';
 $string['googlemap'] = 'Carte Google';
 $string['googlemap'] = 'Google Map';
@@ -397,6 +206,10 @@ $string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
 $string['listvalue'] = 'Liste';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['log'] = 'Logarithmique';
 $string['maptypehybrid'] = 'Vue combinée';
 $string['maptyperoadmap'] = 'Carte routière';
@@ -411,29 +224,11 @@ $string['nofiles'] = 'Pas de fichiers';
 $string['noquerystored'] = 'Pas de requête enregistrée';
 $string['norefresh'] = 'Pas de raffraichissement&nbsp;';
 $string['notretrievable'] = 'Les données ne peuvent être affichées. Vous êtes probablement en mode édition et il n\'existe aucun cache de données disponible. Cette situation est forcée afin de prévenir une perte de contrôle sur le paramétrage du tableau de bord en cas de requête erronée.';
-<<<<<<< HEAD
-=======
 $string['obsoletequery'] = 'Cette requête semble être écrite pour Moodel 1.9 et est incompatible avec la base de donnée actuelle.';
->>>>>>> MOODLE_33_STABLE
 $string['ofbiz_dashboard'] = 'Tableaux de bord Ofbiz';
 $string['outputfilegeneration'] = 'Extraction de données';
 $string['outputfiltered'] = 'Générer le fichier de sortie (filtré)';
 $string['outputparams'] = 'Configuration des données de sorties';
-<<<<<<< HEAD
-$string['obsoletequery'] = 'Cette requête semble être écrite pour Moodel 1.9 et est incompatible avec la base de donnée actuelle.';
-$string['pie'] = 'Camenberts';
-<<<<<<< HEAD
-=======
-$string['plugindist'] = 'Distribution du plugin';
-$string['pluginname'] = 'Tableau de bord';
->>>>>>> MOODLE_34_STABLE
-$string['publishinblock'] = 'Dans l\'espace du bloc';
-$string['publishinpage'] = 'Dans une page séparée';
-$string['pluginname'] = 'Tableaux de bord';
-$string['querydesc'] = 'Définition de requête';
-<<<<<<< HEAD
-$string['queryparams'] = 'Paramêtres utilisateur';
-=======
 $string['pie'] = 'Camenberts';
 $string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Tableau de bord';
@@ -442,11 +237,6 @@ $string['publishinpage'] = 'Dans une page séparée';
 $string['querydesc'] = 'Définition de requête';
 $string['queryparams'] = 'Paramètres utilisateur';
 $string['rangevalue'] = 'Plage de valeurs';
->>>>>>> MOODLE_33_STABLE
-=======
-$string['queryparams'] = 'Paramètres utilisateur';
-$string['rangevalue'] = 'Plage de valeurs';
->>>>>>> MOODLE_34_STABLE
 $string['saturday'] = 'Samedi';
 $string['savechangesandconfig'] = 'Enregistrer et continuer la configuration';
 $string['savechangesandview'] = 'Enregistrer et afficher';
@@ -459,29 +249,14 @@ $string['sqlparamtype'] = 'Type';
 $string['sqlparamvalues'] = 'Valeurs';
 $string['sqlparamvar'] = 'Champ SQL';
 $string['subtotal'] = 'Sous-total';
-<<<<<<< HEAD
-<<<<<<< HEAD
-$string['savechangesandreturn'] = 'Enregistrer et revenir au cours';
-$string['summatorsparams'] = 'Configuration des sommateurs';
-=======
 $string['sumsandfiltersparams'] = 'Sommes et filtres';
->>>>>>> MOODLE_33_STABLE
-=======
-$string['sumsandfiltersparams'] = 'Sommes et filtres';
->>>>>>> MOODLE_34_STABLE
 $string['sunday'] = 'Dimanche';
 $string['tab'] = 'Tabulation';
 $string['tablecolormapping'] = 'Colorisation des lignes de table';
 $string['tabular'] = 'Table croisée';
 $string['tabularparams'] = 'Paramètres supplémentaires affichage croisé';
-<<<<<<< HEAD
-=======
 $string['task_exportdata'] = 'Export automatisé de données';
 $string['textvalue'] = 'Texte';
-<<<<<<< HEAD
->>>>>>> MOODLE_33_STABLE
-=======
->>>>>>> MOODLE_34_STABLE
 $string['thursday'] = 'Jeudi';
 $string['timegraph'] = 'Courbes temporelle';
 $string['timeline'] = 'Données temporelle';
@@ -498,8 +273,6 @@ $string['week'] = 'Semaine';
 $string['year'] = 'Année';
 $string['sums'] = 'Sommateurs';
 
-<<<<<<< HEAD
-=======
 $string['configdelayedrefresh_help'] = '
 <p>Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
 <p>Vous pouvez choisir de sortir les données selon le réglage général de la fonction cron des tableaux de bord, ou
@@ -521,7 +294,6 @@ $string['configfilesqlouttable_help'] = '
 $string['configfilepathadminoverride_help'] = 'Les administrateurs peuvent avoir besoin de générer les fichiers de sortie
 dans des chemins non contrôllés par Moodle';
 
->>>>>>> MOODLE_33_STABLE
 $string['configformatting_help'] = '
 <p>Ces champs permettent de reformater les données en sorties, selon des masques compatibles
 	avec la fonction "sprintf".</p>
@@ -561,21 +333,12 @@ définir successivement plusieurs filtres à présenter dans l\'interface.</p>
 <p>Pour la requête</p>
 
 <pre>
-<<<<<<< HEAD
-	SELECT
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
-	   DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
-	   count(l.id) as queries
-	FROM
-		mdl_log l
-=======
     SELECT
        DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year,
        DATE_FORMAT(FROM_UNIXTIME(l.time), \'%m\') as month,
        count(l.id) as queries
     FROM
         mdl_log l
->>>>>>> MOODLE_33_STABLE
     GROUP BY
         year,month
 </pre>
@@ -586,12 +349,8 @@ définir successivement plusieurs filtres à présenter dans l\'interface.</p>
 <p>Pour mettre en place deux filtres indépendants sur le mois et l\'année, on écrira :</p>
 <pre>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y\') as year<b>;</b>DATE_FORMAT(FROM_UNIXTIME(l.time), \'%Y-%m\') as month</pre>
 
-<<<<<<< HEAD
-<p>Attention : lors de l\'usage de deux filtres, chaque filtre fournit ses valeurs possibles indépendamment des autres. Il est donc potentiellement possible que certaines combinaisons de filtrage ne produisent aucun résultat.</p>
-=======
 <p>Attention : lors de l\'usage de deux filtres, chaque filtre fournit ses valeurs possibles indépendamment des autres.
 Il est donc potentiellement possible que certaines combinaisons de filtrage ne produisent aucun résultat.</p>
->>>>>>> MOODLE_33_STABLE
 
 <h4>Configuration de la requête</h4>
 
@@ -599,43 +358,6 @@ Il est donc potentiellement possible que certaines combinaisons de filtrage ne p
 dynamique de filtrage. Ce marqueur doit apparaitre comme une balise "<%%FILTERS%%>" en remplacement ou en complément d\'une clause WHERE</p>
 <p><u>Exemples de position valide :</u></p>
 <pre>
-<<<<<<< HEAD
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	WHERE
-		t1.id = t2.t1key
-	   <span style="color:green">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-
-<p><u>Exemples de position invalide :</u></p>
-<pre>
-	SELECT 
-	  data1,data2
-	FROM
-	   table1 t1,
-	   table2 t2
-	GROUP BY
-	    data2
-	   <span style="color:red">&lt;%%FILTERS%%&gt;</span>
-	ORDER BY
-	   data1
-</pre>	   
-=======
     SELECT
       data1,data2
     FROM
@@ -671,7 +393,6 @@ dynamique de filtrage. Ce marqueur doit apparaitre comme une balise "<%%FILTERS%
     ORDER BY
        data1
 </pre>
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configfilterdefaults_help'] = '
@@ -685,16 +406,6 @@ Dans ce cas également on pourra utiliser avantageusement les options pour inter
 <h4>Cas de plusieurs filtres</h4>
 
 <p>Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent également faire aparaitre une liste
-<<<<<<< HEAD
-de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".</p> 
-
-<h4>Valeurs spéciales</h4>
-
-<p>Certaines valeurs spéciales permettent :</p> 
-<ul>
-	<li>"LAST" : d\'obtenir par défaut la dernière valeur de la liste. (Appliqué à des dates, cela revient à "la page la plus récente").</li>
-	<li>"FIRST" : d\'obtenir par défaut la première valeur de la liste. (Appliqué à des dates, cela revient à "la page la plus ancienne").</li>
-=======
 de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".</p>
 
 <h4>Valeurs spéciales</h4>
@@ -703,7 +414,6 @@ de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".
 <ul>
     <li>"LAST" : d\'obtenir par défaut la dernière valeur de la liste. (Appliqué à des dates, cela revient à "la page la plus récente").</li>
     <li>"FIRST" : d\'obtenir par défaut la première valeur de la liste. (Appliqué à des dates, cela revient à "la page la plus ancienne").</li>
->>>>>>> MOODLE_33_STABLE
 </ul> 
 ';
 
@@ -712,140 +422,6 @@ Certaines options complémentaires peuvent être appliquées aux filtres, sous f
 
 ## Valeurs
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<ul>
-	<li><b>m</b> : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".</li>
-	<li><b>s</b> : (single) Interdit l\'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé sur "FIRST" si aucun défaut n\'est défini. Un filtre en mode "s" exclut le précédent.</li>
-	<li><b>x</b> : (crossthrough) Invalide le prétraitement de requête pour la recherche des modalités de filtre. Ceci peut être activé sur certaines requêtes complexes (UNIONS, requêtes multi-imbriquées), mais le résultat ne peut être garanti.</li>
-</ul>                                                           
-=======
-* __m__ : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".
-* __s_ : (single) Interdit l\'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé
-sur "FIRST" si aucun défaut n\'est défini. Un filtre en mode "s" exclut le précédent.
-* __x__ : (crossthrough) Invalide le prétraitement de requête pour la recherche des modalités de filtre.
-Ceci peut être activé sur certaines requêtes complexes (UNIONS, requêtes multi-imbriquées), mais le résultat
-ne peut être garanti.
-* __g__ : Filtre Global. si cette option est utilisée sur plusieurs blocs tableau de bord affichés sur la même page,
-alors les valeurs de tous les filtres globaux portant la même définition de champ se synchronisent.
->>>>>>> MOODLE_34_STABLE
-
-## Cas de plusieurs filtres
-
-<<<<<<< HEAD
-<p>Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent également faire aparaitre une liste
-de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".</p> 
-=======
-Lorsque plusieurs filtres sont définis comme une liste séparée pard es ";", alors les valeurs par défaut doivent
-également faire aparaitre une liste de valeurs séparées par des ";". Une valeur vide vaudra pour "pas de défaut".
->>>>>>> MOODLE_34_STABLE
-
-## Exemple
-
-Soit les filtres :
-
-    year;month;day
-
-les options
-
-    s;m;
-
-permettront la sélection d\'une et une seule année d\'extraction, une sélection de mois, et n\'importe quel jour OU tous les jours.
-';
-
-$string['configgmdata_help'] = '
-<<<<<<< HEAD
-<p>La prise en charge d\'affichage de données sur une carte GoogleMaps suppose la disponibilité d\'information
-	disposant de coordonnées de géolocalisaiton, ou de mentions d\'adresse transposable. Le bloc dashboard 
-	peut prendre en charge la transposition d\'adresses en coordonnées de localisation et mettra en cache
-	ces informations.</p>
-<p>La conversion de données d\'adresse en coordonnées de géolocalisation est soumise aux conditions de service
-	de l\'API de géocodage de Google. La conversion "gratuite" pour un utilisateur non enregistré ne
-peut excéder 2500 appels par jour. Consulter la documentation sur l\'<a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >API de géocodage de Google</a> pour plus d\'information.</p>
-=======
-La prise en charge d\'affichage de données sur une carte GoogleMaps suppose la disponibilité d\'information
-disposant de coordonnées de géolocalisaiton, ou de mentions d\'adresse transposable. Le bloc dashboard 
-peut prendre en charge la transposition d\'adresses en coordonnées de localisation et mettra en cache
-ces informations.
-
-La conversion de données d\'adresse en coordonnées de géolocalisation est soumise aux conditions de service
-    de l\'API de géocodage de Google. La conversion "gratuite" pour un utilisateur non enregistré ne
-peut excéder 2500 appels par jour. Consulter la documentation sur
-l\'<a href="http://code.google.com/intl/fr/apis/maps/documentation/geocoding/" target="_blank" >API de
-géocodage de Google</a> pour plus d\'information.
->>>>>>> MOODLE_34_STABLE
-
-## Paramétrage des données de carte
-
-<<<<<<< HEAD
-<p>Les données géolocalisables sont implantées sur la carte comme des marqueurs. Ces marqueurs peuvent être définis :</p>
-<ul><li>Comme un quadruplet : Titre, Latitude, Longitude, Type</li>
-	<li>Comme un sextuplet : Titre, Adresse, Code Postal, Ville, Région, Type</li>
-</ul>
-<p>Les définitions des champs sont :</p>
-<ul><li><i>Titre</i> : Le label texte du marqueur</li>
-	<li><i>Latitude</i> : La latitude de géolocalisation (flottant)</li>
-	<li><i>Longitude</i> : La longitude de géolocalisation (flottant)</li>
-	<li><i>Adresse</i> : Les données de voie, numéro</li>
-	<li><i>Code postal</i> : Le code postal ou Zip code pour les pays anglosaxons</li>
-	<li><i>Ville</i> : La ville</li>
-	<li><i>Type</i> : Un label de type, permettant la sélection d\'une icone graphique particulière</li>
-</ul>	
-
-<p>Les champs de paramétrage permettent de désigner les champs de sortie de requête qui fournissent ces informations. Les champs de paramétrage prennent en général un ou plusieurs nom (ou alias) de colonne de résultat.</p>
-<ul>
-	<li><i>Champs de titre</i> : Le nom de la colonne de sortie fournissant le label texte</li>
-	<li><i>Champs de localisation</i> : 
-		<ul>
-			<li><u>Cas 1</u> : Le nom de LA colonne de sortie fournissant la paire de géolocation sous forme d\'une paire à virgule : "lat,lng"</li>
-			<li><u>Cas 2</u> : la liste des noms de colonnes qui fournissent successivement (et dans l\'ordre) : l\'information d\'adresse, le code postal, la ville, et le code de région (*)</li>
-		</ul>
-	</li>
-	<li><i>Champs de type</i> : Le nom de la colonne de sortie fournissant la classification des marqueurs</li>
-	
-<p>(*) Il est possible de donner des valeurs constantes ici, en encadrant la valeur de liste par des quotes : </p>
-<pre>address;cp;city;\'FR\'</pre>
-<p>par exemple, fournira toujours le code de région à la valeur \'FR\'.</p>
-=======
-Les données géolocalisables sont implantées sur la carte comme des marqueurs. Ces marqueurs peuvent être définis :
-
-* Comme un quadruplet : Titre, Latitude, Longitude, Type</li>
-* Comme un sextuplet : Titre, Adresse, Code Postal, Ville, Région, Type</li>
-
-Les valeurs attendues sont :
-
-* Titre : Le label texte du marqueur
-* Latitude : La latitude de géolocalisation (flottant)
-* Longitude : La longitude de géolocalisation (flottant)
-* Adresse : Les données de voie, numéro
-* Code postal : Le code postal ou Zip code pour les pays anglosaxons
-* Ville : La ville
-* Type : Un label de type, permettant la sélection d\'une icone graphique particulière
-
-## Configuration des champs
-
-Les champs de paramétrage permettent de désigner les champs de sortie de requête qui fournissent ces informations.
-Les champs de paramétrage prennent en général un ou plusieurs nom (ou alias) de colonne de résultat.
-
-* Champs de titre : Le nom de la colonne de sortie fournissant le label texte
-* Champs de localisation :
-** __Cas 1__ : Le nom de LA colonne de sortie fournissant la paire de géolocation sous forme d\'une paire à virgule : "lat,lng"
-** __Cas 2__ : la liste des noms de colonnes qui fournissent successivement (et dans l\'ordre) :
-            l\'information d\'adresse, le code postal, la ville, et le code de région (*)
-* Champs de type : Le nom de la colonne de sortie fournissant la classification des marqueurs
-
-(*) Il est possible de donner des valeurs constantes ici, en encadrant la valeur de liste par des quotes :
-
-    address;cp;city;\'FR\'
-
-par exemple, fournira toujours le code de région à la valeur \'FR\'.
->>>>>>> MOODLE_34_STABLE
-';
-
-$string['configoutputfields_help'] = '
-<p>Ce paramètre détermine quels champs du résultat de requête seront affichés dans la table résultat (affichage des données).</p>
-<p>Les chammps doivent être nommés selon les noms de sortie des colonnes (nom de champ ou nom d\'alias) et ne peuvent être des expressions SQL. Les noms des champs sont séparés par des points-virgule (;).</p>
-=======
 * __m__ : (multiple) permet de choisir plusieurs valeurs de filtrage pour réaliser des "intervalles".
 * __s_ : (single) Interdit l\'utilisation de la valeur "*" du filtre (plage complète). Le filtre est forcé
 sur "FIRST" si aucun défaut n\'est défini. Un filtre en mode "s" exclut le précédent.
@@ -926,7 +502,6 @@ $string['configoutputfields_help'] = '
 (affichage des données).</p>
 <p>Les chammps doivent être nommés selon les noms de sortie des colonnes (nom de champ ou nom d\'alias) et
 ne peuvent être des expressions SQL. Les noms des champs sont séparés par des points-virgule (;).</p>
->>>>>>> MOODLE_33_STABLE
 
 <p><b>Exemple :</b>
 <p>Si la requête est : </p>
@@ -960,16 +535,9 @@ source.</p>
 </ul>
 
 <h3>Introduction des filtres</h3>
-<<<<<<< HEAD
-<p>Si des filtres doivent être définis sur les données, alors il est nécessaire
-	d\'insérer une balise <%%FILTERS%%> dans la requête à la place ou pour compléter
-une claise WHERE</p>
-<p>Notez qu\'il n\'est pas possible </p>
-=======
 <p>Si des filtres doivent être définis sur les données, alors il est nécessaire d\'insérer une balise <%%FILTERS%%>
 dans la requête à la place ou pour compléter une clause WHERE</p>
 <p>Notez qu\'il n\'est pas possible d\'utiliser des requêtes imbriquées.</p>
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configsplitsumonsort_help'] = '
@@ -1012,16 +580,6 @@ dans l\'ordre d\'affichage de la sortie. </p>
 ';
 
 $string['configbigresult_help'] = '
-<<<<<<< HEAD
-<p>Les séries de données sont les données graphées. Suivant le type de graphe il est possible de définir une ou plusieurs séries à afficher.
-Les séries de données doivent êtres de noms de colonnes de sortie (ou leurs alias) et doivent être séparées par des ";".</p>
-<p>Les noms des séries peuvent être définies dans la zone de texte à droite (Titre des séries) sous forme d\'une liste de mentions séparées par des ";".</p>
-
-<h4>Fonctions spéciales sur les séries de sorties</h4>
-
-<p>Si une série de données est exprimée sous forme S(<i>nom_colonne</i>), alors les valeurs sont cumulées
-dans l\'ordre d\'affichage de la sortie. </p>
-=======
 <h3>Protection contre les résultats massifs</h3>
 <p>Les requêtes d\'extraction peuvent avoir des conséquences dramatiques sur les performances, et notamment au moment
 de la mise au point des jointures.
@@ -1032,7 +590,6 @@ courbes graphiques qui nécessitent beaucoup de données.</p>
 
 <p>Lorsqu\'elle est désactivée, des résultars massifs sont effectivement produits et remontés dans le bloc pour rendu.</p>
 <p>Il est fortement conseillé d\'utiliser les caches de résultats pour ce type de requête.</p>
->>>>>>> MOODLE_33_STABLE
 ';
 
 $string['configcaching_help'] = '
@@ -1161,4 +718,10 @@ Lorsque vous affichez plusieurs séries de données dans un graphe (ou affichez 
 prennent par défaut le nom des valeurs de l\'axe des abscisses (X). vous pouvez utiliser ce champ pour fournir des
 libellés alternatifs pour les valeurs de l\'axe X. La liste doit faire figurer les labels dans l\'ordre d\'arrivée
 des valeurs d\'abscisses.
+';
+
+$string['tablecolormapping_help'] = '
+Vous pouvez coloriser les résultats dans une colonne de résultat :
+  - dans la zone de texte de gauche, en entrant une expression évaluante qui remplace la valeur de sortie par %% (f.e. %% == 0).
+  - dans la zone de droite, le code couleur HTML de la colorisation (couleur de fond).
 ';

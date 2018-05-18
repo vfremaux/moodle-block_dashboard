@@ -20,64 +20,63 @@
  * @package    blocks
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-// jshint unused: true, undef:true
+// jshint unused: true, undef:false
+// global dhtmlXCalendarObject
+/* eslint-disable no-undef */
 define(['jquery', 'core/log'], function ($, log) {
 
     return {
 
-        init: function(args) {
+        init: function() {
 
-            that = this;
+            var that = this;
 
             that.calendars = [];
 
-            var lang = $('html').attr('lang').replace(/-/g, '_').substr(0,2);
+            var lang = $('html').attr('lang').replace(/-/g, '_').substr(0, 2);
 
             // Attach filter handles if autosubmit.
             $('.dashboard-filter-autosubmit').each( function() {
-                regex = /dashboard-auto-([0-9]+)/;
-                matchs = regex.exec($(this).attr('id'));
-                blockid = matchs[1];
+                var regex = /dashboard-auto-([0-9]+)/;
+                var matchs = regex.exec($(this).attr('id'));
+                var blockid = matchs[1];
 
                 $('.dashboard-filter-element-' + blockid).on('change', that.submitdashboardfilter);
-            })
+            });
 
             $('.dashboard-filter-submitters').each( function() {
                 $(this).on('click', that.submitdashboardfilter);
-            })
+            });
 
             // Capture all data params and attach a dhtmlxCalendar.
             $('.dashboard-param-date').each(function() {
-                id = $(this).attr('id');
+                var id = $(this).attr('id');
                 that.calendars[id] = new dhtmlXCalendarObject(id);
                 that.calendars[id].loadUserLanguage(lang + '_utf8');
                 that.calendars[id].setSkin('dhx_web');
-            })
+            });
 
             $('.dashboard-param-daterange').each(function() {
-                id = $(this).attr('id');
-<<<<<<< HEAD
-=======
+                var id = $(this).attr('id');
                 id = id.replace('_from', '');
->>>>>>> MOODLE_34_STABLE
                 that.calendars[id] = new dhtmlXCalendarObject([id + '_from', id + '_to']);
                 that.calendars[id].loadUserLanguage(lang + '_utf8');
                 that.calendars[id].setSkin('dhx_web');
-            })
+            });
 
             log.debug('Block dashboard AMD initialized');
 
         },
 
-        submitdashboardfilter: function submitdashboardfilter(e) {
+        submitdashboardfilter: function submitdashboardfilter() {
 
             // That is the Jquery representant of the changed form element.
-            that = $(this);
-            regex = /(?:filter|filtersubmit)([0-9]+)_/;
-            matchs = regex.exec(that.attr('name'));
+            var that = $(this);
+            var regex = /(?:filter|filtersubmit)([0-9]+)_/;
+            var matchs = regex.exec(that.attr('name'));
 
             if (matchs) {
-                blockid = matchs[1];
+                var blockid = matchs[1];
                 $('#dashboard-form-' + blockid).submit();
             }
         }
