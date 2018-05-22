@@ -350,11 +350,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                             continue;
                         }
                         $vkeyvalue = $result->$vkey;
-                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                        $vkeyvalue = dashboard_format_data($theblock->vertkeys->formats[$vkey], $vkeyvalue, null, $result);
+                        $matrix[] = "['".str_replace("'", "\'", $vkeyvalue)."']";
                     }
                     $hkey = $theblock->config->horizkey;
                     $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrix[] = "['".str_replace("'", "\'", $hkeyvalue)."']";
                     $matrixst = "\$m".implode($matrix);
                     if (!in_array($hkeyvalue, $hcols)) {
                         $hcols[] = $hkeyvalue;
@@ -561,10 +562,22 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
             } else if (@$theblock->config->tabletype == 'tabular') {
                 // Forget table and use $m matrix for making display.
-                $template->data = $this->cross_table($theblock, $m, $hcols, $theblock->config->horizkey, $theblock->vertkeys, $theblock->config->horizlabel, true);
+                $template->data = $this->cross_table($theblock,
+                                                     $m,
+                                                     $hcols,
+                                                     $theblock->config->horizkey,
+                                                     $theblock->vertkeys,
+                                                     $theblock->config->horizlabel,
+                                                     true);
                 $template->controlbuttons = $this->tabular_buttons($theblock, $filterquerystring);
             } else {
-                $template->data = $this->tree_view($theblock, $treedata, $theblock->treeoutput, $theblock->output, $theblock->outputf, $theblock->colourcoding, true);
+                $template->data = $this->tree_view($theblock,
+                                                   $treedata,
+                                                   $theblock->treeoutput,
+                                                   $theblock->output,
+                                                   $theblock->outputf,
+                                                   $theblock->colourcoding,
+                                                   true);
                 $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring);
             }
         }
@@ -586,8 +599,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 if (empty($theblock->config->timelineeventstart) || empty($theblock->config->timelineeventend)) {
                     $template->graph = $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
                 } else {
-                    $template->graph = timeline_print_graph($theblock, 'dashboard'.$theblock->instance->id, $theblock->config->graphwidth,
-                                                  $theblock->config->graphheight, $data, true);
+                    $template->graph = timeline_print_graph($theblock,
+                                                            'dashboard'.$theblock->instance->id,
+                                                            $theblock->config->graphwidth,
+                                                            $theblock->config->graphheight,
+                                                            $data,
+                                                            true);
                 }
             }
         }
@@ -739,157 +756,32 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param arrayref $outputformats formats for above
      * @param arrayref $colourcoding an array of colour coding rules issued from table scope colourcoding settings
      */
+
     public function tree_view(&$theblock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding) {
-        static $level = 1;
+        global $PAGE;
 
-        $str = '';
-
-        asort($tree);
-
-        $str .= '<ul class="dashboard-tree'.$level.'">';
-        $level++;
-        foreach ($tree as $key => $node) {
-            $nodestrs = array();
-            foreach ($treeoutput as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodestrs[] = $datum;
-            }
-            $nodecontent = implode(' ', $nodestrs);
-            $nodedata = array();
-            foreach ($outputformats as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodedata[] = $datum;
-            }
-            $nodedatastr = implode(' ', $nodedata);
-            $str .= "<li>$nodecontent <div style=\"float:right\">$nodedatastr</div></li>";
-            if (!empty($node->childs)) {
-                $str .= $this->tree_view($theblock, $node->childs, $treeoutput, $outputfields, $outputformats, $colorcoding);
-            }
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $level--;
-        $str .= '</ul>';
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        return $str;
+        return $prorenderer->tree_view($theblock, $tree, $treeoutput, $outputfields, $outputformats, $colorcoding);
     }
 
     /**
      * prints and format data for googlemap plotting.
      */
     public function googlemaps_data(&$theblock, &$data, &$graphdesc) {
+        global $PAGE;
 
-        $str = '';
-
-        if (!empty($config->datalocations)) {
-            // Data comes from query and locating information from datalocations field mapping.
-            $googlelocs = explode(";", $theblock->config->datalocations);
-            if (!empty($data)) {
-                foreach ($data as $d) {
-                    $t = $d->{$theblock->config->datatitles};
-                    if (count($googlelocs) == 1) {
-                        list($lat,$lng) = explode(',', $d->{$theblock->config->datalocations});
-                        $type = $d->{$theblock->config->datatypes};
-                        $gmdata[] = array('title' => $t, 'lat' => 0 + $lat, 'lng' => 0 + $lng, 'markerclass' => $type);
-                    } else if (count($googlelocs) == 4) {
-                        // We expect an address,postcode,city,region field list. If some data is quoted, take it as "constant".
-                        $addresselms = explode(';', $theblock->config->datalocations);
-                        $addressfield = trim($addresselms[0]);
-                        $postcodefield = trim($addresselms[1]);
-                        $cityfield = trim($addresselms[2]);
-                        $regionfield = trim($addresselms[3]);
-                        $address = $d->{$addressfield};
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $postcodefield, $matches)) {
-                            $postcode = $matches[1];
-                        } else {
-                            $postcode = $d->{$postcodefield};
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $cityfield, $matches)) {
-                            $city = $matches[1];
-                        } else {
-                            $city = preg_replace('/cedex.*/i', '', $d->{$cityfield}); // remove postal alterations
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $regionfield, $matches)) {
-                            $region = $matches[1];
-                        } else {
-                            $region = $d->{$regionfield};
-                        }
-                        $googleerrors = array();
-                        if ($location = googlemaps_get_geolocation($region, $address, $postcode, $city, $googleerrors)) {
-                            list($lat,$lng) = explode(',', $location);
-                            $type = $d->{$theblock->config->datatypes};
-                            $gmdata[] = array('title' => $t, 'lat' => $lat, 'lng' => $lng, 'markerclass' => $type);
-                        }
-                    } else {
-                        $str .= '<span class="error">'.get_string('googlelocationerror', 'block_dashboard').'</span>';
-                        break;
-                    }
-                }
-            }
-        } else {
-            $str .= " This is a demo set !! ";
-            /**
-             * demo
-             */
-            $gmdata = array(
-                array('lat' => 48.020587,
-                      'lng' => 0.151405,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'Via formation'),
-                array('lat' => 47.894823,
-                      'lng' => 1.904798,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'FormaSanté'),
-                array('lat' => 48.091582,
-                      'lng' => -1.789484,
-                      'markerclass' => 'hq',
-                      'title' => 'CLPS Siege'),
-                array('lat' => 48.392852,
-                      'lng' => -4.444313,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Brest'),
-                array('lat' => 47.663075,
-                      'lng' => -2.711906,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Vannes'),
-                array('lat' => 47.093953,
-                      'lng' => 5.497713,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'INFA Franche-Comte'),
-                array('lat' => 48.565703,
-                      'lng' => 7.734375,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Alsace'),
-                array('lat' => 49.274973,
-                      'lng' => 2.444458,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Picardie'),
-            );
+        if (!block_dashboard_supports_feature('graph/google')) {
+            return 'Not supported in this distribution';
         }
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= googlemaps_embed_graph('dashboard'.$theblock->instance->id, @$theblock->config->lat, @$theblock->config->lng, @$theblock->config->graphwidth, $theblock->config->graphheight, $graphdesc, $gmdata, true);
-
-        return $str;
+        return $prorenderer->googlemaps_data($theblock, $data, $graphdesc);
     }
 
     /**
@@ -1224,23 +1116,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function tree_buttons($theblock, $filterquerystring) {
-        global $COURSE;
+    public function tree_buttons(&$theblock, &$filterquerystring) {
+        global $PAGE;
 
-        // passed to each buttons.
-        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
-
-        $str = '<div class="dashboard-table-buttons">';
-
-        $str .= $this->allexport_button($theblock);
-        if (empty($theblock->config->filepathadminoverride)) {
-            $str .= $this->fileview_button($theblock);
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= '</div>';
-
-        return $str;
+        return $prorenderer->tree_buttons($theblock, $filterquerystring, $this);
     }
 
     protected function allexport_button($theblock) {

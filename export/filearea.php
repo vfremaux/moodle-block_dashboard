@@ -116,7 +116,7 @@ if ($fileinfo = $browser->get_file_info($context, 'block_dashboard', 'generated'
     foreach ($dirs as $dir) {
         $exportdir = new StdClass;
         $dirinfo = $dir->get_params();
-        $exportdir->nodeiconurl = $OUTPUT->image_url('f/folder', 'core');
+        $exportdir->nodeiconurl = $OUTPUT->image_url('f/folder');
         $exportdir->url = $url.'&path='.$dirinfo['filepath'];
         $exportdir->name = $dir->get_visible_name();
         $template->exportdirs[] = $exportdir;

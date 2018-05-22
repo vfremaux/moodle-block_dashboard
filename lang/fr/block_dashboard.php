@@ -206,6 +206,10 @@ $string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
 $string['listvalue'] = 'Liste';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['log'] = 'Logarithmique';
 $string['maptypehybrid'] = 'Vue combinée';
 $string['maptyperoadmap'] = 'Carte routière';
@@ -714,4 +718,10 @@ Lorsque vous affichez plusieurs séries de données dans un graphe (ou affichez 
 prennent par défaut le nom des valeurs de l\'axe des abscisses (X). vous pouvez utiliser ce champ pour fournir des
 libellés alternatifs pour les valeurs de l\'axe X. La liste doit faire figurer les labels dans l\'ordre d\'arrivée
 des valeurs d\'abscisses.
+';
+
+$string['tablecolormapping_help'] = '
+Vous pouvez coloriser les résultats dans une colonne de résultat :
+  - dans la zone de texte de gauche, en entrant une expression évaluante qui remplace la valeur de sortie par %% (f.e. %% == 0).
+  - dans la zone de droite, le code couleur HTML de la colorisation (couleur de fond).
 ';
