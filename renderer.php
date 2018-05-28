@@ -113,6 +113,20 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $ticks = array();
         $filterquerystring = '';
 
+        if (!empty($theblock->params)) {
+            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_params() : $theblock->prepare_params();
+        } else {
+            $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
+            $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
+        }
+
+        if (!empty($sort)) {
+            // Do not sort if already sorted in explained query.
+            if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
+                $theblock->filteredsql .= " ORDER BY $sort";
+            }
+        }
+
         if (!empty($theblock->config->filters)) {
             try {
                 $filterquerystring = $theblock->prepare_filters();
@@ -138,20 +152,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         // Needed to prepare for filter range prefetch.
         $theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
-
-        if (!empty($theblock->params)) {
-            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_params() : $theblock->prepare_params();
-        } else {
-            $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
-            $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
-        }
-
-        if (!empty($sort)) {
-            // Do not sort if already sorted in explained query.
-            if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
-                $theblock->filteredsql .= " ORDER BY $sort";
-            }
-        }
 
         $theblock->filteredsql = $theblock->protect($theblock->filteredsql);
 
@@ -350,11 +350,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                             continue;
                         }
                         $vkeyvalue = $result->$vkey;
-                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                        $vkeyvalue = dashboard_format_data($theblock->vertkeys->formats[$vkey], $vkeyvalue, null, $result);
+                        $matrix[] = "['".str_replace("'", "\'", $vkeyvalue)."']";
                     }
                     $hkey = $theblock->config->horizkey;
                     $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrix[] = "['".str_replace("'", "\'", $hkeyvalue)."']";
                     $matrixst = "\$m".implode($matrix);
                     if (!in_array($hkeyvalue, $hcols)) {
                         $hcols[] = $hkeyvalue;
@@ -943,15 +944,30 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     $param->quotedvalue = htmlentities($param->value, ENT_QUOTES, 'UTF-8');
                     break;
 
-                case 'list':
+                case 'select':
                     $param->list = true;
                     $param->options = array();
-                    foreach ($param->values as $v) {
+
+                    $option = new Stdclass;
+                    $option->selected = empty($param->value) ? ' selected="selected" ' : '';
+                    $option->value = '';
+                    $option->label = get_string('selectnone', 'block_dashboard');
+                    $param->options[] = $option;
+
+                    $values = explode("\n", $param->values);
+                    foreach ($values as $v) {
+                        // Resolve potential multipart definition.
+                        if (strpos($v, '|') !== false) {
+                            list($key, $label) = explode('|', trim($v));
+                        } else {
+                            $key = htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
+                            $label = trim($v);
+                        }
                         $option = new Stdclass;
-                        $option->selected = ($v == $param->value) ? ' selected="selected" ' : '';
-                        $option->value = htmlentities($v, ENT_QUOTES, 'UTF-8');
-                        $option->label = $v;
-                        $param->options[] = $options;
+                        $option->selected = (trim($key) == trim(@$param->value)) ? ' selected="selected" ' : '';
+                        $option->value = $key;
+                        $option->label = $label;
+                        $param->options[] = $option;
                     }
                     break;
 
