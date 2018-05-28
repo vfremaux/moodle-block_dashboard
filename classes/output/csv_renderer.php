@@ -109,6 +109,12 @@ class csv_renderer extends \plugin_renderer_base {
             dashboard_normalize($outputfields, $outputformats); // Normalizes labels to keys.
             $theblock->outputf = array_combine($outputfields, $outputformats);
 
+            if (!empty($this->config->fileheaders)) {
+                $fileoutputheaders = explode(';', $this->config->fileheaders);
+                dashboard_normalize($outputfields, $fileoutputheaders); // Normalizes output headers to keys.
+                $theblock->fileheaders = array_combine($outputfields, $fileoutputheaders);
+            }
+
             mtrace('   ... generating file for instance '.$theblock->instance->id.' in format '.$theblock->config->fileformat);
             if (!empty($theblock->outputf)) {
 
@@ -116,12 +122,23 @@ class csv_renderer extends \plugin_renderer_base {
 
                 if ($theblock->config->fileformat == 'CSV') {
                     // Print col names.
-                    $rarr = array();
-                    foreach ($theblock->outputf as $key => $format) {
-                        $rarr[] = $key;
+                    if (empty($theblock->fileheaders)) {
+                        // Implicit headers from output col names.
+                        $rarr = array();
+                        foreach ($theblock->outputf as $key => $format) {
+                            $rarr[] = $key;
+                        }
+                        $filestr .= implode($config->csv_field_separator, $rarr);
+                        $filestr .= $config->csv_line_separator;
+                    } else {
+                        // Explicitely specified headers.
+                        $rarr = array();
+                        foreach ($theblock->fileheaders as $key => $header) {
+                            $rarr[] = $header;
+                        }
+                        $filestr .= implode($config->csv_field_separator, $rarr);
+                        $filestr .= $config->csv_line_separator;
                     }
-                    $filestr .= implode($config->csv_field_separator, $rarr);
-                    $filestr .= $config->csv_line_separator;
                 }
 
                 if (($theblock->config->fileformat == 'CSV') ||

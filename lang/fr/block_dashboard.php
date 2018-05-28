@@ -59,6 +59,7 @@ $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
 $string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
 $string['configfileformat'] = 'Type de fichier de sortie&nbsp;';
+$string['configfileheaders'] = 'En-têtes du fichier&nbsp;';
 $string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
 $string['configfileoutput'] = 'Champs de sortie sur fichier&nbsp;';
 $string['configfileoutputformats'] = 'Formattage des données&nbsp;';
@@ -206,6 +207,10 @@ $string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
 $string['listvalue'] = 'Liste';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['log'] = 'Logarithmique';
 $string['maptypehybrid'] = 'Vue combinée';
 $string['maptyperoadmap'] = 'Carte routière';
@@ -225,6 +230,10 @@ $string['ofbiz_dashboard'] = 'Tableaux de bord Ofbiz';
 $string['outputfilegeneration'] = 'Extraction de données';
 $string['outputfiltered'] = 'Générer le fichier de sortie (filtré)';
 $string['outputparams'] = 'Configuration des données de sorties';
+$string['paramas'] = 'Le paramètre est ';
+$string['paramasvar'] = 'une variable';
+$string['paramassql'] = 'une clause where';
+$string['paramascol'] = 'une colonne de sortie';
 $string['pie'] = 'Camenberts';
 $string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Tableau de bord';
@@ -237,6 +246,7 @@ $string['saturday'] = 'Samedi';
 $string['savechangesandconfig'] = 'Enregistrer et continuer la configuration';
 $string['savechangesandview'] = 'Enregistrer et afficher';
 $string['securityparams'] = 'Paramètres de sécurité et de performance';
+$string['selectnone'] = '(aucune valeur)';
 $string['semicolon'] = 'Point-virgule';
 $string['setup'] = 'Configuration';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
@@ -270,17 +280,23 @@ $string['year'] = 'Année';
 $string['sums'] = 'Sommateurs';
 
 $string['configdelayedrefresh_help'] = '
-<p>Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
+Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
 <p>Vous pouvez choisir de sortir les données selon le réglage général de la fonction cron des tableaux de bord, ou
-choisir un autre moment particulier pour cette instance.</p>
+choisir un autre moment particulier pour cette instance.
 ';
 
 $string['configmakefile_help'] = '
-<p>Lorsque le cache est régénéré, vous pouvez choisir de sortir également les données vers un fichier.</p>
+Lorsque le cache est régénéré, vous pouvez choisir de sortir également les données vers un fichier.
 ';
 
 $string['configfileoutput_help'] = '
-<p>La sortie sur fichier peut être alimentée par d\'autres champs que ceux utilisés pour l\'affichage. </p>
+La sortie sur fichier peut être alimentée par d\'autres champs que ceux utilisés pour l\'affichage. Si ce champ est vide, alors
+les colonnes exportées seront les mêmes que celles définies pour l\'affichage.
+';
+
+$string['configfileheaders_help'] = '
+Vous pouvez définir pour chaque champ la valeur de l\'en-tête produite en première ligne de fichier. Si ce champ est vide, alors
+les alias SQL de colonnes de sorties sont utilisés par défaut comme en-têtes.
 ';
 
 $string['configfilesqlouttable_help'] = '
@@ -714,4 +730,10 @@ Lorsque vous affichez plusieurs séries de données dans un graphe (ou affichez 
 prennent par défaut le nom des valeurs de l\'axe des abscisses (X). vous pouvez utiliser ce champ pour fournir des
 libellés alternatifs pour les valeurs de l\'axe X. La liste doit faire figurer les labels dans l\'ordre d\'arrivée
 des valeurs d\'abscisses.
+';
+
+$string['tablecolormapping_help'] = '
+Vous pouvez coloriser les résultats dans une colonne de résultat :
+  - dans la zone de texte de gauche, en entrant une expression évaluante qui remplace la valeur de sortie par %% (f.e. %% == 0).
+  - dans la zone de droite, le code couleur HTML de la colorisation (couleur de fond).
 ';

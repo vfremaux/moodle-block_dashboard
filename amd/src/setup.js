@@ -23,11 +23,9 @@
 // jshint unused: true, undef:true
 define(['jquery', 'core/log'], function ($, log) {
 
-    var autosubmit = 1;
-
     return {
 
-        init: function(args) {
+        init: function() {
 
             // Attach togglestate handler to all handles in page.
             $('.dashboard-setup-tablink').on('click', this.openpanel);
@@ -40,12 +38,12 @@ define(['jquery', 'core/log'], function ($, log) {
 
         },
 
-        openpanel: function(e) {
+        openpanel: function() {
 
-            that = $(this);
-            regex = /tablink-([a-z0-9]+)/;
-            matchs = regex.exec(that.attr('id'));
-            panelid = matchs[1];
+            var that = $(this);
+            var regex = /tablink-([a-z0-9]+)/;
+            var matchs = regex.exec(that.attr('id'));
+            var panelid = matchs[1];
 
             $('.dashboardsettings-panel').attr('class', 'dashboardsettings-panel off');
             $('#dashboardsettings-panel-' + panelid).attr('class', 'dashboardsettings-panel on');
@@ -55,9 +53,9 @@ define(['jquery', 'core/log'], function ($, log) {
             $('#setting-tab-' + panelid).addClass('active');
         },
 
-        showtabletypes: function (e) {
-            that = $(this);
-            option = $(that.attr('id') + ' options:selected').val();
+        showtabletypes: function () {
+            var that = $(this);
+            var option = $(that.attr('id') + ' options:selected').val();
             switch (option) {
                 case 'linear': {
                     $('#setting-tab-tabularparams').attr('class', 'dashboardsettings-panel off');
@@ -79,9 +77,9 @@ define(['jquery', 'core/log'], function ($, log) {
             }
         },
 
-        showgraphtypes: function (e) {
-            that = $(this);
-            option = $('#' + that.attr('id') + ' option:selected').attr('value');
+        showgraphtypes: function () {
+            var that = $(this);
+            var option = $('#' + that.attr('id') + ' option:selected').attr('value');
             log.debug('Graph type' + option);
             switch (option) {
 

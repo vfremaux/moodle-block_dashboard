@@ -40,9 +40,9 @@
 {{/text}}
 
 {{#list}}
-<select name="{{paramkey}}" class="dashboard-param" id="id_param_{{paramkey}}>
+<select name="{{paramkey}}" class="dashboard-param" id="id_param_{{paramkey}}">
 {{#options}}
-    <option value="{{value}}" {{selected}}>{{label}}</option>
+    <option value="{{{value}}}" {{{selected}}}>{{{label}}}</option>
 {{/options}}}
 </select>
 {{/list}}
