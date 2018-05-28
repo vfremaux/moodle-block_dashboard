@@ -45,7 +45,19 @@
         </td>
 
         <td align="left">
-            <input type="text" name="fileoutput" value="{{fileoutput}}" />
+            <input type="text" name="fileoutput" value="{{fileoutput}}"  class="block-dashboard-longvalue"/>
+        </td>
+
+    </tr>
+
+    <tr valign="top">
+
+        <td align="right">
+            <b>{{{strconfigfileheaders}}}: {{{helpiconconfigfileheaders}}} </b>
+        </td>
+
+        <td align="left">
+            <input type="text" name="fileheaders" value="{{fileheaders}}" class="block-dashboard-longvalue"/>
         </td>
 
     </tr>
@@ -56,7 +68,7 @@
         </td>
 
         <td align="left">
-            <input type="text" name="fileoutputformats" value="{{fileoutputformats}}" />
+            <input type="text" name="fileoutputformats" value="{{fileoutputformats}}" class="block-dashboard-longvalue"/>
         </td>
     </tr>
 
@@ -89,7 +101,7 @@
         </td>
 
         <td align="left">
-            <input type="text" name="filelocation" size="30" value="{{filelocation}}" />
+            <input type="text" name="filelocation" size="30" value="{{filelocation}}" class="block-dashboard-pathvalue"/>
         </td>
     </tr>
 
@@ -110,7 +122,7 @@
         </td>
 
         <td align="left">
-            <input type="text" name="filepathadminoverride" size="30" value="{{filepathadminoverride}}" />
+            <input type="text" name="filepathadminoverride" size="30" value="{{filepathadminoverride}}"  class="block-dashboard-pathvalue"/>
         </td>
     </tr>
 {{/isadmin}}
