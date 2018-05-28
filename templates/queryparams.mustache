@@ -54,7 +54,11 @@
 {{#params}}
     <tr valign="top">
     <td align="right" width="25%">
-        <input type="text" size="20" name="{{varkey}}" value="{{varkeyvalue}}" />
+        <input type="text" size="20" name="{{varkey}}" value="{{varkeyvalue}}" /><br/>
+        {{{strparamas}}}
+        <input type="radio" name="{{asvarkey}}" value="sql" {{{sqlchecked}}} /> {{{strassql}}},
+        <input type="radio" name="{{asvarkey}}" value="variable" {{{varchecked}}} /> {{{strasvar}}} ou
+        <input type="radio" name="{{asvarkey}}" value="outputcol" {{{colchecked}}} /> {{{strascol}}}
     </td>
 
     <td align="right" width="25%">

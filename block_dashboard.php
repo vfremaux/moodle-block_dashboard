@@ -22,6 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+define('DASHBOARD_MAX_QUERY_PARAMS', 10);
+
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 require_once($CFG->dirroot.'/blocks/dashboard/classes/filter_query_exception.class.php');
@@ -459,7 +461,7 @@ class block_dashboard extends block_base {
             try {
                 $DB->delete_records('block_dashboard_filter_cache', $params);
             } catch (Exception $e) {
-                throw new \block_dashboard\filter_query_cache_exception();
+                throw new \block_dashboard\filter_query_cache_exception($DB->get_last_error());
             }
             list($usec, $sec) = explode(' ', microtime());
             $t1 = (float)$usec + (float)$sec;
@@ -473,7 +475,7 @@ class block_dashboard extends block_base {
                 try {
                     $FILTERSET[$fielddef] = $DB->get_records_sql($filtersql);
                 } catch (Exception $e) {
-                    throw new \block_dashboard\filter_query_exception();
+                    throw new \block_dashboard\filter_query_exception($DB->get_last_error());
                 }
                 if (@$this->config->showbenches) {
                     $bench->end = time();
@@ -484,7 +486,7 @@ class block_dashboard extends block_base {
                     try {
                         $FILTERSET[$fielddef] = extra_db_query($filtersql, false, true, $error);
                     } catch (Exception $e) {
-                        throw new \block_dashboard\filter_query_exception();
+                        throw new \block_dashboard\filter_query_exception($DB->get_last_error());
                     }
                     if ($error) {
                         $this->content->text .= $error;
@@ -613,6 +615,7 @@ class block_dashboard extends block_base {
             if ($this->config->target == 'moodle') {
                 return $this->get_moodle_results($sql, $results, $limit, $offset);
             } else {
+                // This is a pro feature.
                 // TODO : enhance performance by using recordsets.
 
                 if (empty($extra_db_CNX)) {
@@ -660,10 +663,12 @@ class block_dashboard extends block_base {
             if (@$this->config->showbenches) {
                 $this->benches[] = $$t2 - $t1;
             }
+            $this->add_param_output_cols($results);
 
         } else {
             if ($cachefootprint) {
                 $results = $this->get_data_from_cache($sqlkey, $limit, $offset);
+                $this->add_param_output_cols($results);
                 return '<div class="dashboard-special">'.get_string('cacheddata', 'block_dashboard').'</div>';
             } else {
                 $notretrievablestr = get_string('notretrievable', 'block_dashboard');
@@ -738,6 +743,7 @@ class block_dashboard extends block_base {
             $bench->end = time();
             $this->benches[] = $bench;
         }
+        $this->add_param_output_cols($results);
     }
 
     /**
@@ -890,6 +896,38 @@ class block_dashboard extends block_base {
     }
 
     /**
+     * Add some additional virtual columns from user params. Additional "fixed value" output cols
+     * may be defined as user params of 'outputcol' type. The param var key generates a new result column
+     * in the output result. This may be usefull to produce static/parametric fields in an output CSV file.
+     *
+     * The post processing occurs in @see block_dashboard::fetch_dashboard_data()
+     *
+     * @param arrayref &$results
+     * @return Void. the incomming results array is processed by reference.
+     */
+    protected function add_param_output_cols(&$results) {
+
+        if (empty($results)) {
+            return;
+        }
+
+        $addedcolumns = array();
+        foreach ($this->params as $up) {
+            if ($up->paramas == 'outputcol') {
+                $addedcolumns[] = $up->key;
+            }
+        }
+
+        if (!empty($addedcolumns)) {
+            foreach ($results as $r) {
+                foreach ($addedcolumns as $key) {
+                    $r->$key = $this->params[$key]->value;
+                }
+            }
+        }
+    }
+
+    /**
      * determines if filter is global
      * a global filter will be catched by all dashboard instances in the same page
      */
@@ -1027,14 +1065,16 @@ class block_dashboard extends block_base {
         $this->colourcoding = dashboard_prepare_colourcoding($this->config);
 
         // Prepare user params definitions.
-        for ($i = 1 ; $i < 5 ; $i++) {
+        for ($i = 1 ; $i <= DASHBOARD_MAX_QUERY_PARAMS ; $i++) {
             $varkey = 'sqlparamvar'.$i;
+            $paramaskey = 'paramasvar'.$i;
             $labelkey = 'sqlparamlabel'.$i;
             $typekey = 'sqlparamtype'.$i;
             $valueskey = 'sqlparamvalues'.$i;
             if (!empty($this->config->$varkey)) {
                 $uparam = new StdClass;
                 $uparam->key = $this->config->$varkey;
+                $uparam->paramas = @$this->config->$paramaskey;
                 $uparam->label = $this->config->$labelkey;
                 $uparam->type = $this->config->$typekey;
                 $uparam->values = $this->config->$valueskey;
@@ -1075,12 +1115,15 @@ class block_dashboard extends block_base {
         $paramsqlarr = array();
         $havingparamsqlarr = array();
         $paramsurlvalues = array();
+        $queryvars = array();
+        $emptyqueryvarkeys = array();
+
         foreach ($this->params as $key => $param) {
             $sqlkey = $key;
             $key = preg_replace('/[.() *]/', '', $key).'_'.$this->instance->id;
             switch ($param->type) {
                 case ('choice'):
-                case ('list'):
+                case ('select'):
                 case ('date'):
                     $paramvalue = optional_param($key, '', PARAM_TEXT);
                     $paramvalue = trim($paramvalue); // In case of...
@@ -1090,13 +1133,22 @@ class block_dashboard extends block_base {
                     }
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
-                        } else {
-                            $paramsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                            } else {
+                                $paramsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                            }
+                            // Collects for making a urlquerystring.
+                            $paramsurlvalues[$key] = $paramvalue;
+                        } else if ($param->paramas == 'variable') {
+                            $queryvars[$param->key] = $paramvalue;
                         }
-                        // Collects for making a urlquerystring.
-                        $paramsurlvalues[$key] = $paramvalue;
+                    } else {
+                        if ($param->paramas == 'variable') {
+                            // collect all variable keys to remove them from SQL if empty.
+                            $emptyqueryvarkeys[] = $param->key;
+                        }
                     }
                     break;
 
@@ -1104,12 +1156,21 @@ class block_dashboard extends block_base {
                     $paramvalue = optional_param($key, '', PARAM_TEXT);
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
-                        } else {
-                            $paramsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                            } else {
+                                $paramsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                            }
+                            $paramsurlvalues[$key] = $paramvalue;
+                        } else if ($param->paramas == 'variable') {
+                            $queryvars[$param->key] = $paramvalue;
                         }
-                        $paramsurlvalues[$key] = $paramvalue;
+                    } else {
+                        if ($param->paramas == 'variable') {
+                            // collect all variable keys to remove them from SQL if empty.
+                            $emptyqueryvarkeys[] = $param->key;
+                        }
                     }
                     break;
 
@@ -1141,10 +1202,12 @@ class block_dashboard extends block_base {
                             $sqlarr[] = " {$sqlkey} <= '{$valueto}' ";
                             $paramsurlvalues[$key.'_to'] = $valueto;
                         }
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
-                        } else {
-                            $paramsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                            } else {
+                                $paramsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                            }
                         }
                     }
                     $this->params[$sqlkey]->valuefrom = $valuefrom;
@@ -1195,6 +1258,20 @@ class block_dashboard extends block_base {
         $this->filteredsql = str_replace('<%%USERID%%>', $USER->id, $this->filteredsql);
         $this->filteredsql = str_replace('<%%GROUPID%%>', $group, $this->filteredsql);
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
+
+        // Process all queryvars replacements.
+        foreach ($queryvars as $key => $value) {
+            $this->sql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->sql);
+            $this->filteredsql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->filteredsql);
+        }
+
+        // Clean out empty variable keys.
+        if (!empty($emptyqueryvarkeys)) {
+            foreach ($emptyqueryvarkeys as $emptykey) {
+                $this->sql = str_replace('<%%'.core_text::strtoupper($emptykey).'%%>', '', $this->sql);
+                $this->filteredsql = str_replace('<%%'.core_text::strtoupper($emptykey).'%%>', '', $this->filteredsql);
+            }
+        }
 
         if (!empty($paramsurlvalues)) {
             foreach ($paramsurlvalues as $k => $v) {

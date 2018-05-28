@@ -69,6 +69,7 @@ $string['configeventmapping'] = 'Data mapping for events';
 $string['configexplicitscaling'] = 'Explicit scaling';
 $string['configexportcharset'] = 'Charset for CSV exports';
 $string['configfileformat'] = 'File format';
+$string['configfileheaders'] = 'File output headers';
 $string['configfilelocation'] = 'Generated file location';
 $string['configfilelocationadmin'] = 'Generated file location admin extension';
 $string['configfileoutput'] = 'File output fields';
@@ -278,6 +279,10 @@ $string['outputfilegeneration'] = 'Output file generation';
 $string['outputfiltered'] = 'Generate output file (filtered)';
 $string['outputparams'] = 'Query output settings';
 $string['pageexport'] = 'Page export';
+$string['paramas'] = 'Provide param as ';
+$string['paramasvar'] = 'query variable';
+$string['paramassql'] = 'sql where';
+$string['paramascol'] = 'output column';
 $string['pie'] = 'Pie';
 $string['plotgraphparams'] = 'Plotted graph settings';
 $string['pluginname'] = 'Dashboard';
@@ -290,6 +295,7 @@ $string['saturday'] = 'Saturday';
 $string['savechangesandconfig'] = 'Save and continue configuration';
 $string['savechangesandview'] = 'Save and view';
 $string['securityparams'] = 'Security and performance settings';
+$string['selectnone'] = '(none)';
 $string['setup'] = 'Setup';
 $string['sqlinserts'] = 'SQL INSERTs';
 $string['sqlparamlabel'] = 'Label';
@@ -341,11 +347,17 @@ $string['configsummators_help'] = '
 ';
 
 $string['configfileoutput_help'] = '
-<p>File can use a distinct set of output field than what is required for display. </p>
+File can use a distinct set of output field than what is required for display. If empty, the output columns will have
+same definitions as the display.
+';
+
+$string['configfileheaders_help'] = '
+You can define the effective headers of the exported CSV file for each output column. If empty, the output SQL field aliases will
+be used as default values.
 ';
 
 $string['configfilesqlouttable_help'] = '
-<p>In case file format is outputing an SQL inserts, youl\'ll need tell the table name in which records go in. </p>
+<p>In case file format is outputing an SQL inserts, youl\'ll need tell the table name in which records go in.</p>
 ';
 
 $string['configfilepathadminoverride_help'] = 'Administrators may need to generate the files outside the Moodle controlled area';
