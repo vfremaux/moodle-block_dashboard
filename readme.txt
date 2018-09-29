@@ -82,4 +82,15 @@ Add this statement :
 
 As latest possible statement in footer.
 
+X.X.0004
+########################
+
+Provides new variable user params features :
+- params as sql : as before, generates a filtering where clause in the query
+- params as variables : generates a variable that can stand anywhere in the query. placeholders 
+use the <%%UPPERCASEKEY%%> convention in the query templates. A single placeholder can be used
+several times in the query template.
+- params as outputcol : allows a user GUI variable to produce additional columns in the output result
+for forging output CSVs.
+
 Enjoy nice plotting...

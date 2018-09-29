@@ -242,6 +242,10 @@ class setup_renderer extends \plugin_renderer_base {
         $template->strsqlparamlabel = get_string('sqlparamlabel', 'block_dashboard');
         $template->strsqlparamtype = get_string('sqlparamtype', 'block_dashboard');
         $template->strsqlparamvalues = get_string('sqlparamvalues', 'block_dashboard');
+        $template->strparamas = get_string('paramas', 'block_dashboard');
+        $template->strassql = get_string('paramassql', 'block_dashboard');
+        $template->strasvar = get_string('paramasvar', 'block_dashboard');
+        $template->strascol = get_string('paramascol', 'block_dashboard');
 
         $typeopts = array(
             'choice' => get_string('choicevalue', 'block_dashboard'),
@@ -252,11 +256,31 @@ class setup_renderer extends \plugin_renderer_base {
             'daterange' => get_string('daterangevalue', 'block_dashboard'),
         );
 
-        for ($i = 1; $i < 5; $i ++) {
+        for ($i = 1; $i <= DASHBOARD_MAX_QUERY_PARAMS; $i ++) {
             $param = new StdClass;
+            $param->asvarkey = 'paramasvar'.$i;
             $param->varkey = 'sqlparamvar'.$i;
             $param->labelkey = 'sqlparamlabel'.$i;
             $param->valueskey = 'sqlparamvalues'.$i;
+
+            switch (@$theblock->config->{$param->asvarkey}) {
+                case 'sql': {
+                    $param->sqlchecked = 'checked="checked"';
+                    break;
+                }
+
+                case 'variable': {
+                    $param->varchecked = 'checked="checked"';
+                    break;
+                }
+
+                case 'outputcol': {
+                    $param->colchecked = 'checked="checked"';
+                }
+
+                default:
+                    $param->sqlchecked = 'checked="checked"';
+            }
 
             $param->varkeyvalue = @$theblock->config->{$param->varkey};
             $param->labelkeyvalue = @$theblock->config->{$param->labelkey};
@@ -313,10 +337,14 @@ class setup_renderer extends \plugin_renderer_base {
         $template->helpiconconfigcaching = $this->output->help_icon('configcaching', 'block_dashboard');
         $template->strconfigcaching = get_string('configcaching', 'block_dashboard');
 
+        $template->uselocalcachingchecked = '';
+        $template->uselocalcachingunchecked = '';
         if (isset($theblock->config) && isset($theblock->config->uselocalcaching)) {
-            $template->uselocalcachingchecked = 'checked="checked"';
-        } else {
-            $uselocalcachingunchecked = 'checked="checked"';
+            if ($theblock->config->uselocalcaching) {
+                $template->uselocalcachingchecked = 'checked="checked"';
+            } else {
+                $template->uselocalcachingunchecked = 'checked="checked"';
+            }
         }
 
         $template->strconfigcachingttl = get_string('configcachingttl', 'block_dashboard');
@@ -779,6 +807,9 @@ class setup_renderer extends \plugin_renderer_base {
 
         $template->helpiconconfigfileoutput = $this->output->help_icon('configfileoutput', 'block_dashboard');
         $template->strconfigfileoutput = get_string('configfileoutput', 'block_dashboard');
+
+        $template->helpiconconfigfileheaders = $this->output->help_icon('configfileheaders', 'block_dashboard');
+        $template->strconfigfileheaders = get_string('configfileheaders', 'block_dashboard');
 
         $template->fileoutput = '';
         if (isset($theblock->config) && isset($theblock->config->fileoutput)) {
