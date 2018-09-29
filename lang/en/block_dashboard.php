@@ -29,6 +29,9 @@ $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard:systempathaccess'] = 'Can configure output in system data path';
 $string['dashboard:export'] = 'Export data (web service)';
 
+// Privacy.
+$string['privacy:metadata'] = 'The Dashboard block does not store any personal data about any user.';
+
 $string['backtocourse'] = 'Back to course';
 $string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
@@ -69,6 +72,7 @@ $string['configeventmapping'] = 'Data mapping for events';
 $string['configexplicitscaling'] = 'Explicit scaling';
 $string['configexportcharset'] = 'Charset for CSV exports';
 $string['configfileformat'] = 'File format';
+$string['configfileheaders'] = 'File output headers';
 $string['configfilelocation'] = 'Generated file location';
 $string['configfilelocationadmin'] = 'Generated file location admin extension';
 $string['configfileoutput'] = 'File output fields';
@@ -165,6 +169,8 @@ $string['configyseries'] = 'Data series';
 $string['configyseriesformats'] = 'Data series formatting';
 $string['configzoom'] = 'Zoom';
 $string['confiygmin'] = 'Q min';
+$string['crontraceon'] = 'Dashboard cron trace';
+$string['crontraceon_desc'] = 'If enable, generates a special <dataroot>/dashboards.log file for tracing croned executions.';
 $string['csv'] = 'CSV records';
 $string['csvfieldseparator'] = 'CSV Field separator';
 $string['csvfieldseparator_desc'] = 'Sitewide value for CSV field separator';
@@ -225,6 +231,7 @@ $string['eventlink'] = 'Link series';
 $string['eventstart'] = 'Event start serie';
 $string['eventtitles'] = 'Title data serie';
 $string['eventtaskprocessed'] = 'Task processed event';
+$string['eventtaskempty'] = 'Empty result task event';
 $string['exportall'] = 'Export all data';
 $string['exportconfig'] = 'Get the current config';
 $string['exportdataastable'] = 'Export data as table';
@@ -278,6 +285,10 @@ $string['outputfilegeneration'] = 'Output file generation';
 $string['outputfiltered'] = 'Generate output file (filtered)';
 $string['outputparams'] = 'Query output settings';
 $string['pageexport'] = 'Page export';
+$string['paramas'] = 'Provide param as ';
+$string['paramasvar'] = 'query variable';
+$string['paramassql'] = 'sql where';
+$string['paramascol'] = 'output column';
 $string['pie'] = 'Pie';
 $string['plotgraphparams'] = 'Plotted graph settings';
 $string['pluginname'] = 'Dashboard';
@@ -290,6 +301,7 @@ $string['saturday'] = 'Saturday';
 $string['savechangesandconfig'] = 'Save and continue configuration';
 $string['savechangesandview'] = 'Save and view';
 $string['securityparams'] = 'Security and performance settings';
+$string['selectnone'] = '(none)';
 $string['setup'] = 'Setup';
 $string['sqlinserts'] = 'SQL INSERTs';
 $string['sqlparamlabel'] = 'Label';
@@ -341,11 +353,17 @@ $string['configsummators_help'] = '
 ';
 
 $string['configfileoutput_help'] = '
-<p>File can use a distinct set of output field than what is required for display. </p>
+File can use a distinct set of output field than what is required for display. If empty, the output columns will have
+same definitions as the display.
+';
+
+$string['configfileheaders_help'] = '
+You can define the effective headers of the exported CSV file for each output column. If empty, the output SQL field aliases will
+be used as default values.
 ';
 
 $string['configfilesqlouttable_help'] = '
-<p>In case file format is outputing an SQL inserts, youl\'ll need tell the table name in which records go in. </p>
+<p>In case file format is outputing an SQL inserts, youl\'ll need tell the table name in which records go in.</p>
 ';
 
 $string['configfilepathadminoverride_help'] = 'Administrators may need to generate the files outside the Moodle controlled area';

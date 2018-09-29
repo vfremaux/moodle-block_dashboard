@@ -83,6 +83,11 @@ if ($ADMIN->fulltree) {
     $desc = get_string('csvfieldseparator_desc', 'block_dashboard');
     $settings->add(new admin_setting_configselect($key, $label, $desc, "\n", $seplineoptions));
 
+    $key = 'block_dashboard/cron_trace_on';
+    $label = get_string('crontraceon', 'block_dashboard');
+    $desc = get_string('crontraceon_desc', 'block_dashboard');
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+
     if (block_dashboard_supports_feature('emulate/community') == 'pro') {
         // This will accept any.
         include_once($CFG->dirroot.'/blocks/dashboard/pro/prolib.php');

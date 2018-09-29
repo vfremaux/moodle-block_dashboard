@@ -59,6 +59,7 @@ $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
 $string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
 $string['configfileformat'] = 'Type de fichier de sortie&nbsp;';
+$string['configfileheaders'] = 'En-têtes du fichier&nbsp;';
 $string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
 $string['configfileoutput'] = 'Champs de sortie sur fichier&nbsp;';
 $string['configfileoutputformats'] = 'Formattage des données&nbsp;';
@@ -133,6 +134,8 @@ $string['configymin'] = 'Min axe Y&nbsp;';
 $string['configyseries'] = 'Séries de données';
 $string['configyseriesformats'] = 'Formats de données des séries&nbsp;';
 $string['configzoom'] = 'Zoom&nbsp;';
+$string['crontraceon'] = 'Trace spécifique de cron';
+$string['crontraceon_desc'] = 'Si activé, génère un fichier de log <dataroot>/dashboards.log pour tracer les exécutions de cron.';
 $string['csv'] = 'Enregistrements CSV';
 $string['csvfieldseparator'] = 'Séparateur de champs&nbsp;';
 $string['csvfieldseparator_desc'] = 'Séparateur de champs CSV (Toute la plate-forme)&nbsp;';
@@ -176,6 +179,7 @@ $string['eventend'] = 'Série des fins de plage&nbsp;';
 $string['eventlink'] = 'Série des cibles de liens&nbsp;';
 $string['eventstart'] = 'Série des débuts de plage&nbsp;';
 $string['eventtaskprocessed'] = 'Tâche de tableau de bord exécutée';
+$string['eventtaskempty'] = 'Tâche de tableau de bord sans résultats';
 $string['eventtitles'] = 'Série des titres&nbsp;';
 $string['exportall'] = 'Exporter toutes les données';
 $string['exportconfig'] = 'Obtenir la configuration';
@@ -229,6 +233,10 @@ $string['ofbiz_dashboard'] = 'Tableaux de bord Ofbiz';
 $string['outputfilegeneration'] = 'Extraction de données';
 $string['outputfiltered'] = 'Générer le fichier de sortie (filtré)';
 $string['outputparams'] = 'Configuration des données de sorties';
+$string['paramas'] = 'Le paramètre est ';
+$string['paramasvar'] = 'une variable';
+$string['paramassql'] = 'une clause where';
+$string['paramascol'] = 'une colonne de sortie';
 $string['pie'] = 'Camenberts';
 $string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Tableau de bord';
@@ -241,6 +249,7 @@ $string['saturday'] = 'Samedi';
 $string['savechangesandconfig'] = 'Enregistrer et continuer la configuration';
 $string['savechangesandview'] = 'Enregistrer et afficher';
 $string['securityparams'] = 'Paramètres de sécurité et de performance';
+$string['selectnone'] = '(aucune valeur)';
 $string['semicolon'] = 'Point-virgule';
 $string['setup'] = 'Configuration';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
@@ -274,17 +283,23 @@ $string['year'] = 'Année';
 $string['sums'] = 'Sommateurs';
 
 $string['configdelayedrefresh_help'] = '
-<p>Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
+Le raffraicchissement de données dans le cache et un fichier de sortie peut être programmé dans le temps.</p>
 <p>Vous pouvez choisir de sortir les données selon le réglage général de la fonction cron des tableaux de bord, ou
-choisir un autre moment particulier pour cette instance.</p>
+choisir un autre moment particulier pour cette instance.
 ';
 
 $string['configmakefile_help'] = '
-<p>Lorsque le cache est régénéré, vous pouvez choisir de sortir également les données vers un fichier.</p>
+Lorsque le cache est régénéré, vous pouvez choisir de sortir également les données vers un fichier.
 ';
 
 $string['configfileoutput_help'] = '
-<p>La sortie sur fichier peut être alimentée par d\'autres champs que ceux utilisés pour l\'affichage. </p>
+La sortie sur fichier peut être alimentée par d\'autres champs que ceux utilisés pour l\'affichage. Si ce champ est vide, alors
+les colonnes exportées seront les mêmes que celles définies pour l\'affichage.
+';
+
+$string['configfileheaders_help'] = '
+Vous pouvez définir pour chaque champ la valeur de l\'en-tête produite en première ligne de fichier. Si ce champ est vide, alors
+les alias SQL de colonnes de sorties sont utilisés par défaut comme en-têtes.
 ';
 
 $string['configfilesqlouttable_help'] = '

@@ -15,25 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
+ * The block_dashboard event for logging dashboard export process
  *
  * @package    block_dashboard
  * @category   blocks
- * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
+ * @author     Valery Fremaux (valery.fremaux@gmail.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * VFLibs can be found at http://github.com/vfremaux/moodle-local_vflibs
  */
+
+namespace block_dashboard\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018092600;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017110800;        // Requires this Moodle version.
-$plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics).
-$plugin->release = '3.5.0 (build 2018092600)';
-$plugin->maturity = MATURITY_RC;
-$plugin->dependencies = array('local_vflibs' => '2016081100');
+/**
+ * The block dashboard event when a dashboard generates with no query results.
+ *
+ * @package    block_dashboard
+ * @since      Moodle 3.5
+ * @copyright  2014 Petr Skoda
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class export_task_empty extends \core\event\base {
+    protected function init() {
+        $this->data['crud'] = 'r';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
+    }
 
-// Non moodle attributes.
-$plugin->codeincrement = '3.5.0004';
-$plugin->privacy = 'dualrelease';
+    /**
+     * Returns localised general event name.
+     *
+     * @return string
+     */
+    public static function get_name() {
+        return get_string('eventtaskempty', 'block_dashboard');
+    }
+
+}
