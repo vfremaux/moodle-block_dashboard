@@ -337,10 +337,14 @@ class setup_renderer extends \plugin_renderer_base {
         $template->helpiconconfigcaching = $this->output->help_icon('configcaching', 'block_dashboard');
         $template->strconfigcaching = get_string('configcaching', 'block_dashboard');
 
+        $template->uselocalcachingchecked = '';
+        $template->uselocalcachingunchecked = '';
         if (isset($theblock->config) && isset($theblock->config->uselocalcaching)) {
-            $template->uselocalcachingchecked = 'checked="checked"';
-        } else {
-            $uselocalcachingunchecked = 'checked="checked"';
+            if ($theblock->config->uselocalcaching) {
+                $template->uselocalcachingchecked = 'checked="checked"';
+            } else {
+                $template->uselocalcachingunchecked = 'checked="checked"';
+            }
         }
 
         $template->strconfigcachingttl = get_string('configcachingttl', 'block_dashboard');

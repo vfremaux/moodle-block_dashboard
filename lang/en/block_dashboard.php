@@ -29,6 +29,9 @@ $string['dashboard:configure'] = 'Can configure the block';
 $string['dashboard:systempathaccess'] = 'Can configure output in system data path';
 $string['dashboard:export'] = 'Export data (web service)';
 
+// Privacy.
+$string['privacy:metadata'] = 'The Dashboard block does not store any personal data about any user.';
+
 $string['backtocourse'] = 'Back to course';
 $string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
@@ -166,6 +169,8 @@ $string['configyseries'] = 'Data series';
 $string['configyseriesformats'] = 'Data series formatting';
 $string['configzoom'] = 'Zoom';
 $string['confiygmin'] = 'Q min';
+$string['crontraceon'] = 'Dashboard cron trace';
+$string['crontraceon_desc'] = 'If enable, generates a special <dataroot>/dashboards.log file for tracing croned executions.';
 $string['csv'] = 'CSV records';
 $string['csvfieldseparator'] = 'CSV Field separator';
 $string['csvfieldseparator_desc'] = 'Sitewide value for CSV field separator';
@@ -226,6 +231,7 @@ $string['eventlink'] = 'Link series';
 $string['eventstart'] = 'Event start serie';
 $string['eventtitles'] = 'Title data serie';
 $string['eventtaskprocessed'] = 'Task processed event';
+$string['eventtaskempty'] = 'Empty result task event';
 $string['exportall'] = 'Export all data';
 $string['exportconfig'] = 'Get the current config';
 $string['exportdataastable'] = 'Export data as table';

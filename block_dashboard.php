@@ -790,19 +790,23 @@ class block_dashboard extends block_base {
 
         mtrace("\nDashboard cron...");
         if ($alldashboards = $DB->get_records('block_instances', array('blockname' => 'dashboard'))) {
+            $dashtrace = "[".strftime('%Y-%m-%d %H:%M:%S', time())."] Processing dashboards\n";
             foreach ($alldashboards as $dsh) {
+                $dashtrace .= "\tProcessing dashboard $dsh->id\n";
                 $instance = block_instance('dashboard', $dsh);
                 if (!$instance->prepare_config()) {
                     continue;
                 }
                 $context = context_block::instance($dsh->id);
 
-                if (empty($instance->config->cronmode) or (@$instance->config->cronmode == 'norefresh')) {
+                if (empty($instance->config->cronmode) || (@$instance->config->cronmode == 'norefresh')) {
+                    $dashtrace .= "\tNo cron programmed for $dsh->id\n";
                     mtrace("$dsh->id Skipping norefresh");
                     continue;
                 }
                 if (!@$instance->config->uselocalcaching) {
-                    mtrace("$dsh->id Skipping no cache ");
+                    $dashtrace .= "\tOutputting in files needs caching being enabled\n";
+                    mtrace("$dsh->id Skipping as not cached ");
                     continue;
                 }
 
@@ -828,7 +832,7 @@ class block_dashboard extends block_base {
                 if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug || ($nowdt['yday'] == 0)) {
                     // We wait the programmed time is passed, and check we are an allowed day to run and no query is already running.
                     if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug || ($nowdt['yday'] == 0)) {
-                        if (($nowdt['hours'] * 60 + $nowdt['minutes'] >= $chour * 60 + $cmin &&
+                        if (((($nowdt['hours'] * 60 + $nowdt['minutes']) >= ($chour * 60 + $cmin)) &&
                                 !@$instance->config->isrunning) ||
                                         $crondebug) {
                             $instance->config->isrunning = true;
@@ -846,46 +850,72 @@ class block_dashboard extends block_base {
                             $sql = str_replace('<%%FILTERS%%>', '', $instance->config->query);
                             $sql = str_replace('<%%PARAMS%%>', '', $sql);
 
-                            mtrace('   ... refreshing for instance '.$dsh->id);
+                            $logbuf = "\t   ... refreshing for instance {$dsh->id} \n";
                             $status = $instance->fetch_dashboard_data($sql, $results, $limit, $offset, true, true /* with mtracing */);
 
                             if (empty($results)) {
-                                mtrace('Empty result on query : '.$sql);
+                                $logbuf = "\tEmpty result on query : {$sql} \n";
+                                $eventparams = array(
+                                    'context' => context_block::instance($dsh->id),
+                                    'other' => array(
+                                        'blockid' => $dsh->id
+                                    ),
+                                );
+                                $event = \block_dashboard\event\export_task_empty::create($eventparams);
+                                $event->trigger();
                             } else {
                                 // Generate output file if required.
+                                $logbuf = "\tOutputting file for instance {$dsh->id} \n";
                                 $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
                                 $csvrenderer->generate_output_file($instance, $results);
+
+                                $eventparams = array(
+                                    'context' => context_block::instance($dsh->id),
+                                    'other' => array(
+                                        'blockid' => $dsh->id
+                                    ),
+                                );
+                                $event = \block_dashboard\event\export_task_processed::create($eventparams);
+                                $event->trigger();
                             }
 
                             // Ugly way to do it....
                             $blockconfig = unserialize(base64_decode($DB->get_field('block_instances', 'configdata', array('id' => $dsh->id))));
                             $blockconfig->isrunning = false;
+                            $blockconfig->lastcron = time();
                             $DB->set_field('block_instances', 'configdata', base64_encode(serialize($blockconfig)), array('id' => $dsh->id)); // Save config
 
-                            $eventparams = array(
-                                'context' => context_block::instance($dsh->id),
-                                'other' => array(
-                                    'blockid' => $dsh->id
-                                ),
-                            );
-                            $event = \block_dashboard\event\export_task_processed::create($eventparams);
-                            $event->trigger();
+                            mtrace($logbuf);
+                            $dashtrace .= $logbuf;
 
                             if (!empty($blockconfig->cronadminnotifications)) {
                                 $admins = get_admins();
-                                foreach($admins as $admin) {
+                                foreach ($admins as $admin) {
                                     email_to_user($admin, $admin, $SITE->fullname.': Dashboard export task '.$dsh->id, '', '');
                                 }
                             }
 
                         } else {
-                            mtrace('   waiting for valid time for instance '.$dsh->id);
+                            $msg = '   waiting for valid time for instance '.$dsh->id;
+                            mtrace($msg);
+                            $dashtrace .= "\t".$msg;
                         }
                     } else {
-                        mtrace('   waiting for valid day for instance '.$dsh->id);
+                        $msg = '   waiting for valid day for instance '.$dsh->id;
+                        mtrace($msg);
+                        $dashtrace .= "\t".$msg;
                     }
                 } else {
-                    mtrace('   waiting for next unprocessed day for instance '.$dsh->id);
+                    $msg = '   waiting for next unprocessed day for instance '.$dsh->id;
+                    mtrace($msg);
+                    $dashtrace .= "\t".$msg;
+                }
+            }
+
+            if (!empty($config->cron_trace_on)) {
+                if ($DASHTRACE = fopen($CFG->dataroot.'/dashboards.log', 'a')) {
+                    fputs($DASHTRACE, $dashtrace);
+                    fclose($DASHTRACE);
                 }
             }
         } else {
