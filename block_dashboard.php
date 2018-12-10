@@ -94,7 +94,7 @@ class block_dashboard extends block_base {
         return true;
     }
 
-    public function instance_config_save($data, $notused = false) {
+    public function instance_config_save($data, $nolongerused = false) {
         global $USER;
 
         /*
@@ -112,7 +112,12 @@ class block_dashboard extends block_base {
         $data->isrunning = 0;
         $data->lastcron = 0;
 
-        return parent::instance_config_save($data, $notused);
+        $config = clone($data);
+        // Move embedded files into a proper filearea and adjust HTML links to match
+        $config->description = file_save_draft_area_files(@$data->description['itemid'], $this->context->id, 'block_dashboard', 'description',
+                                                   0, array('subdirs'=>true), @$data->description['text']);
+        $config->descriptionformat = @$data->description['format'];
+        return parent::instance_config_save($config, $nolongerused);
     }
 
     public function applicable_formats() {
@@ -163,6 +168,27 @@ class block_dashboard extends block_base {
         }
 
         return $this->content;
+    }
+
+    function content_is_trusted() {
+        global $SCRIPT;
+
+        if (!$context = context::instance_by_id($this->instance->parentcontextid, IGNORE_MISSING)) {
+            return false;
+        }
+        //find out if this block is on the profile page
+        if ($context->contextlevel == CONTEXT_USER) {
+            if ($SCRIPT === '/my/index.php') {
+                // this is exception - page is completely private, nobody else may see content there
+                // that is why we allow JS here
+                return true;
+            } else {
+                // no JS on public personal pages, it would be a big security issue
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -697,6 +723,11 @@ class block_dashboard extends block_base {
             $bench->start = time();
         }
 
+		if (!empty($limit)) {
+			$sql = preg_replace('/LIMIT.*$/', '', $sql);
+			$sql .= " LIMIT $limit OFFSET $offset ";
+		}
+
         if ($rs = $DB->get_recordset_sql($sql)) {
             while ($rs->valid()) {
                 $rec = $rs->current();
@@ -1101,6 +1132,7 @@ class block_dashboard extends block_base {
             $labelkey = 'sqlparamlabel'.$i;
             $typekey = 'sqlparamtype'.$i;
             $valueskey = 'sqlparamvalues'.$i;
+            $defaultkey = 'sqlparamdefault'.$i;
             if (!empty($this->config->$varkey)) {
                 $uparam = new StdClass;
                 $uparam->key = $this->config->$varkey;
@@ -1108,6 +1140,7 @@ class block_dashboard extends block_base {
                 $uparam->label = $this->config->$labelkey;
                 $uparam->type = $this->config->$typekey;
                 $uparam->values = $this->config->$valueskey;
+                $uparam->default = @$this->config->$defaultkey;
                 $uparam->ashaving = dashboard_guess_is_alias($this, $uparam->key);
                 $this->params[$uparam->key] = $uparam;
             }
@@ -1145,7 +1178,7 @@ class block_dashboard extends block_base {
         $paramsqlarr = array();
         $havingparamsqlarr = array();
         $paramsurlvalues = array();
-        $queryvars = array();
+        $this->queryvars = array();
         $emptyqueryvarkeys = array();
 
         foreach ($this->params as $key => $param) {
@@ -1155,7 +1188,7 @@ class block_dashboard extends block_base {
                 case ('choice'):
                 case ('select'):
                 case ('date'):
-                    $paramvalue = optional_param($key, '', PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
                     $paramvalue = trim($paramvalue); // In case of...
                     if ($param->type == 'date') {
                         $this->params[$sqlkey]->originalvalue = $paramvalue;
@@ -1172,7 +1205,7 @@ class block_dashboard extends block_base {
                             // Collects for making a urlquerystring.
                             $paramsurlvalues[$key] = $paramvalue;
                         } else if ($param->paramas == 'variable') {
-                            $queryvars[$param->key] = $paramvalue;
+                            $this->queryvars[$param->key] = $paramvalue;
                         }
                     } else {
                         if ($param->paramas == 'variable') {
@@ -1183,7 +1216,7 @@ class block_dashboard extends block_base {
                     break;
 
                 case ('text'):
-                    $paramvalue = optional_param($key, '', PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
                         if ($param->paramas == 'sql') {
@@ -1206,8 +1239,8 @@ class block_dashboard extends block_base {
 
                 case ('range'):
                 case ('daterange'):
-                    $valuefrom = optional_param($key.'_from', '', PARAM_TEXT);
-                    $valueto = optional_param($key.'_to', '', PARAM_TEXT);
+                    $valuefrom = optional_param(core_text::strtolower($key).'_from', @$param->default, PARAM_TEXT);
+                    $valueto = optional_param(core_text::strtolower($key).'_to', '', PARAM_TEXT);
                     $this->params[$sqlkey]->originalvaluefrom = $valuefrom;
                     $this->params[$sqlkey]->originalvalueto = $valueto;
                     if ($param->type == 'daterange') {
@@ -1290,7 +1323,7 @@ class block_dashboard extends block_base {
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
 
         // Process all queryvars replacements.
-        foreach ($queryvars as $key => $value) {
+        foreach ($this->queryvars as $key => $value) {
             $this->sql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->sql);
             $this->filteredsql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->filteredsql);
         }
@@ -1336,7 +1369,7 @@ class block_dashboard extends block_base {
         $filterinputs = array();
 
         foreach ($filterkeys as $key) {
-            $filterinputs[$key] = $filtersinputsource[$key];
+            $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
         }
 
         foreach ($globalfilterkeys as $key) {
@@ -1344,7 +1377,7 @@ class block_dashboard extends block_base {
             $cond = array_key_exists($radical, $this->filterfields->translations);
             $canonicalfilter = ($cond) ? $this->filterfields->translations[$radical] : $radical;
             if ($this->is_filter_global($canonicalfilter)) {
-                $filterinputs[$key] = $filtersinputsource[$key];
+                $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
             }
         }
 
@@ -1361,8 +1394,9 @@ class block_dashboard extends block_base {
         }
         $filterquerystring = implode('&', $filterquerystringelms);
 
-        // Process defaults if setup, faking $filtersinputsource input.
-        if (!empty($this->filterfields->defaults)) {
+        // Process defaults if setup, faking $filtersinputsource input but not when reporting all data!
+        $alldata = optional_param('alldata', 0, PARAM_BOOL);
+        if (!empty($this->filterfields->defaults) && !$alldata) {
             foreach ($this->filterfields->defaults as $filter => $default) {
                 $cond = array_key_exists($filter, $this->filterfields->translations);
                 $canonicalfilter = ($cond) ? $this->filterfields->translations[$filter] : $filter;

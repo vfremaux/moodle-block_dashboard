@@ -23,6 +23,7 @@
     * none
 
 }}
+<!-- block_dashboard/dashboard -->
 <div class="dashboard-panel">
 
 {{{dhtmlxcalendarstyle}}}
@@ -33,6 +34,10 @@
 
 {{^errormsg}}
 {{{warningmsg}}}
+
+{{#description}}
+<div class="block-dashboard-description">{{{description}}}</div>
+{{/description}}
 
 {{{debug}}}
 
@@ -71,3 +76,4 @@
 
 {{/errormsg}}
 </div>
+<!-- /block_dashboard/dashboard -->
