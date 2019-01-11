@@ -1,5 +1,5 @@
 {{!
-    This file is part of The Course Module Navigation Block
+    This file is part of The Dashboard Block
 
     Moodle is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -15,26 +15,18 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block-dashboard/layout
+    @template block-dashboard/filters
 
-    Block template for block output layout
+    Block template for filters form part.
 
     Classes required for JS:
     * none
 
 }}
-<!-- block_dashboard/layout -->
-<fieldset>
-<legend>{{strdashboardlayout}}</legend>
-    <table class="dashboard-setup">
-        <tr valign="top">
-            <td align="right">
-                <b>{{{strconfiglayout}}}:</b>
-            </td>
-            <td>
-                {{{inblocklayoutselect}}}
-            </td>
-        </tr>
-    </table>
-</fieldset>
-<!-- /block_dashboard/layout -->
+<!-- block_dashboard/filters -->
+{{#filters}}
+<span class="dashboard-filter">{{filtername}}</span>&nbsp;
+{{{filterselect}}}
+&nbsp;&nbsp
+{{/filters}}
+<!-- /block_dashboard/filters -->

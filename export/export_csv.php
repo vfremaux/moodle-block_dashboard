@@ -42,14 +42,16 @@ $courseid = required_param('id', PARAM_INT); // The course ID.
 $instanceid = required_param('instance', PARAM_INT); // The block ID.
 $output = optional_param('output', 'csv', PARAM_ALPHA); // Output format (csv).
 $limit = optional_param('limit', '', PARAM_INT);
-$offset = optional_param('offset', '', PARAM_INT); 
-$alldata = optional_param('alldata', '', PARAM_INT); 
+$offset = optional_param('offset', '', PARAM_INT);
+
+// Not directly used here. @see block_dashboard@prepare_filters().
+$alldata = optional_param('alldata', '', PARAM_INT);
 
 if (!$course = $DB->get_record('course', array('id' => "$courseid"))) {
     print_error('badcourseid');
 }
 
-if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))){
+if (!$instance = $DB->get_record('block_instances', array('id' => "$instanceid"))) {
     print_error('badblockinstance', 'block_dashboard');
 }
 
@@ -60,20 +62,21 @@ $theblock = block_instance('dashboard', $instance);
 require_login($course);
 
 $theblock->prepare_config();
-$theblock->prepare_params();
+if (!empty($theblock->params)) {
+    $theblock->prepare_params();
+} else {
+    $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->sql);
+    $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
+}
 
 // Fetch data.
 
 if (!empty($theblock->config->filters)) {
-    $theblock->prepare_filters();
+    $theblock->prepare_filters($_POST);
 } else {
     $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }
 $theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
-
-if (!empty($theblock->params)) {
-    $theblock->prepare_params();
-}
 
 $sort = optional_param('tsort'.$theblock->instance->id, '', PARAM_TEXT);
 if (!empty($sort)) {
@@ -84,19 +87,17 @@ if (!empty($sort)) {
 }
 
 $filteredsql = $theblock->protect($theblock->filteredsql);
-
 $theblock->fetch_dashboard_data($filteredsql, $theblock->results, '', '', true); // Get all data.
 
 if ($theblock->results) {
     // Output csv file.
     $exportname = (!empty($theblock->config->title)) ? clean_filename($theblock->config->title) : 'dashboard_export' ;
-    header("Content-Type:text/csv\n\n");
-    header("Content-Disposition:filename={$exportname}.csv\n\n");
 
     if (!$debug) {
         ob_end_clean();
     }
-
+    header("Content-Type:text/csv\n\n");
+    header("Content-Disposition:filename={$exportname}.csv\n\n");
     $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
     $csvdata = $csvrenderer->export($theblock);
     echo $csvdata;

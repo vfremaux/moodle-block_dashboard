@@ -36,7 +36,9 @@ function block_dashboard_supports_feature($feature) {
             'pro' => array(
                 'format' => array('xls', 'csv'),
                 'config' => array('importexport'),
-                'result' => array('rotation', 'export'),
+                'graph' => array('google', 'timeline'),
+                'data' => array('treeview', 'extrapostgresource'),
+                'result' => array('rotation', 'export', 'colouring'),
             ),
             'community' => array(
                 'format' => array('csv'),
@@ -73,7 +75,11 @@ function block_dashboard_supports_feature($feature) {
 
 /**
  * A low level utility to format data in a cell
- *
+ * @param string $format the formating text formula
+ * @param string $data the data value to be formated
+ * @param int $cumulativeix index of the accumulator when using line accumulation format
+ * @param array $record the full result record, used for inserting other named field values in the formula using %{fieldname}
+ * @return the formated data.
  */
 function dashboard_format_data($format, $data, $cumulativeix = null, &$record = null) {
     global $dashboardaccumulatorcache;
@@ -145,7 +151,11 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
 
         // Date value format.
         if ($format == '%D') {
-            $data = userdate($data);
+            if ($data == 0) {
+                $data = get_string('nulldate', 'block_dashboard');
+            } else {
+                $data = userdate($data);
+            }
             return $data;
         }
 
@@ -164,7 +174,7 @@ function dashboard_format_data($format, $data, $cumulativeix = null, &$record = 
         }
 
         // All other cases fallback to sprintf.
-        $data = sprintf($format, $data);
+        $data = @sprintf($format, $data);
 
         if ($negativeenhance && $data < 0) {
             $data = '<span style="color:red;font-weight:bold">'.$data.'</span>';
@@ -198,7 +208,7 @@ function dashboard_table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$
             $c = 0;
             foreach ($pathstack as $pathelm) {
                 if (!empty($vformats[$c])) {
-                    $pathelm = dashboard_format_data($vformats[$c], $pathelm);
+                    // $pathelm = dashboard_format_data($vformats[$c], $pathelm);
                 }
                 if (!empty($theblock->config->cleandisplay)) {
                     if ($pathelm != @$vkeys->mem[$c]) {
@@ -427,11 +437,15 @@ function block_dashboard_pluginfile($course, $instance, $context, $filearea, $ar
 function dashboard_output_file(&$theblock, $str) {
     global $CFG;
 
+    if ($theblock->config->exportcharset == 'iso') {
+        $str = utf8_decode($str);
+    }
+
     if (!empty($theblock->config->filepathadminoverride)) {
         // An admin has configured, can be anywhere in moodledata so be carefull !
         $outputfile = $CFG->dataroot.'/'.$theblock->config->filepathadminoverride.'/'.$theblock->config->filelocation;
         mtrace("   ... writing to ".$outputfile."\n");
-        mtrace("   ... Note that settings will not allow file being accessible in the dashbaord fielarea\n");
+        mtrace("   ... Note that settings will not allow file being accessible in the dashbaord filearea\n");
         if ($FILE = fopen($outputfile, 'wb')) {
             fputs($FILE, $str);
             fclose($FILE);

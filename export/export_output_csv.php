@@ -60,16 +60,16 @@ $theblock->prepare_config();
 
 // Fetch data.
 
-if (!empty($theblock->config->filters)) {
-    $theblock->prepare_filters();
-} else {
-    $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
-}
-
 if (!empty($theblock->params)) {
     $theblock->prepare_params();
 } else {
     $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql);
+}
+
+if (!empty($theblock->config->filters)) {
+    $theblock->prepare_filters($_POST);
+} else {
+    $theblock->filteredsql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
 }
 
 $sort = optional_param('tsort'.$theblock->instance->id, '', PARAM_TEXT);
@@ -98,7 +98,7 @@ if ($results) {
 
     } else {
         echo '</pre>';
-        echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyfailure');
+        echo $OUTPUT->notification(get_string('filegenerationfailed', 'block_dashboard'), 'notifyproblem');
     }
     if ($theblock->config->inblocklayout) {
         $buttonurl = new moodle_url('/course/view.php', array('id' => $courseid));

@@ -65,7 +65,8 @@ class csv_renderer extends \plugin_renderer_base {
                 }
                 $row[] = $datum;
             }
-            if ($theblock->config->exportcharset == 'utf8') {
+            if ($theblock->config->exportcharset == 'iso') {
+                debug_trace("Converting generated CSV to ISO");
                 $str .= utf8_decode(implode($config->csv_field_separator, $row));
             } else {
                 $str .= implode($config->csv_field_separator, $row);
@@ -78,6 +79,16 @@ class csv_renderer extends \plugin_renderer_base {
     public function generate_output_file(&$theblock, &$results) {
 
         $config = get_config('block_dashboard');
+
+        if (empty($theblock->config->makefile)) {
+            mtrace(" File generation not enabled");
+            return;
+        }
+
+        if (empty($results)) {
+            mtrace(" No results ");
+            return;
+        }
 
         if (!empty($theblock->config->makefile) && !empty($results)) {
 
@@ -98,6 +109,12 @@ class csv_renderer extends \plugin_renderer_base {
             dashboard_normalize($outputfields, $outputformats); // Normalizes labels to keys.
             $theblock->outputf = array_combine($outputfields, $outputformats);
 
+            if (!empty($this->config->fileheaders)) {
+                $fileoutputheaders = explode(';', $this->config->fileheaders);
+                dashboard_normalize($outputfields, $fileoutputheaders); // Normalizes output headers to keys.
+                $theblock->fileheaders = array_combine($outputfields, $fileoutputheaders);
+            }
+
             mtrace('   ... generating file for instance '.$theblock->instance->id.' in format '.$theblock->config->fileformat);
             if (!empty($theblock->outputf)) {
 
@@ -105,12 +122,23 @@ class csv_renderer extends \plugin_renderer_base {
 
                 if ($theblock->config->fileformat == 'CSV') {
                     // Print col names.
-                    $rarr = array();
-                    foreach ($theblock->outputf as $key => $format) {
-                        $rarr[] = $key;
+                    if (empty($theblock->fileheaders)) {
+                        // Implicit headers from output col names.
+                        $rarr = array();
+                        foreach ($theblock->outputf as $key => $format) {
+                            $rarr[] = $key;
+                        }
+                        $filestr .= implode($config->csv_field_separator, $rarr);
+                        $filestr .= $config->csv_line_separator;
+                    } else {
+                        // Explicitely specified headers.
+                        $rarr = array();
+                        foreach ($theblock->fileheaders as $key => $header) {
+                            $rarr[] = $header;
+                        }
+                        $filestr .= implode($config->csv_field_separator, $rarr);
+                        $filestr .= $config->csv_line_separator;
                     }
-                    $filestr .= implode($config->csv_field_separator, $rarr);
-                    $filestr .= $config->csv_line_separator;
                 }
 
                 if (($theblock->config->fileformat == 'CSV') ||
@@ -186,7 +214,7 @@ class csv_renderer extends \plugin_renderer_base {
 
         return $str;
     }
-    
+
     /**
      * Recursive worker for CSV table writing
      */
@@ -289,24 +317,24 @@ class csv_renderer extends \plugin_renderer_base {
      */
     function dashboard_print_table_header_csv(&$str, &$theblock, &$hcols) {
         global $CFG;
-    
+
         $config = get_config('block_dashboard');
-    
+
         $vlabels = array_values($theblock->vertkeys->labels);
-    
+
         $row = array();
         foreach ($theblock->vertkeys->labels as $vk => $vlabel) {
             $row[] = $vlabel;
         }
-    
+
         foreach ($hcols as $hc) {
             $row[] = $hc;
         }
-    
+
         if (isset($theblock->config->horizsums)) {
             $row[] = get_string('total', 'block_dashboard');
         }
-    
+
         if ($theblock->config->exportcharset == 'utf8') {
             $str .= utf8_decode(implode($config->csv_field_separator, $row));
         } else {

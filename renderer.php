@@ -38,6 +38,27 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $template = new StdClass;
 
+        // Print description.
+        if (isset($theblock->config->description)) {
+            // rewrite url.
+            $theblock->config->description = file_rewrite_pluginfile_urls($theblock->config->description, 'pluginfile.php',
+                                                                      $theblock->context->id, 'block_dashboard',
+                                                                      'description', null);
+            /*
+             * Default to FORMAT_HTML which is what will have been used before the
+             * editor was properly implemented for the block.
+             */
+
+            $filteropt = new stdClass;
+            $filteropt->overflowdiv = true;
+            if ($theblock->content_is_trusted()) {
+                // fancy html allowed only on course, category and system blocks.
+                $filteropt->noclean = true;
+            }
+
+            $template->description = format_text($theblock->config->description, $theblock->config->descriptionformat, $filteropt);
+        }
+
         $template->dhtmlxcalendarstyle = $this->dhtmlxcalendar_style();
 
         if (!isset($theblock->config)) {
@@ -113,9 +134,33 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $ticks = array();
         $filterquerystring = '';
 
+        if (!empty($theblock->params)) {
+            $filterquerystring = $theblock->prepare_params();
+
+            // Add expressed queryvars to url.
+            if (!empty($theblock->queryvars)) {
+                $bid = $theblock->instance->id;
+                foreach ($theblock->queryvars as $k => $v) {
+                    $pair = core_text::strtolower($k)."_{$bid}=$v";
+                    $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$pair : $pair ;
+                }
+            }
+        } else {
+            $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
+            $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
+        }
+
+        if (!empty($sort)) {
+            // Do not sort if already sorted in explained query.
+            if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
+                $theblock->filteredsql .= " ORDER BY $sort";
+            }
+        }
+
+        // Preparing filters.
         if (!empty($theblock->config->filters)) {
             try {
-                $filterquerystring = $theblock->prepare_filters();
+                $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_filters() : $theblock->prepare_filters();
             } catch (\block_dashboard\filter_query_exception $e) {
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
@@ -138,20 +183,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         // Needed to prepare for filter range prefetch.
         $theblock->sql = str_replace('<%%FILTERS%%>', '', $theblock->sql);
-
-        if (!empty($theblock->params)) {
-            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_params() : $theblock->prepare_params();
-        } else {
-            $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
-            $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
-        }
-
-        if (!empty($sort)) {
-            // Do not sort if already sorted in explained query.
-            if (!preg_match('/ORDER\s+BY/si', $theblock->sql)) {
-                $theblock->filteredsql .= " ORDER BY $sort";
-            }
-        }
 
         $theblock->filteredsql = $theblock->protect($theblock->filteredsql);
 
@@ -225,9 +256,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '';
 
         if (@$theblock->config->inblocklayout) {
-            $baseurl = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd;
+            $baseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+            $baseurl .= $coursepage.$filterquerystringadd;
         } else {
-            $baseurl = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$theblock->instance->id.$coursepage.$filterquerystringadd;
+            $params = array('id' => $COURSE->id, 'blockid' => $theblock->instance->id);
+            $baseurl = new moodle_url('/blocks/dashboard/view.php', $params);
+            $baseurl .= $coursepage.$filterquerystringadd;
         }
 
         // Start prepare output table.
@@ -350,11 +384,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                             continue;
                         }
                         $vkeyvalue = $result->$vkey;
-                        $matrix[] = "['".addslashes($vkeyvalue)."']";
+                        $vkeyvalue = dashboard_format_data($theblock->vertkeys->formats[$vkey], $vkeyvalue, null, $result);
+                        $matrix[] = "['".str_replace("'", "\'", $vkeyvalue)."']";
                     }
                     $hkey = $theblock->config->horizkey;
                     $hkeyvalue = (!empty($hkey)) ? $result->$hkey : '';
-                    $matrix[] = "['".addslashes($hkeyvalue)."']";
+                    $matrix[] = "['".str_replace("'", "\'", $hkeyvalue)."']";
                     $matrixst = "\$m".implode($matrix);
                     if (!in_array($hkeyvalue, $hcols)) {
                         $hcols[] = $hkeyvalue;
@@ -561,10 +596,22 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
             } else if (@$theblock->config->tabletype == 'tabular') {
                 // Forget table and use $m matrix for making display.
-                $template->data = $this->cross_table($theblock, $m, $hcols, $theblock->config->horizkey, $theblock->vertkeys, $theblock->config->horizlabel, true);
+                $template->data = $this->cross_table($theblock,
+                                                     $m,
+                                                     $hcols,
+                                                     $theblock->config->horizkey,
+                                                     $theblock->vertkeys,
+                                                     $theblock->config->horizlabel,
+                                                     true);
                 $template->controlbuttons = $this->tabular_buttons($theblock, $filterquerystring);
             } else {
-                $template->data = $this->tree_view($theblock, $treedata, $theblock->treeoutput, $theblock->output, $theblock->outputf, $theblock->colourcoding, true);
+                $template->data = $this->tree_view($theblock,
+                                                   $treedata,
+                                                   $theblock->treeoutput,
+                                                   $theblock->output,
+                                                   $theblock->outputf,
+                                                   $theblock->colourcoding,
+                                                   true);
                 $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring);
             }
         }
@@ -586,8 +633,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 if (empty($theblock->config->timelineeventstart) || empty($theblock->config->timelineeventend)) {
                     $template->graph = $OUTPUT->notification("Missing mappings (start or titles)", 'notifyproblem');
                 } else {
-                    $template->graph = timeline_print_graph($theblock, 'dashboard'.$theblock->instance->id, $theblock->config->graphwidth,
-                                                  $theblock->config->graphheight, $data, true);
+                    $template->graph = timeline_print_graph($theblock,
+                                                            'dashboard'.$theblock->instance->id,
+                                                            $theblock->config->graphwidth,
+                                                            $theblock->config->graphheight,
+                                                            $data,
+                                                            true);
                 }
             }
         }
@@ -739,157 +790,32 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param arrayref $outputformats formats for above
      * @param arrayref $colourcoding an array of colour coding rules issued from table scope colourcoding settings
      */
+
     public function tree_view(&$theblock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding) {
-        static $level = 1;
+        global $PAGE;
 
-        $str = '';
-
-        asort($tree);
-
-        $str .= '<ul class="dashboard-tree'.$level.'">';
-        $level++;
-        foreach ($tree as $key => $node) {
-            $nodestrs = array();
-            foreach ($treeoutput as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodestrs[] = $datum;
-            }
-            $nodecontent = implode(' ', $nodestrs);
-            $nodedata = array();
-            foreach ($outputformats as $field => $formatter) {
-                if (empty($field)) {
-                    continue;
-                }
-                if (!empty($formatter)) {
-                    $datum = dashboard_format_data($formatter, $node->$field);
-                } else {
-                    $datum = $node->$field;
-                }
-                if (!empty($theblock->config->colorfield) && $theblock->config->colorfield == $field) {
-                    // We probably prefer inline coloouring here, rather than div block.
-                    $datum = dashboard_colour_code($theblock, $datum, $colorcoding, true);
-                }
-                $nodedata[] = $datum;
-            }
-            $nodedatastr = implode(' ', $nodedata);
-            $str .= "<li>$nodecontent <div style=\"float:right\">$nodedatastr</div></li>";
-            if (!empty($node->childs)) {
-                $str .= $this->tree_view($theblock, $node->childs, $treeoutput, $outputfields, $outputformats, $colorcoding);
-            }
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $level--;
-        $str .= '</ul>';
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        return $str;
+        return $prorenderer->tree_view($theblock, $tree, $treeoutput, $outputfields, $outputformats, $colorcoding);
     }
 
     /**
      * prints and format data for googlemap plotting.
      */
     public function googlemaps_data(&$theblock, &$data, &$graphdesc) {
+        global $PAGE;
 
-        $str = '';
-
-        if (!empty($config->datalocations)) {
-            // Data comes from query and locating information from datalocations field mapping.
-            $googlelocs = explode(";", $theblock->config->datalocations);
-            if (!empty($data)) {
-                foreach ($data as $d) {
-                    $t = $d->{$theblock->config->datatitles};
-                    if (count($googlelocs) == 1) {
-                        list($lat,$lng) = explode(',', $d->{$theblock->config->datalocations});
-                        $type = $d->{$theblock->config->datatypes};
-                        $gmdata[] = array('title' => $t, 'lat' => 0 + $lat, 'lng' => 0 + $lng, 'markerclass' => $type);
-                    } else if (count($googlelocs) == 4) {
-                        // We expect an address,postcode,city,region field list. If some data is quoted, take it as "constant".
-                        $addresselms = explode(';', $theblock->config->datalocations);
-                        $addressfield = trim($addresselms[0]);
-                        $postcodefield = trim($addresselms[1]);
-                        $cityfield = trim($addresselms[2]);
-                        $regionfield = trim($addresselms[3]);
-                        $address = $d->{$addressfield};
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $postcodefield, $matches)) {
-                            $postcode = $matches[1];
-                        } else {
-                            $postcode = $d->{$postcodefield};
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $cityfield, $matches)) {
-                            $city = $matches[1];
-                        } else {
-                            $city = preg_replace('/cedex.*/i', '', $d->{$cityfield}); // remove postal alterations
-                        }
-                        if (preg_match('/^(?:\'|")([^\']*)(?:\'|")$/', $regionfield, $matches)) {
-                            $region = $matches[1];
-                        } else {
-                            $region = $d->{$regionfield};
-                        }
-                        $googleerrors = array();
-                        if ($location = googlemaps_get_geolocation($region, $address, $postcode, $city, $googleerrors)) {
-                            list($lat,$lng) = explode(',', $location);
-                            $type = $d->{$theblock->config->datatypes};
-                            $gmdata[] = array('title' => $t, 'lat' => $lat, 'lng' => $lng, 'markerclass' => $type);
-                        }
-                    } else {
-                        $str .= '<span class="error">'.get_string('googlelocationerror', 'block_dashboard').'</span>';
-                        break;
-                    }
-                }
-            }
-        } else {
-            $str .= " This is a demo set !! ";
-            /**
-             * demo
-             */
-            $gmdata = array(
-                array('lat' => 48.020587,
-                      'lng' => 0.151405,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'Via formation'),
-                array('lat' => 47.894823,
-                      'lng' => 1.904798,
-                      'markerclass' => 'certiffoad',
-                      'title' => 'FormaSanté'),
-                array('lat' => 48.091582,
-                      'lng' => -1.789484,
-                      'markerclass' => 'hq',
-                      'title' => 'CLPS Siege'),
-                array('lat' => 48.392852,
-                      'lng' => -4.444313,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Brest'),
-                array('lat' => 47.663075,
-                      'lng' => -2.711906,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'CLPS Vannes'),
-                array('lat' => 47.093953,
-                      'lng' => 5.497713,
-                      'markerclass' => 'fcfoad',
-                      'title' => 'INFA Franche-Comte'),
-                array('lat' => 48.565703,
-                      'lng' => 7.734375,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Alsace'),
-                array('lat' => 49.274973,
-                      'lng' => 2.444458,
-                      'markerclass' => 'fc',
-                      'title' => 'INFA Picardie'),
-            );
+        if (!block_dashboard_supports_feature('graph/google')) {
+            return 'Not supported in this distribution';
         }
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= googlemaps_embed_graph('dashboard'.$theblock->instance->id, @$theblock->config->lat, @$theblock->config->lng, @$theblock->config->graphwidth, $theblock->config->graphheight, $graphdesc, $gmdata, true);
-
-        return $str;
+        return $prorenderer->googlemaps_data($theblock, $data, $graphdesc);
     }
 
     /**
@@ -933,7 +859,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $template->autosubmit = (count(array_keys($theblock->filters)) + count(array_keys($theblock->params))) <= 1;
 
         if (!empty($theblock->config->filters)) {
-            $template->filters = $this->filters($theblock);
+            // Fill template with filters.
+            $this->filters($theblock, $template);
+            if (!empty($template->hasmultiple)) {
+                $template->autosubmit = false;
+            }
         }
         if (!empty($theblock->params)) {
             $template->params = $this->params($theblock);
@@ -950,9 +880,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
      *
      * Javascript handler is provided when preparing form overrounding.
      */
-    public function filters(&$theblock) {
-
-        $str = '';
+    public function filters(&$theblock, &$template) {
 
         $alllabels = array_keys($theblock->filterfields->labels);
 
@@ -963,10 +891,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 continue;
             }
 
-            $cond = isset($theblock->filterfields->translations[$afield]);
-            $fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+            $filtertpl = new StdClass;
 
-            $filterresults = $theblock->filter_get_results($afield, $fieldname, false, false, $str);
+            $cond = isset($theblock->filterfields->translations[$afield]);
+            $filtertpl->fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
+
+            $filterresults = $theblock->filter_get_results($afield, $filtertpl->fieldname, false, false, $str);
 
             if ($filterresults) {
                 $filteropts = array();
@@ -976,12 +906,11 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
                 foreach (array_values($filterresults) as $value) {
                     // Removes table scope explicitators.
-                    $radical = preg_replace('/^.*\./', '', $fieldname);
+                    $radical = preg_replace('/^.*\./', '', $filtertpl->fieldname);
                     $filteropts[$value->$radical] = $value->$radical;
                 }
-                $str .= '<span class="dashboard-filter">'.$theblock->filterfields->labels[$afield].':</span>';
-                $multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
-                $arrayform = ($multiple) ? '[]' : '';
+                $filtertpl->multiple = (strstr($theblock->filterfields->options[$afield], 'm') === false) ? false : true;
+                $arrayform = ($filtertpl->multiple) ? '[]' : '';
 
                 if (!is_array(@$theblock->filtervalues[$radical])) {
                     $unslashedvalue = stripslashes(@$theblock->filtervalues[$radical]);
@@ -992,25 +921,25 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 // Build the select options.
                 $attrs = array();
 
-                if ($multiple) {
+                if ($filtertpl->multiple) {
+                    $template->hasmultiple = true;
+                    $filtertpl->multiple = true;
                     $attrs['multiple'] = 1;
-                    $attrs['size'] = 5;
+                    $attrs['size'] = 8;
                 }
 
                 if ($theblock->is_filter_global($afield)) {
                     $key = "filter0_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 } else {
                     $key = "filter{$theblock->instance->id}_{$radical}{$arrayform}";
                     $attrs['class'] = 'dashboard-filter-element-'.$theblock->instance->id;
-                    $str .= html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
+                    $filtertpl->filterselect = html_writer::select($filteropts, $key, $unslashedvalue, null, $attrs);
                 }
-                $str .= "&nbsp;&nbsp;";
             }
+            $template->filters[] = $filtertpl;
         }
-
-        return $str;
     }
 
     /**
@@ -1030,6 +959,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         foreach ($theblock->params as $key => $param) {
 
             $param->paramkey = preg_replace('/[.() *]/', '', $key).'_'.$theblock->instance->id;
+            $param->paramkey = core_text::strtolower($param->paramkey);
 
             switch ($param->type) {
 
@@ -1049,15 +979,30 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     $param->quotedvalue = htmlentities($param->value, ENT_QUOTES, 'UTF-8');
                     break;
 
-                case 'list':
+                case 'select':
                     $param->list = true;
                     $param->options = array();
-                    foreach ($param->values as $v) {
+
+                    $option = new Stdclass;
+                    $option->selected = empty($param->value) ? ' selected="selected" ' : '';
+                    $option->value = '';
+                    $option->label = get_string('selectnone', 'block_dashboard');
+                    $param->options[] = $option;
+
+                    $values = explode("\n", $param->values);
+                    foreach ($values as $v) {
+                        // Resolve potential multipart definition.
+                        if (strpos($v, '|') !== false) {
+                            list($key, $label) = explode('|', trim($v));
+                        } else {
+                            $key = htmlentities(trim($v), ENT_QUOTES, 'UTF-8');
+                            $label = trim($v);
+                        }
                         $option = new Stdclass;
-                        $option->selected = ($v == $param->value) ? ' selected="selected" ' : '';
-                        $option->value = htmlentities($v, ENT_QUOTES, 'UTF-8');
-                        $option->label = $v;
-                        $param->options[] = $options;
+                        $option->selected = (trim($key) == trim(@$param->value)) ? ' selected="selected" ' : '';
+                        $option->value = $key;
+                        $option->label = $label;
+                        $param->options[] = $option;
                     }
                     break;
 
@@ -1221,23 +1166,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function tree_buttons($theblock, $filterquerystring) {
-        global $COURSE;
+    public function tree_buttons(&$theblock, &$filterquerystring) {
+        global $PAGE;
 
-        // passed to each buttons.
-        $this->sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
-
-        $str = '<div class="dashboard-table-buttons">';
-
-        $str .= $this->allexport_button($theblock);
-        if (empty($theblock->config->filepathadminoverride)) {
-            $str .= $this->fileview_button($theblock);
+        if (!block_dashboard_supports_feature('data/treeview')) {
+            return 'Not supported in this distribution';
         }
-        $str .= $this->filteredoutput_button($theblock, $filterquerystring);
+        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        $str .= '</div>';
-
-        return $str;
+        return $prorenderer->tree_buttons($theblock, $filterquerystring, $this);
     }
 
     protected function allexport_button($theblock) {
@@ -1306,14 +1244,14 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         if ($sortfield != $fieldname) {
-            $pix = '<img src="'.$this->output->pix_url('sinactive', 'block_dashboard').'" />';
+            $pix = $this->output->pix_icon('sinactive', '', 'block_dashboard');
             $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
         } else {
             if ($dir == 'DESC') {
-                $pix = '<img src="'.$this->output->pix_url('sdesc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sdesc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' ASC">'.$pix.'</a>';
             } else {
-                $pix = '<img src="'.$this->output->pix_url('sasc', 'block_dashboard').'" />';
+                $pix = $this->output->pix_icon('sasc', '', 'block_dashboard');
                 $str .= '&nbsp;<a href="'.$baseurl.'&tsort'.$theblock->instance->id.'='.$fieldname.' DESC">'.$pix.'</a>';
             }
         }

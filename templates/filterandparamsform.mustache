@@ -15,14 +15,15 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block-dashboard/layout
+    @template block-dashboard/filterandparamsform
 
-    Block template for graph output params form
+    Block template for outputing filters and params on results
 
     Classes required for JS:
     * none
 
 }}
+<!-- block_dashboard/filterandparamsform -->
 <form class="dashboard-filter-form" id="dashboard-form-{{blockid}}" name="dashboardform{{blockid}}" method="GET">
     <input type="hidden" name="id" value="{{courseid}}" />
 
@@ -40,7 +41,7 @@
 
     <input type="hidden" name="tsort{{blockid}}" value="{{sort}}" />
 
-    {{{filters}}}
+    {{> block_dashboard/filters }}
 
     {{{params}}}
 
@@ -52,3 +53,4 @@
     {{/autosubmit}}
 
 </form>
+<!-- /block_dashboard/filterandparamsform -->

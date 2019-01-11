@@ -17,11 +17,12 @@
 /**
  * @package block_dashboard
  * @category blocks
- * @author Valery Fremaux (valery@club-internet.fr)
+ * @author Valery Fremaux (valery.fremaux@gmail.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL
  */
 require('../../config.php');
 require_once($CFG->dirroot.'/blocks/dashboard/block_dashboard.php');
+require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 
 $PAGE->requires->jquery();
 $PAGE->requires->js('/blocks/dashboard/js/module.js', true);
@@ -60,7 +61,12 @@ $PAGE->set_heading($SITE->shortname);
 $PAGE->set_pagelayout('admin');
 $PAGE->requires->js_call_amd('block_dashboard/setup', 'init');
 
-$renderer = $PAGE->get_renderer('block_dashboard', 'setup');
+if (block_dashboard_supports_feature('emulate/community') == 'pro') {
+    include_once($CFG->dirroot.'/blocks/dashboard/pro/classes/output/setup_renderer.php');
+    $renderer = new \block_dashboard\output\setup_pro_renderer($PAGE, 'html');
+} else {
+    $renderer = $PAGE->get_renderer('block_dashboard', 'setup');
+}
 $renderer->set_block($theblock);
 
 echo $OUTPUT->header();
@@ -105,11 +111,17 @@ echo $renderer->query_description();
 echo $renderer->query_params();
 echo $renderer->output_params();
 echo $renderer->tabular_params();
-echo $renderer->treeview_params();
+if (block_dashboard_supports_feature('data/treeview')) {
+    echo $renderer->treeview_params();
+}
 echo $renderer->sums_and_filters();
 echo $renderer->graph_params();
-echo $renderer->google_params();
-echo $renderer->timeline_params();
+if (block_dashboard_supports_feature('graph/google')) {
+    echo $renderer->google_params();
+}
+if (block_dashboard_supports_feature('graph/timeline')) {
+    echo $renderer->timeline_params();
+}
 if (block_dashboard_supports_feature('result/colouring')) {
     echo $renderer->tablecolor_mapping();
 }

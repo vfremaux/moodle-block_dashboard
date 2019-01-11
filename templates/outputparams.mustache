@@ -23,6 +23,7 @@
     * none
 
 }}
+<!-- block_dashboard/outputparams -->
 <div id="dashboardsettings-panel-outputparams" class="dashboardsettings-panel off">
 <fieldset>
 <legend>{{stroutputparams}}</legend>
@@ -36,30 +37,11 @@
 
     <tr valign="top">
         <td align="right">
-            <b>{{{strconfigtabletype}}}: {{{helpiconconfigtabletype}}}</b>
-        </td>
-
-        <td align="left">
-            {{{tabletypeselect}}}
-        </td>
-
-    </tr>
-
-    <tr valign="top">
-        <td align="right">
             <b>{{{strconfigoutputfields}}}: {{{helpiconconfigoutputfields}}}</b>
         </td>
 
-        <td align="left">
-            <input type="text" name="outputfields" size="30" value="{{fields}}" />
-        </td>
-
-        <td align="right" rowspan="2">
-            <b>{{{strconfigoutputfieldslabels}}}:</b>
-        </td>
-
-        <td align="left" rowspan="2">
-            <textarea name="fieldlabels" cols="30" rows="5" >{{{fieldlabels}}}</textarea>
+        <td align="left" colspan="3">
+            <input type="text" name="outputfields" value="{{fields}}" class="block-dashboard-longvalue"/>
         </td>
     </tr>
 
@@ -68,8 +50,26 @@
             <b>{{{strconfigoutputformats}}}: {{{helpiconconfigoutputformats}}}</b>
         </td>
 
+        <td align="left" colspan="3">
+            <input type="text" name="outputformats" value="{{formats}}" class="block-dashboard-longvalue"/>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td align="right">
+            <b>{{{strconfigtabletype}}}: {{{helpiconconfigtabletype}}}</b>
+        </td>
+
         <td align="left">
-            <input type="text" name="outputformats" size="30" value="{{formats}}" />
+            {{{tabletypeselect}}}
+        </td>
+
+        <td align="right" rowspan="2">
+            <b>{{{strconfigoutputfieldslabels}}}:</b>
+        </td>
+
+        <td align="left" rowspan="2">
+            <textarea name="fieldlabels" cols="30" rows="5" >{{{fieldlabels}}}</textarea>
         </td>
     </tr>
 
@@ -147,3 +147,4 @@
 
 <br/>
 </div>
+<!-- /block_dashboard/outputparams -->
