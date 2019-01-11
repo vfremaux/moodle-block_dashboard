@@ -250,3 +250,11 @@ table.dashboard-setup td {
 #dashboardsettings-menu .setting-tab.off {
     display:none;
 }
+
+.block-dashboard-longvalue {
+    width: 40em;
+}
+
+.block-dashboard-pathvalue {
+    width: 30em;
+}

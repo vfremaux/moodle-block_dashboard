@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template block-dashboard/dashbaord
+    @template block-dashboard/dashboard
 
     Block template for main block content output
 
@@ -23,6 +23,7 @@
     * none
 
 }}
+<!-- block_dashboard/dashboard -->
 <div class="dashboard-panel">
 
 {{{dhtmlxcalendarstyle}}}
@@ -34,11 +35,17 @@
 {{^errormsg}}
 {{{warningmsg}}}
 
+{{#description}}
+<div class="block-dashboard-description">{{{description}}}</div>
+{{/description}}
+
 {{{debug}}}
 
 {{{filterandparams}}}
 
 {{{data}}}
+
+{{{summators}}}
 
 {{#graph}}
 <div class="dashboard-graph-box">
@@ -69,3 +76,4 @@
 
 {{/errormsg}}
 </div>
+<!-- /block_dashboard/dashboard -->

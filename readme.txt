@@ -62,14 +62,14 @@ Given a full query, the dashboard block mashes up :
 # Library locations
 ########################################
 
-Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_27_STABLE.zip
+Get the VFLibs libraries package at https://github.com/vfremaux/moodle-local_vflibs/archive/MOODLE_XX_STABLE.zip
 and add the ocntent to the moodle/local directory
 
 Those libs are NOT moodle libs but additional public opensource libraries i use in several components as
-extra framework. 
+extra framework.
 
-# Install additive for running timelines
-########################################
+# Install additive for running timelines (PRO version)
+######################################################
 
 @TODO : Review this with better JS provisioning calls
 
@@ -82,4 +82,15 @@ Add this statement :
 
 As latest possible statement in footer.
 
-Enjoy nice plotting... 
+X.X.0004
+########################
+
+Provides new variable user params features :
+- params as sql : as before, generates a filtering where clause in the query
+- params as variables : generates a variable that can stand anywhere in the query. placeholders 
+use the <%%UPPERCASEKEY%%> convention in the query templates. A single placeholder can be used
+several times in the query template.
+- params as outputcol : allows a user GUI variable to produce additional columns in the output result
+for forging output CSVs.
+
+Enjoy nice plotting...

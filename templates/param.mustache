@@ -23,6 +23,7 @@
     * none
 
 }}
+<!-- block_dashboard/params -->
 <div class="dashboard-sql-params">
 
 {{#params}}
@@ -36,13 +37,13 @@
 {{/choice}}
 
 {{#text}}
-<input type="text" size="10" id="id_param_{{paramkey}}" class="dashboard-param" name="{{paramkey}}" value="{{quotedparamvalue}}" />
+<input type="text" size="10" id="id_param_{{paramkey}}" class="dashboard-param" name="{{paramkey}}" value="{{quotedvalue}}" />
 {{/text}}
 
 {{#list}}
-<select name="{{paramkey}}" class="dashboard-param" id="id_param_{{paramkey}}>
+<select name="{{paramkey}}" class="dashboard-param" id="id_param_{{paramkey}}">
 {{#options}}
-    <option value="{{value}}" {{selected}}>{{label}}</option>
+    <option value="{{{value}}}" {{{selected}}}>{{{label}}}</option>
 {{/options}}}
 </select>
 {{/list}}
@@ -64,3 +65,4 @@
 {{/params}}
 
 </div>
+<!-- /block_dashboard/params -->

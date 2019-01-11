@@ -22,6 +22,8 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+define('DASHBOARD_MAX_QUERY_PARAMS', 10);
+
 require_once($CFG->dirroot.'/blocks/moodleblock.class.php');
 require_once($CFG->dirroot.'/blocks/dashboard/lib.php');
 require_once($CFG->dirroot.'/blocks/dashboard/classes/filter_query_exception.class.php');
@@ -92,7 +94,7 @@ class block_dashboard extends block_base {
         return true;
     }
 
-    public function instance_config_save($data, $notused = false) {
+    public function instance_config_save($data, $nolongerused = false) {
         global $USER;
 
         /*
@@ -110,7 +112,12 @@ class block_dashboard extends block_base {
         $data->isrunning = 0;
         $data->lastcron = 0;
 
-        return parent::instance_config_save($data, $notused);
+        $config = clone($data);
+        // Move embedded files into a proper filearea and adjust HTML links to match
+        $config->description = file_save_draft_area_files(@$data->description['itemid'], $this->context->id, 'block_dashboard', 'description',
+                                                   0, array('subdirs'=>true), @$data->description['text']);
+        $config->descriptionformat = @$data->description['format'];
+        return parent::instance_config_save($config, $nolongerused);
     }
 
     public function applicable_formats() {
@@ -161,6 +168,27 @@ class block_dashboard extends block_base {
         }
 
         return $this->content;
+    }
+
+    function content_is_trusted() {
+        global $SCRIPT;
+
+        if (!$context = context::instance_by_id($this->instance->parentcontextid, IGNORE_MISSING)) {
+            return false;
+        }
+        //find out if this block is on the profile page
+        if ($context->contextlevel == CONTEXT_USER) {
+            if ($SCRIPT === '/my/index.php') {
+                // this is exception - page is completely private, nobody else may see content there
+                // that is why we allow JS here
+                return true;
+            } else {
+                // no JS on public personal pages, it would be a big security issue
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
@@ -459,7 +487,7 @@ class block_dashboard extends block_base {
             try {
                 $DB->delete_records('block_dashboard_filter_cache', $params);
             } catch (Exception $e) {
-                throw new \block_dashboard\filter_query_cache_exception();
+                throw new \block_dashboard\filter_query_cache_exception($DB->get_last_error());
             }
             list($usec, $sec) = explode(' ', microtime());
             $t1 = (float)$usec + (float)$sec;
@@ -473,7 +501,7 @@ class block_dashboard extends block_base {
                 try {
                     $FILTERSET[$fielddef] = $DB->get_records_sql($filtersql);
                 } catch (Exception $e) {
-                    throw new \block_dashboard\filter_query_exception();
+                    throw new \block_dashboard\filter_query_exception($DB->get_last_error());
                 }
                 if (@$this->config->showbenches) {
                     $bench->end = time();
@@ -484,7 +512,7 @@ class block_dashboard extends block_base {
                     try {
                         $FILTERSET[$fielddef] = extra_db_query($filtersql, false, true, $error);
                     } catch (Exception $e) {
-                        throw new \block_dashboard\filter_query_exception();
+                        throw new \block_dashboard\filter_query_exception($DB->get_last_error());
                     }
                     if ($error) {
                         $this->content->text .= $error;
@@ -613,6 +641,7 @@ class block_dashboard extends block_base {
             if ($this->config->target == 'moodle') {
                 return $this->get_moodle_results($sql, $results, $limit, $offset);
             } else {
+                // This is a pro feature.
                 // TODO : enhance performance by using recordsets.
 
                 if (empty($extra_db_CNX)) {
@@ -660,10 +689,12 @@ class block_dashboard extends block_base {
             if (@$this->config->showbenches) {
                 $this->benches[] = $$t2 - $t1;
             }
+            $this->add_param_output_cols($results);
 
         } else {
             if ($cachefootprint) {
                 $results = $this->get_data_from_cache($sqlkey, $limit, $offset);
+                $this->add_param_output_cols($results);
                 return '<div class="dashboard-special">'.get_string('cacheddata', 'block_dashboard').'</div>';
             } else {
                 $notretrievablestr = get_string('notretrievable', 'block_dashboard');
@@ -691,6 +722,11 @@ class block_dashboard extends block_base {
             $bench->name = "main query";
             $bench->start = time();
         }
+
+		if (!empty($limit)) {
+			$sql = preg_replace('/LIMIT.*$/', '', $sql);
+			$sql .= " LIMIT $limit OFFSET $offset ";
+		}
 
         if ($rs = $DB->get_recordset_sql($sql)) {
             while ($rs->valid()) {
@@ -738,6 +774,7 @@ class block_dashboard extends block_base {
             $bench->end = time();
             $this->benches[] = $bench;
         }
+        $this->add_param_output_cols($results);
     }
 
     /**
@@ -784,19 +821,23 @@ class block_dashboard extends block_base {
 
         mtrace("\nDashboard cron...");
         if ($alldashboards = $DB->get_records('block_instances', array('blockname' => 'dashboard'))) {
+            $dashtrace = "[".strftime('%Y-%m-%d %H:%M:%S', time())."] Processing dashboards\n";
             foreach ($alldashboards as $dsh) {
+                $dashtrace .= "\tProcessing dashboard $dsh->id\n";
                 $instance = block_instance('dashboard', $dsh);
                 if (!$instance->prepare_config()) {
                     continue;
                 }
                 $context = context_block::instance($dsh->id);
 
-                if (empty($instance->config->cronmode) or (@$instance->config->cronmode == 'norefresh')) {
+                if (empty($instance->config->cronmode) || (@$instance->config->cronmode == 'norefresh')) {
+                    $dashtrace .= "\tNo cron programmed for $dsh->id\n";
                     mtrace("$dsh->id Skipping norefresh");
                     continue;
                 }
                 if (!@$instance->config->uselocalcaching) {
-                    mtrace("$dsh->id Skipping no cache ");
+                    $dashtrace .= "\tOutputting in files needs caching being enabled\n";
+                    mtrace("$dsh->id Skipping as not cached ");
                     continue;
                 }
 
@@ -822,7 +863,7 @@ class block_dashboard extends block_base {
                 if (($nowdt['yday'] > $lastdate['yday']) || ($lastdate['yday'] == 0) || $crondebug || ($nowdt['yday'] == 0)) {
                     // We wait the programmed time is passed, and check we are an allowed day to run and no query is already running.
                     if (($cfreq == 'daily') || ($nowdt['wday'] == $cfreq) || $crondebug || ($nowdt['yday'] == 0)) {
-                        if (($nowdt['hours'] * 60 + $nowdt['minutes'] >= $chour * 60 + $cmin &&
+                        if (((($nowdt['hours'] * 60 + $nowdt['minutes']) >= ($chour * 60 + $cmin)) &&
                                 !@$instance->config->isrunning) ||
                                         $crondebug) {
                             $instance->config->isrunning = true;
@@ -840,46 +881,72 @@ class block_dashboard extends block_base {
                             $sql = str_replace('<%%FILTERS%%>', '', $instance->config->query);
                             $sql = str_replace('<%%PARAMS%%>', '', $sql);
 
-                            mtrace('   ... refreshing for instance '.$dsh->id);
+                            $logbuf = "\t   ... refreshing for instance {$dsh->id} \n";
                             $status = $instance->fetch_dashboard_data($sql, $results, $limit, $offset, true, true /* with mtracing */);
 
                             if (empty($results)) {
-                                mtrace('Empty result on query : '.$sql);
+                                $logbuf = "\tEmpty result on query : {$sql} \n";
+                                $eventparams = array(
+                                    'context' => context_block::instance($dsh->id),
+                                    'other' => array(
+                                        'blockid' => $dsh->id
+                                    ),
+                                );
+                                $event = \block_dashboard\event\export_task_empty::create($eventparams);
+                                $event->trigger();
                             } else {
                                 // Generate output file if required.
+                                $logbuf = "\tOutputting file for instance {$dsh->id} \n";
                                 $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
                                 $csvrenderer->generate_output_file($instance, $results);
+
+                                $eventparams = array(
+                                    'context' => context_block::instance($dsh->id),
+                                    'other' => array(
+                                        'blockid' => $dsh->id
+                                    ),
+                                );
+                                $event = \block_dashboard\event\export_task_processed::create($eventparams);
+                                $event->trigger();
                             }
 
                             // Ugly way to do it....
                             $blockconfig = unserialize(base64_decode($DB->get_field('block_instances', 'configdata', array('id' => $dsh->id))));
                             $blockconfig->isrunning = false;
+                            $blockconfig->lastcron = time();
                             $DB->set_field('block_instances', 'configdata', base64_encode(serialize($blockconfig)), array('id' => $dsh->id)); // Save config
 
-                            $eventparams = array(
-                                'context' => context_block::instance($dsh->id),
-                                'other' => array(
-                                    'blockid' => $dsh->id
-                                ),
-                            );
-                            $event = \block_dashboard\event\export_task_processed::create($eventparams);
-                            $event->trigger();
+                            mtrace($logbuf);
+                            $dashtrace .= $logbuf;
 
                             if (!empty($blockconfig->cronadminnotifications)) {
                                 $admins = get_admins();
-                                foreach($admins as $admin) {
+                                foreach ($admins as $admin) {
                                     email_to_user($admin, $admin, $SITE->fullname.': Dashboard export task '.$dsh->id, '', '');
                                 }
                             }
 
                         } else {
-                            mtrace('   waiting for valid time for instance '.$dsh->id);
+                            $msg = '   waiting for valid time for instance '.$dsh->id;
+                            mtrace($msg);
+                            $dashtrace .= "\t".$msg;
                         }
                     } else {
-                        mtrace('   waiting for valid day for instance '.$dsh->id);
+                        $msg = '   waiting for valid day for instance '.$dsh->id;
+                        mtrace($msg);
+                        $dashtrace .= "\t".$msg;
                     }
                 } else {
-                    mtrace('   waiting for next unprocessed day for instance '.$dsh->id);
+                    $msg = '   waiting for next unprocessed day for instance '.$dsh->id;
+                    mtrace($msg);
+                    $dashtrace .= "\t".$msg;
+                }
+            }
+
+            if (!empty($config->cron_trace_on)) {
+                if ($DASHTRACE = fopen($CFG->dataroot.'/dashboards.log', 'a')) {
+                    fputs($DASHTRACE, $dashtrace);
+                    fclose($DASHTRACE);
                 }
             }
         } else {
@@ -887,6 +954,38 @@ class block_dashboard extends block_base {
         }
 
         return true;
+    }
+
+    /**
+     * Add some additional virtual columns from user params. Additional "fixed value" output cols
+     * may be defined as user params of 'outputcol' type. The param var key generates a new result column
+     * in the output result. This may be usefull to produce static/parametric fields in an output CSV file.
+     *
+     * The post processing occurs in @see block_dashboard::fetch_dashboard_data()
+     *
+     * @param arrayref &$results
+     * @return Void. the incomming results array is processed by reference.
+     */
+    protected function add_param_output_cols(&$results) {
+
+        if (empty($results)) {
+            return;
+        }
+
+        $addedcolumns = array();
+        foreach ($this->params as $up) {
+            if ($up->paramas == 'outputcol') {
+                $addedcolumns[] = $up->key;
+            }
+        }
+
+        if (!empty($addedcolumns)) {
+            foreach ($results as $r) {
+                foreach ($addedcolumns as $key) {
+                    $r->$key = $this->params[$key]->value;
+                }
+            }
+        }
     }
 
     /**
@@ -1027,17 +1126,21 @@ class block_dashboard extends block_base {
         $this->colourcoding = dashboard_prepare_colourcoding($this->config);
 
         // Prepare user params definitions.
-        for ($i = 1 ; $i < 5 ; $i++) {
+        for ($i = 1 ; $i <= DASHBOARD_MAX_QUERY_PARAMS ; $i++) {
             $varkey = 'sqlparamvar'.$i;
+            $paramaskey = 'paramasvar'.$i;
             $labelkey = 'sqlparamlabel'.$i;
             $typekey = 'sqlparamtype'.$i;
             $valueskey = 'sqlparamvalues'.$i;
+            $defaultkey = 'sqlparamdefault'.$i;
             if (!empty($this->config->$varkey)) {
                 $uparam = new StdClass;
                 $uparam->key = $this->config->$varkey;
+                $uparam->paramas = @$this->config->$paramaskey;
                 $uparam->label = $this->config->$labelkey;
                 $uparam->type = $this->config->$typekey;
                 $uparam->values = $this->config->$valueskey;
+                $uparam->default = @$this->config->$defaultkey;
                 $uparam->ashaving = dashboard_guess_is_alias($this, $uparam->key);
                 $this->params[$uparam->key] = $uparam;
             }
@@ -1075,14 +1178,17 @@ class block_dashboard extends block_base {
         $paramsqlarr = array();
         $havingparamsqlarr = array();
         $paramsurlvalues = array();
+        $this->queryvars = array();
+        $emptyqueryvarkeys = array();
+
         foreach ($this->params as $key => $param) {
             $sqlkey = $key;
             $key = preg_replace('/[.() *]/', '', $key).'_'.$this->instance->id;
             switch ($param->type) {
                 case ('choice'):
-                case ('list'):
+                case ('select'):
                 case ('date'):
-                    $paramvalue = optional_param($key, '', PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
                     $paramvalue = trim($paramvalue); // In case of...
                     if ($param->type == 'date') {
                         $this->params[$sqlkey]->originalvalue = $paramvalue;
@@ -1090,33 +1196,51 @@ class block_dashboard extends block_base {
                     }
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
-                        } else {
-                            $paramsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                            } else {
+                                $paramsqlarr[] = " {$sqlkey} = '{$paramvalue}' ";
+                            }
+                            // Collects for making a urlquerystring.
+                            $paramsurlvalues[$key] = $paramvalue;
+                        } else if ($param->paramas == 'variable') {
+                            $this->queryvars[$param->key] = $paramvalue;
                         }
-                        // Collects for making a urlquerystring.
-                        $paramsurlvalues[$key] = $paramvalue;
+                    } else {
+                        if ($param->paramas == 'variable') {
+                            // collect all variable keys to remove them from SQL if empty.
+                            $emptyqueryvarkeys[] = $param->key;
+                        }
                     }
                     break;
 
                 case ('text'):
-                    $paramvalue = optional_param($key, '', PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
-                        } else {
-                            $paramsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                            } else {
+                                $paramsqlarr[] = " {$sqlkey} LIKE '{$paramvalue}' ";
+                            }
+                            $paramsurlvalues[$key] = $paramvalue;
+                        } else if ($param->paramas == 'variable') {
+                            $queryvars[$param->key] = $paramvalue;
                         }
-                        $paramsurlvalues[$key] = $paramvalue;
+                    } else {
+                        if ($param->paramas == 'variable') {
+                            // collect all variable keys to remove them from SQL if empty.
+                            $emptyqueryvarkeys[] = $param->key;
+                        }
                     }
                     break;
 
                 case ('range'):
                 case ('daterange'):
-                    $valuefrom = optional_param($key.'_from', '', PARAM_TEXT);
-                    $valueto = optional_param($key.'_to', '', PARAM_TEXT);
+                    $valuefrom = optional_param(core_text::strtolower($key).'_from', @$param->default, PARAM_TEXT);
+                    $valueto = optional_param(core_text::strtolower($key).'_to', '', PARAM_TEXT);
                     $this->params[$sqlkey]->originalvaluefrom = $valuefrom;
                     $this->params[$sqlkey]->originalvalueto = $valueto;
                     if ($param->type == 'daterange') {
@@ -1141,10 +1265,12 @@ class block_dashboard extends block_base {
                             $sqlarr[] = " {$sqlkey} <= '{$valueto}' ";
                             $paramsurlvalues[$key.'_to'] = $valueto;
                         }
-                        if ($param->ashaving) {
-                            $havingparamsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
-                        } else {
-                            $paramsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                        if ($param->paramas == 'sql') {
+                            if ($param->ashaving) {
+                                $havingparamsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                            } else {
+                                $paramsqlarr[] = ' ('.implode(' AND ', $sqlarr).') ';
+                            }
                         }
                     }
                     $this->params[$sqlkey]->valuefrom = $valuefrom;
@@ -1196,6 +1322,20 @@ class block_dashboard extends block_base {
         $this->filteredsql = str_replace('<%%GROUPID%%>', $group, $this->filteredsql);
         $this->filteredsql = str_replace('<%%WWWROOT%%>', $CFG->wwwroot, $this->filteredsql);
 
+        // Process all queryvars replacements.
+        foreach ($this->queryvars as $key => $value) {
+            $this->sql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->sql);
+            $this->filteredsql = str_replace('<%%'.core_text::strtoupper($key).'%%>', $value, $this->filteredsql);
+        }
+
+        // Clean out empty variable keys.
+        if (!empty($emptyqueryvarkeys)) {
+            foreach ($emptyqueryvarkeys as $emptykey) {
+                $this->sql = str_replace('<%%'.core_text::strtoupper($emptykey).'%%>', '', $this->sql);
+                $this->filteredsql = str_replace('<%%'.core_text::strtoupper($emptykey).'%%>', '', $this->filteredsql);
+            }
+        }
+
         if (!empty($paramsurlvalues)) {
             foreach ($paramsurlvalues as $k => $v) {
                 $pairs[] = "$k=".urlencode($v);
@@ -1229,7 +1369,7 @@ class block_dashboard extends block_base {
         $filterinputs = array();
 
         foreach ($filterkeys as $key) {
-            $filterinputs[$key] = $filtersinputsource[$key];
+            $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
         }
 
         foreach ($globalfilterkeys as $key) {
@@ -1237,7 +1377,7 @@ class block_dashboard extends block_base {
             $cond = array_key_exists($radical, $this->filterfields->translations);
             $canonicalfilter = ($cond) ? $this->filterfields->translations[$radical] : $radical;
             if ($this->is_filter_global($canonicalfilter)) {
-                $filterinputs[$key] = $filtersinputsource[$key];
+                $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
             }
         }
 
@@ -1254,8 +1394,9 @@ class block_dashboard extends block_base {
         }
         $filterquerystring = implode('&', $filterquerystringelms);
 
-        // Process defaults if setup, faking $filtersinputsource input.
-        if (!empty($this->filterfields->defaults)) {
+        // Process defaults if setup, faking $filtersinputsource input but not when reporting all data!
+        $alldata = optional_param('alldata', 0, PARAM_BOOL);
+        if (!empty($this->filterfields->defaults) && !$alldata) {
             foreach ($this->filterfields->defaults as $filter => $default) {
                 $cond = array_key_exists($filter, $this->filterfields->translations);
                 $canonicalfilter = ($cond) ? $this->filterfields->translations[$filter] : $filter;
