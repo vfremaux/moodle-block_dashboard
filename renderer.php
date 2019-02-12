@@ -38,6 +38,27 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $template = new StdClass;
 
+        // Print description.
+        if (isset($theblock->config->description)) {
+            // rewrite url.
+            $theblock->config->description = file_rewrite_pluginfile_urls($theblock->config->description, 'pluginfile.php',
+                                                                      $theblock->context->id, 'block_dashboard',
+                                                                      'description', null);
+            /*
+             * Default to FORMAT_HTML which is what will have been used before the
+             * editor was properly implemented for the block.
+             */
+
+            $filteropt = new stdClass;
+            $filteropt->overflowdiv = true;
+            if ($theblock->content_is_trusted()) {
+                // fancy html allowed only on course, category and system blocks.
+                $filteropt->noclean = true;
+            }
+
+            $template->description = format_text($theblock->config->description, $theblock->config->descriptionformat, $filteropt);
+        }
+
         $template->dhtmlxcalendarstyle = $this->dhtmlxcalendar_style();
 
         if (!isset($theblock->config)) {
@@ -114,7 +135,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $filterquerystring = '';
 
         if (!empty($theblock->params)) {
-            $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_params() : $theblock->prepare_params();
+            $filterquerystring = $theblock->prepare_params();
+
+            // Add expressed queryvars to url.
+            if (!empty($theblock->queryvars)) {
+                $bid = $theblock->instance->id;
+                foreach ($theblock->queryvars as $k => $v) {
+                    $pair = "{$k}_{$bid}=$v";
+                    $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$pair : $pair ;
+                }
+            }
         } else {
             $theblock->sql = str_replace('<%%PARAMS%%>', '', $theblock->sql); // Needed to prepare for filter range prefetch.
             $theblock->filteredsql = str_replace('<%%PARAMS%%>', '', $theblock->filteredsql); // Needed to prepare for filter range prefetch.
@@ -127,9 +157,10 @@ class block_dashboard_renderer extends plugin_renderer_base {
             }
         }
 
+        // Preparing filters.
         if (!empty($theblock->config->filters)) {
             try {
-                $filterquerystring = $theblock->prepare_filters();
+                $filterquerystring = ($filterquerystring) ? $filterquerystring.'&'.$theblock->prepare_filters() : $theblock->prepare_filters();
             } catch (\block_dashboard\filter_query_exception $e) {
                 $filtersql = $theblock->filteredsql;
                 $template->errormsg = '<div class="dashboard-query-box">';
@@ -225,9 +256,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $filterquerystringadd = (isset($filterquerystring)) ? "&amp;$filterquerystring" : '';
 
         if (@$theblock->config->inblocklayout) {
-            $baseurl = $CFG->wwwroot.'/course/view.php?id='.$COURSE->id.$coursepage.$filterquerystringadd;
+            $baseurl = new moodle_url('/course/view.php', array('id' => $COURSE->id));
+            $baseurl .= $coursepage.$filterquerystringadd;
         } else {
-            $baseurl = $CFG->wwwroot.'/blocks/dashboard/view.php?id='.$COURSE->id.'&amp;blockid='.$theblock->instance->id.$coursepage.$filterquerystringadd;
+            $params = array('id' => $COURSE->id, 'blockid' => $theblock->instance->id);
+            $baseurl = new moodle_url('/blocks/dashboard/view.php', $params);
+            $baseurl .= $coursepage.$filterquerystringadd;
         }
 
         // Start prepare output table.
