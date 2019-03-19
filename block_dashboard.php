@@ -476,12 +476,16 @@ class block_dashboard extends block_base {
             $this->benches[] = $bench;
         }
 
+        if (empty($this->config->cachingttl)) {
+            $this->config->cachingttl = 0;
+        }
+
         if ((!$PAGE->user_is_editing() ||
                 !@$config->enable_isediting_security) &&
                         (!@$this->config->uselocalcaching ||
                                 !$cachefootprint ||
                                         ($cachefootprint &&
-                                                $cachefootprint->timereloaded < time() - @$this->config->cachingttl * 60) ||
+                                                $cachefootprint->timereloaded < time() - $this->config->cachingttl * 60) ||
                                                         $forcereload)) {
             $params = array('querykey' => $sqlkey, 'access' => $this->config->target);
             try {
