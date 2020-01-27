@@ -88,6 +88,14 @@ if ($ADMIN->fulltree) {
     $desc = get_string('crontraceon_desc', 'block_dashboard');
     $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
 
+    $key = 'block_dashboard/mapprovider';
+    $label = get_string('configmapprovider', 'block_dashboard');
+    $desc = get_string('configmapprovider_desc', 'block_dashboard');
+    $options = ['openlayers' => 'OpenLayers',
+                'googlemaps' => 'Google Maps'];
+    $default = 'openlayers';
+    $settings->add(new admin_setting_configselect($key, $label, $desc, $default, $options));
+
     if (block_dashboard_supports_feature('emulate/community') == 'pro') {
         // This will accept any.
         include_once($CFG->dirroot.'/blocks/dashboard/pro/prolib.php');

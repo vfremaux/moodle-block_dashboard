@@ -71,7 +71,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             include_once($CFG->dirroot.'/course/format/lib.php');
             $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
             if (!$pageid) {
-                $flexpage = course_page::get_current_page($COURSE->id);
+                $flexpage = \format\page\course_page::get_current_page($COURSE->id);
             } else {
                 $flexpage = new StdClass;
                 $flexpage->id = $pageid;
@@ -750,7 +750,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         if (!empty($hlabel)) {
-            $str .= '<tr valign="top" class="row">';
+            $str .= '<tr valign="top" class="dashboard-row">';
             if ($vkc > 1) {
                 $str .= '<th colspan="'.$vkc.'">&nbsp;</th>';
             } else {
@@ -760,7 +760,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $str .= '</tr>';
         }
 
-        $str .= '<tr class="row">';
+        $str .= '<tr class="dashboard-row">';
 
         $vlabels = array_values($vkeys->labels);
 
@@ -790,7 +790,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param arrayref $outputformats formats for above
      * @param arrayref $colourcoding an array of colour coding rules issued from table scope colourcoding settings
      */
-
     public function tree_view(&$theblock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding) {
         global $PAGE;
 
@@ -807,15 +806,21 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * prints and format data for googlemap plotting.
      */
     public function googlemaps_data(&$theblock, &$data, &$graphdesc) {
-        global $PAGE;
+        global $PAGE, $CFG;
+
+        $config = get_config('dashboard');
 
         if (!block_dashboard_supports_feature('graph/google')) {
             return 'Not supported in this distribution';
         }
-        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        include_once($CFG->dirroot.'/blocks/dashboard/pro/classes/output/renderer.php');
         $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
-        return $prorenderer->googlemaps_data($theblock, $data, $graphdesc);
+        if ($config->mapprovider == 'googlemaps') {
+            return $prorenderer->googlemaps_data($theblock, $data, $graphdesc);
+        } else {
+            return $prorenderer->olmaps_data($theblock, $data, $graphdesc);
+        }
     }
 
     /**
@@ -844,7 +849,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
             $pageid = optional_param('page', false, PARAM_INT);
             $template->ispageformatpage = !empty($pageid);
-            if ($page = course_page::get_current_page($COURSE->id)) {
+            if ($page = \format\page\course_page::get_current_page($COURSE->id)) {
                 $template->pageid = $page->id;
             }
         }
@@ -1165,13 +1170,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    public function tree_buttons(&$theblock, &$filterquerystring) {
+    public function tree_buttons(&$theblock, &$filterquerystring, $renderer) {
         global $PAGE;
 
         if (!block_dashboard_supports_feature('data/treeview')) {
             return 'Not supported in this distribution';
         }
-        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        include_once($CFG->dirroot.'/blocks/dashboard/pro/classes/output/renderer.php');
         $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
         return $prorenderer->tree_buttons($theblock, $filterquerystring, $this);

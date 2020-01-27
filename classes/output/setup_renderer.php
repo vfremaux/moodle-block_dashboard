@@ -126,7 +126,7 @@ class setup_renderer extends \plugin_renderer_base {
             $tab = new StdClass;
             list($tab->tabkey, $tab->tabname, $visible) = $tabarr;
             $tab->tabclass = ($tab->tabkey == 'querydesc') ? 'active ' : '';
-            $tab->tabclass .= ($visible) ? 'on' : 'off';
+            $tab->tabclass .= ($visible) ? 'on here' : 'off';
             $tab->tabname = str_replace(' ', '&nbsp;', $tab->tabname);
             $template->tabs[] = $tab;
         }
