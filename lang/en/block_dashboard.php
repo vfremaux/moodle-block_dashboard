@@ -279,6 +279,7 @@ $string['monday'] = 'Monday';
 $string['month'] = 'Month';
 $string['newdashboard'] = 'New dashboard';
 $string['nodata'] = 'No data available';
+$string['node'] = 'Data Node';
 $string['nofiles'] = 'No files';
 $string['noquerystored'] = 'No query stored';
 $string['norefresh'] = 'No refresh';
@@ -799,4 +800,8 @@ $string['tablecolormapping_help'] = '
 You may choose to colorize results (textual) in one output column using value filters mapped to HTML color definitions :
   - in the left side text area enter an evaluation expression replacing value by %% (f.e. %% == 0).
   - in the right side text area, enter the html colour code.
+';
+
+$string['configparent_help'] = '
+Give the alias of the query output field that designates the hierarchic binding. Often named "parent".
 ';

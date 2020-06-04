@@ -37,29 +37,16 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $sort = optional_param('tsort'.$theblock->instance->id, @$theblock->config->defaultsort, PARAM_TEXT);
 
         $template = new StdClass;
+        $template->debug = '';
+        $debug = optional_param('dashboarddebug', false, PARAM_BOOL);
 
         // Print description.
         if (isset($theblock->config->description)) {
-            // rewrite url.
-            $theblock->config->description = file_rewrite_pluginfile_urls($theblock->config->description, 'pluginfile.php',
-                                                                      $theblock->context->id, 'block_dashboard',
-                                                                      'description', null);
-            /*
-             * Default to FORMAT_HTML which is what will have been used before the
-             * editor was properly implemented for the block.
-             */
-
-            $filteropt = new stdClass;
-            $filteropt->overflowdiv = true;
-            if ($theblock->content_is_trusted()) {
-                // fancy html allowed only on course, category and system blocks.
-                $filteropt->noclean = true;
-            }
-
-            $template->description = format_text($theblock->config->description, $theblock->config->descriptionformat, $filteropt);
+            $template->description = $this->process_description($theblock);
         }
 
         $template->dhtmlxcalendarstyle = $this->dhtmlxcalendar_style();
+        $template->debug = '';
 
         if (!isset($theblock->config)) {
             $theblock->config = new StdClass;
@@ -68,7 +55,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $coursepage = '';
         if ($COURSE->format == 'page') {
-            include_once($CFG->dirroot.'/course/format/lib.php');
+            include_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
             $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
             if (!$pageid) {
                 $flexpage = \format\page\course_page::get_current_page($COURSE->id);
@@ -244,8 +231,8 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $template->data = $OUTPUT->notification(get_string('nodata', 'block_dashboard'));
 
             // Showing query.
-            if (@$theblock->config->showquery) {
-                $template->query = $theblock->filteredsql;
+            if (!empty($theblock->config->showquery)) {
+                $template->query = $theblock->sql;
             }
 
             return $this->render_from_template('block_dashboard/dashboard', $template);
@@ -423,26 +410,29 @@ class block_dashboard_renderer extends plugin_renderer_base {
                     eval($matrixst.";");
                 } else {
 
-                    $debug = optional_param('debug', false, PARAM_BOOL);
-                    $template->debug = '';
+                    if ($debug) {
+                        $template->debug = 'Tree debugger on<br/>';
+                    }
 
                     // Treeview.
                     $resultarr = array_values((array)$result);
                     $resultid = $resultarr[0];
+                    $parentserie = $theblock->config->parentserie;
                     if (!empty($parentserie)) {
                         if (!empty($result->$parentserie)) {
                             // Non root node, attache to his parent if we found it.
                             if (array_key_exists($result->$parentserie, $treekeys)) {
-                                if (!empty($debug)) {
+                                if ($debug) {
                                     $template->debug .= 'binding to '. $result->$parentserie.'. ';
                                 }
                                 $treekeys[$result->$parentserie]->childs[$resultid] = $result;
                                 if (!array_key_exists($resultid, $treekeys)) {
+                                    // New result. Add it to treekeys pool.
                                     $treekeys[$resultid] = $result;
                                 }
                             } else {
                                 // In case nodes do not come in correct order, do not connect but register only.
-                                if (!empty($debug)) {
+                                if ($debug) {
                                     $template->debug .= 'waiting for '. $result->$parentserie.'. ';
                                 }
                                 $waitingnodes[$resultid] = $result;
@@ -451,19 +441,21 @@ class block_dashboard_renderer extends plugin_renderer_base {
                                 }
                             }
                         } else {
-                            // Root node.
-                            if (!empty($debug)) {
-                                $template->debug .= 'root as '. $resultid.'. ';
-                            }
+                            // Root node. No parent.
                             if (!array_key_exists($resultid, $treekeys)) {
                                 $treekeys[$resultid] = $result;
                             }
                             $treedata[$resultid] = &$treekeys[$resultid];
                         }
                     } else {
+                        // No parent serie configured.
+                        // My forget results ? 
+                        throw new moodle_exception("Tree display needs a parent serie to be configured.");
+                        /*
                         if (!array_key_exists($resultid, $treekeys)) {
                             $treekeys[$resultid] = $result;
                         }
+                        */
                     }
                 }
             }
@@ -564,9 +556,6 @@ class block_dashboard_renderer extends plugin_renderer_base {
             if (!empty($waitingnodes)) {
                 foreach ($waitingnodes as $wnid => $wn) {
                     if (array_key_exists($wn->$parentserie, $treekeys)) {
-                        if (!empty($debug)) {
-                            $template->debug .= ' postbinding to '. $wn->$parentserie.'. ';
-                        }
                         $treekeys[$wn->$parentserie]->childs[$wnid] = $wn;
                         unset($waitingnodes[$wnid]); // Free some stuff.
                     }
@@ -574,7 +563,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             }
         }
 
-        if (@$theblock->config->inblocklayout) {
+        if (!empty($theblock->config->inblocklayout)) {
             $params = array('id' => $COURSE->id.$coursepage, 'tsort'.$theblock->instance->id => $sort);
             $url = new moodle_url('/course/view.php', $params);
         } else {
@@ -612,7 +601,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
                                                    $theblock->outputf,
                                                    $theblock->colourcoding,
                                                    true);
-                $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring);
+                $template->controlbuttons = $this->tree_buttons($theblock, $filterquerystring, $this);
             }
         }
 
@@ -649,8 +638,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         // Showing query.
-        if (@$theblock->config->showquery) {
-            $template->query = $theblock->filteredsql;
+        if (!empty($theblock->config->showquery)) {
+            $template->query = $this->sql_postprocess($theblock->sql);
+        }
+
+        // Showing filter queries.
+        if (!empty($theblock->config->showfilterqueries)) {
+            $template->filterqueries = $this->sql_postprocess($theblock->filterqueries);
         }
 
         // Showing SQL benches.
@@ -666,6 +660,26 @@ class block_dashboard_renderer extends plugin_renderer_base {
         }
 
         return $this->render_from_template('block_dashboard/dashboard', $template);
+    }
+
+    public function process_description($theblock) {
+        // rewrite url.
+        $theblock->config->description = file_rewrite_pluginfile_urls($theblock->config->description, 'pluginfile.php',
+                                                                  $theblock->context->id, 'block_dashboard',
+                                                                  'description', null);
+        /*
+         * Default to FORMAT_HTML which is what will have been used before the
+         * editor was properly implemented for the block.
+         */
+
+        $filteropt = new stdClass;
+        $filteropt->overflowdiv = true;
+        if ($theblock->content_is_trusted()) {
+            // fancy html allowed only on course, category and system blocks.
+            $filteropt->noclean = true;
+        }
+
+        return format_text($theblock->config->description, $theblock->config->descriptionformat, $filteropt);
     }
 
     /**
@@ -791,12 +805,12 @@ class block_dashboard_renderer extends plugin_renderer_base {
      * @param arrayref $colourcoding an array of colour coding rules issued from table scope colourcoding settings
      */
     public function tree_view(&$theblock, &$tree, &$treeoutput, &$outputfields, &$outputformats, &$colorcoding) {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         if (!block_dashboard_supports_feature('data/treeview')) {
             return 'Not supported in this distribution';
         }
-        include_once($CFG->dirroot.'/blocks/dashboard/classes/output/renderer.php');
+        include_once($CFG->dirroot.'/blocks/dashboard/pro/classes/output/renderer.php');
         $prorenderer = new \block_dashboard\output\pro_renderer($PAGE, 'html');
 
         return $prorenderer->tree_view($theblock, $tree, $treeoutput, $outputfields, $outputformats, $colorcoding);
@@ -846,7 +860,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $template->blockidparam = optional_param('blockid', 0, PARAM_INT);
 
         if ($COURSE->format == 'page') {
-            require_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
+            include_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
             $pageid = optional_param('page', false, PARAM_INT);
             $template->ispageformatpage = !empty($pageid);
             if ($page = \format\page\course_page::get_current_page($COURSE->id)) {
@@ -889,6 +903,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
 
         $alllabels = array_keys($theblock->filterfields->labels);
 
+        $theblock->filterqueries = '';
         foreach ($alllabels as $afield) {
 
             if (empty($afield)) {
@@ -902,10 +917,14 @@ class block_dashboard_renderer extends plugin_renderer_base {
             $filtertpl->fieldname = ($cond) ? $theblock->filterfields->translations[$afield] : $afield;
 
             $filterresults = $theblock->filter_get_results($afield, $filtertpl->fieldname, false, false, $str);
+            if (!empty($theblock->filterqueries)) {
+                // Append query to block for display.
+                $theblock->filterqueries .= $str."<br/>";
+            }
 
             if ($filterresults) {
                 $filteropts = array();
-                if (!$theblock->is_filter_single($afield)) {
+                if ($theblock->is_filter_single($afield) && !$theblock->is_filter_unique($afield)) {
                     $filteropts['*'] = '*';
                 }
 
@@ -1171,7 +1190,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
     }
 
     public function tree_buttons(&$theblock, &$filterquerystring, $renderer) {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         if (!block_dashboard_supports_feature('data/treeview')) {
             return 'Not supported in this distribution';
@@ -1270,5 +1289,13 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $cssurl = $CFG->wwwroot.'/blocks/dashboard/js/dhtmlxCalendar/codebase/skins/dhtmlxcalendar_dhx_web.css';
         $str .= '<link type="text/css" rel="stylesheet" href="'.$cssurl.'" />';
         return $str;
+    }
+
+    protected function sql_postprocess($sql) {
+        global $CFG;
+
+        $sql = preg_replace('/\\{(.*?)\}/', $CFG->prefix.'\\1', $sql);
+
+        return $sql;
     }
 }

@@ -386,7 +386,6 @@ class setup_renderer extends \plugin_renderer_base {
             $template->splitsumsonsort = $theblock->config->splitsumsonsort;
         }
 
-
         $template->strconfigoutputfieldslabels = get_string('configoutputfieldslabels', 'block_dashboard');
 
         if (isset($theblock->config) && isset($theblock->config->fieldlabels)) {
@@ -879,7 +878,6 @@ class setup_renderer extends \plugin_renderer_base {
 
         return $this->render_from_template('block_dashboard/fileoutputparams', $template);
     }
-
 
     /**
      *
