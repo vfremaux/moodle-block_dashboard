@@ -44,6 +44,8 @@ class block_dashboard extends block_base {
 
     public $paramvalues; // Collects effective param values set by user.
 
+    public $sql; // The data dashboard main SQL.
+
     public $filters; // Stores filter definitions.
 
     public $filteredsql; // Stores filter filtered sql.
@@ -145,23 +147,37 @@ class block_dashboard extends block_base {
         }
 
         $this->content = new StdClass;
+        $this->content->text = '';
+        $this->content->footer = '';
 
         if (@$this->config->inblocklayout) {
             $this->content->text = $renderer->render_dashboard($this);
         } else {
+
+            if (!empty($this->config->description)) {
+                $this->content->text .= '<div class="block-dashboard-description">';
+                $this-> content->text .= $renderer->process_description($this);
+                $this->content->text .= '</div>';
+            }
+
             $viewdashboardstr = get_string('viewdashboard', 'block_dashboard');
             $params = array('id' => $COURSE->id, 'blockid' => $this->instance->id);
-            $dashboardviewurl = new moodle_url('/blocks/dashboard/view.php', $params);
-            $this->content->text = '<a href="'.$dashboardviewurl.'">'.$viewdashboardstr.'</a>';
+            $attrs = [
+                'href' => new moodle_url('/blocks/dashboard/view.php', $params),
+                'class' => 'btn btn-primary'
+            ];
+            $this->content->text .= html_writer::tag('a', $viewdashboardstr, $attrs);
         }
 
         if (has_capability('block/dashboard:configure', $context) && $PAGE->user_is_editing()) {
             $params = array();
             $params['id'] = $COURSE->id;
             $params['instance'] = $this->instance->id;
-            $options['href'] = new moodle_url('/blocks/dashboard/setup.php', $params);
-            $options['class'] = 'smalltext';
-            $editlink = html_writer::tag('a', get_string('configure', 'block_dashboard'), $options);
+            $attrs = [
+                'href' => new moodle_url('/blocks/dashboard/setup.php', $params),
+                'class' => 'smalltext dahsboard-configure-link'
+            ];
+            $editlink = html_writer::tag('a', get_string('configure', 'block_dashboard'), $attrs);
             $this->content->footer = $editlink;
         } else {
             $this->content->footer = '';
@@ -428,6 +444,7 @@ class block_dashboard extends block_base {
                 // Try desagregate.
                 $sql = preg_replace('/MAX\(([^\(]+)\)/si', '$1', $sql);
                 $sql = preg_replace('/SUM\((.*?)\) AS/si', '$1 AS', $sql);
+                $sql = preg_replace('/COUNT\(\*\)/si', 1, $sql);
                 $sql = preg_replace('/COUNT\((?:DISTINCT)?([^\(]+)\)/si', '$1', $sql);
 
                 // Purge from unwanted clauses.
@@ -455,9 +472,10 @@ class block_dashboard extends block_base {
         // Filter values return from cache.
         if (isset($FILTERSET) && array_key_exists($fielddef, $FILTERSET) && empty($specialvalue)) {
             if (!empty($this->config->showfilterqueries)) {
-                if (!is_null($printoutbuffer)) {
-                    $printoutbuffer .= '<div class="dashboard-filter-query"><b>STATIC CACHED DATA FILTER :</b> '.$filtersql.'</div>';
+                if (is_null($printoutbuffer)) {
+                    $printoutbuffer = '';
                 }
+                $printoutbuffer .= '<div class="dashboard-filter-query"><b>STATIC CACHED DATA FILTER :</b> '.$filtersql.'</div>';
             }
             return $FILTERSET[$fielddef];
         }
@@ -561,6 +579,10 @@ class block_dashboard extends block_base {
                 $t2 = (float)$usec + (float)$sec;
             } else {
                 $notretrievablestr = get_string('filternotretrievable', 'block_dashboard');
+                if (!isset($this->content)) {
+                    $this->content = new StdClass;
+                    $this->content->text = '';
+                }
                 $this->content->text .= "<div class=\"dashboard-special\">$notretrievablestr</div>";
             }
 
@@ -727,10 +749,10 @@ class block_dashboard extends block_base {
             $bench->start = time();
         }
 
-		if (!empty($limit)) {
-			$sql = preg_replace('/LIMIT.*$/', '', $sql);
-			$sql .= " LIMIT $limit OFFSET $offset ";
-		}
+        if (!empty($limit)) {
+            $sql = preg_replace('/LIMIT.*$/', '', $sql);
+            $sql .= " LIMIT $limit OFFSET $offset ";
+        }
 
         if ($rs = $DB->get_recordset_sql($sql)) {
             while ($rs->valid()) {
@@ -756,7 +778,7 @@ class block_dashboard extends block_base {
         }
 
         if ($limit) {
-            if ($rs = $DB->get_recordset_sql($sql, $offset, $limit)) {
+            if ($rs = $DB->get_recordset_sql($sql, array(), $offset, $limit)) {
                 while ($rs->valid()) {
                     $rec = $rs->current();
                     $recarr = array_values((array)$rec);
@@ -997,22 +1019,29 @@ class block_dashboard extends block_base {
      * a global filter will be catched by all dashboard instances in the same page
      */
     public function is_filter_global($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 'g') !== false;
+        return preg_match('/g/', $this->filterfields->options[$filterkey]);
     }
 
     /**
      * determines if filter is single
-     * a single filter can only be constraint by a single value
+     * a single filter can only be constraint by a single value or eventualy '*' catch all
      */
     public function is_filter_single($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 's') !== false;
+        return !preg_match('/m/', $this->filterfields->options[$filterkey]);
+    }
+
+    /**
+     * determines if filter is unique : that is single and accepts only one filter explicit value.
+     */
+    public function is_filter_unique($filterkey) {
+        return !preg_match('/s/', $this->filterfields->options[$filterkey]);
     }
 
     /**
      * determines if filter must desaggregate from original query
      */
     public function allow_filter_desaggregate($filterkey) {
-        return strstr($this->filterfields->options[$filterkey], 'x') === false;
+        return preg_match('/x/', $this->filterfields->options[$filterkey]);
     }
 
     /**
@@ -1373,7 +1402,14 @@ class block_dashboard extends block_base {
         $filterinputs = array();
 
         foreach ($filterkeys as $key) {
-            $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
+            $radical = str_replace('filter'.$this->instance->id.'_', '', $key);
+            $cond = array_key_exists($radical, $this->filterfields->translations);
+            $canonicalfilter = ($cond) ? $this->filterfields->translations[$radical] : $radical;
+            if ($this->is_filter_single($canonicalfilter)) {
+                $filterinputs[$key] = clean_param($filtersinputsource[$key], PARAM_TEXT);
+            } else {
+                $filterinputs[$key] = clean_param_array($filtersinputsource[$key], PARAM_TEXT);
+            }
         }
 
         foreach ($globalfilterkeys as $key) {

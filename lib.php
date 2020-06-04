@@ -199,7 +199,7 @@ function dashboard_table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$
         if ($level < $keydeepness) {
             dashboard_table_explore_rec($theblock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
         } else {
-            $pre = "<tr class=\"row r{$r}\" >";
+            $pre = "<tr class=\"dashboard-row r{$r}\" >";
             $r = ($r + 1) % 2;
             $c = 0;
             foreach ($pathstack as $pathelm) {

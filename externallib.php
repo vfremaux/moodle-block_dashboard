@@ -148,7 +148,7 @@ class block_dashboard_external extends external_api {
     public static function get_raw_data_parameters() {
         return new external_function_parameters(
                 array('blockid' => new external_value(PARAM_INT, 'block instance id')
-                )
+            )
         );
     }
 
