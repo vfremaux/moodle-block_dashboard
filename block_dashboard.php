@@ -117,7 +117,7 @@ class block_dashboard extends block_base {
         $config = clone($data);
         // Move embedded files into a proper filearea and adjust HTML links to match
         $config->description = file_save_draft_area_files(@$data->description['itemid'], $this->context->id, 'block_dashboard', 'description',
-                                                   0, array('subdirs'=>true), @$data->description['text']);
+                                                   0, array('subdirs' => true), @$data->description['text']);
         $config->descriptionformat = @$data->description['format'];
         return parent::instance_config_save($config, $nolongerused);
     }
