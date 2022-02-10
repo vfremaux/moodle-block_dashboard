@@ -128,24 +128,69 @@ div.dashboard-special{
    font-size:0.8em;
 }
 
-.dashboard-tree1 li{
-   font-size:1.1em;
-   line-height:1.3em;
+.dashboard-tree1 .even {
+    background-color: white;
 }
 
-.dashboard-tree2 li{
-   font-size:1.0em;
-   line-height:1.2em;
+.dashboard-tree1 .odd {
+    background-color: #eee;
 }
 
-.dashboard-tree3 li{
-   font-size:0.9em;
-   line-height:1.1em;
+ul.dashboard-tree1 {
+    padding-right: 10px;
 }
 
-.dashboard-tree4 li{
-   font-size:0.8em;
-   line-height:1.0em;
+ul.dashboard-tree2,
+ul.dashboard-tree3,
+ul.dashboard-tree4,
+ul.dashboard-tree5,
+ul.dashboard-tree6,
+ul.dashboard-tree7,
+ul.dashboard-tree8,
+ul.dashboard-tree9,
+ul.dashboard-tree10 {
+    padding-right: 0;
+}
+
+.dashboard-tree1 li {
+    padding:6px 0 6px 0;
+    line-height: 1.3em;
+    min-height: 3em;
+}
+
+.dashboard-tree1 .row-datum {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-left: 10px;
+    padding: 5px;
+    background-color: white;
+    min-width: 6em;
+    max-width: 40em;
+    display: inline-block;
+}
+
+.row-head .row-datum-head {
+    margin-left: 10px;
+    padding: 5px;
+    background-color: #444;
+    color: white;
+    min-width: 6em;
+    display: inline-block;
+}
+
+.row-head {
+    color:white;
+    background-color: #444;
+    padding:6px 0 6px 0;
+    line-height: 1.3em;
+    height: 3em;
+    display: flex;
+    justify-content: space-between;
+}
+
+.row-content {
+    display: flex;
+    justify-content: space-between;
 }
 
 .dashboard-table td.coltotal{

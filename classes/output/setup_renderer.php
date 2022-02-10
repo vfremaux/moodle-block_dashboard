@@ -126,7 +126,7 @@ class setup_renderer extends \plugin_renderer_base {
             $tab = new StdClass;
             list($tab->tabkey, $tab->tabname, $visible) = $tabarr;
             $tab->tabclass = ($tab->tabkey == 'querydesc') ? 'active ' : '';
-            $tab->tabclass .= ($visible) ? 'on' : 'off';
+            $tab->tabclass .= ($visible) ? 'on here' : 'off';
             $tab->tabname = str_replace(' ', '&nbsp;', $tab->tabname);
             $template->tabs[] = $tab;
         }
@@ -242,6 +242,7 @@ class setup_renderer extends \plugin_renderer_base {
         $template->strsqlparamlabel = get_string('sqlparamlabel', 'block_dashboard');
         $template->strsqlparamtype = get_string('sqlparamtype', 'block_dashboard');
         $template->strsqlparamvalues = get_string('sqlparamvalues', 'block_dashboard');
+        $template->strsqlparamdefault = get_string('sqlparamdefault', 'block_dashboard');
         $template->strparamas = get_string('paramas', 'block_dashboard');
         $template->strassql = get_string('paramassql', 'block_dashboard');
         $template->strasvar = get_string('paramasvar', 'block_dashboard');
@@ -262,6 +263,7 @@ class setup_renderer extends \plugin_renderer_base {
             $param->varkey = 'sqlparamvar'.$i;
             $param->labelkey = 'sqlparamlabel'.$i;
             $param->valueskey = 'sqlparamvalues'.$i;
+            $param->defaultkey = 'sqlparamdefault'.$i;
 
             switch (@$theblock->config->{$param->asvarkey}) {
                 case 'sql': {
@@ -290,6 +292,7 @@ class setup_renderer extends \plugin_renderer_base {
             $param->typeselect = html_writer::select($typeopts, $typekey, $typevalue);
 
             $param->valueskeyvalue = @$theblock->config->{$param->valueskey};
+            $param->defaultkeyvalue = @$theblock->config->{$param->defaultkey};
             $template->params[] = $param;
         }
 
@@ -382,7 +385,6 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->splitsumsonsort)) {
             $template->splitsumsonsort = $theblock->config->splitsumsonsort;
         }
-
 
         $template->strconfigoutputfieldslabels = get_string('configoutputfieldslabels', 'block_dashboard');
 
@@ -808,12 +810,17 @@ class setup_renderer extends \plugin_renderer_base {
         $template->helpiconconfigfileoutput = $this->output->help_icon('configfileoutput', 'block_dashboard');
         $template->strconfigfileoutput = get_string('configfileoutput', 'block_dashboard');
 
-        $template->helpiconconfigfileheaders = $this->output->help_icon('configfileheaders', 'block_dashboard');
-        $template->strconfigfileheaders = get_string('configfileheaders', 'block_dashboard');
-
         $template->fileoutput = '';
         if (isset($theblock->config) && isset($theblock->config->fileoutput)) {
             $template->fileoutput = $theblock->config->fileoutput;
+        }
+
+        $template->helpiconconfigfileheaders = $this->output->help_icon('configfileheaders', 'block_dashboard');
+        $template->strconfigfileheaders = get_string('configfileheaders', 'block_dashboard');
+
+        $template->fileheaders = '';
+        if (isset($theblock->config) && isset($theblock->config->fileheaders)) {
+            $template->fileheaders = $theblock->config->fileheaders;
         }
 
         $template->helpiconconfigformatting = $this->output->help_icon('configformatting', 'block_dashboard');
@@ -871,7 +878,6 @@ class setup_renderer extends \plugin_renderer_base {
 
         return $this->render_from_template('block_dashboard/fileoutputparams', $template);
     }
-
 
     /**
      *

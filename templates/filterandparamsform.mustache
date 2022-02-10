@@ -23,7 +23,7 @@
     * none
 
 }}
-<!-- filterandparamsform -->
+<!-- block_dashboard/filterandparamsform -->
 <form class="dashboard-filter-form" id="dashboard-form-{{blockid}}" name="dashboardform{{blockid}}" method="GET">
     <input type="hidden" name="id" value="{{courseid}}" />
 
@@ -46,11 +46,11 @@
     {{{params}}}
 
     {{#autosubmit}}
-        <span id="dashboard-auto-{{blockid}}" class="dashboard-filter-autosubmit" />
+        <span id="dashboard-auto-{{blockid}}" class="dashboard-filter-autosubmit"></span>
     {{/autosubmit}}
     {{^autosubmit}}
         <input type="button" id="dashboard-filter-submit-{{blockid}}" name="filtersubmit{{blockid}}_" class="dashboard-filter-submitters" value="{{strdofilter}}" />
     {{/autosubmit}}
 
 </form>
-<!-- /filterandparamsform -->
+<!-- /block_dashboard/filterandparamsform -->

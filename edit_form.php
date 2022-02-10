@@ -41,6 +41,10 @@ class block_dashboard_edit_form extends block_edit_form {
         $mform->setType('config_title', PARAM_MULTILANG);
         $mform->setDefault('config_title', get_string('newdashboard', 'block_dashboard'));
 
+        $editoroptions = array('maxfiles' => EDITOR_UNLIMITED_FILES, 'noclean' => true, 'context' => $this->block->context);
+        $mform->addElement('editor', 'config_description', get_string('configdescription', 'block_dashboard'), null, $editoroptions);
+        $mform->setType('config_description', PARAM_CLEANHTML);
+
         $mform->addElement('checkbox', 'config_hidetitle', '', get_string('checktohide', 'block_dashboard'));
 
         // Layout settings ---------------------------------------------------------------.
@@ -98,7 +102,27 @@ class block_dashboard_edit_form extends block_edit_form {
                     $defaults->$varkey = $paramdef['sqlparamvar'];
                 }
             }
+
+            if (!empty($this->block->config->description)) {
+                $text = $this->block->config->description;
+                $draftid_editor = file_get_submitted_draft_itemid('config_description');
+                if (empty($text)) {
+                    $currenttext = '';
+                } else {
+                    $currenttext = $text;
+                }
+                $defaults->config_description['text'] = file_prepare_draft_area($draftid_editor, $this->block->context->id,
+                                                                                'block_dashboard', 'description', 0,
+                                                                                array('subdirs' => true), $currenttext);
+                $defaults->config_description['itemid'] = $draftid_editor;
+                $defaults->config_description['format'] = $this->block->config->descriptionformat;
+
+                // have to delete text here, otherwise parent::set_data will empty content
+                // of editor
+                unset($this->block->config->description);
+            }
         }
+
         parent::set_data($defaults);
     }
 }

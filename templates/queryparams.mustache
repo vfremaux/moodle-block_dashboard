@@ -23,6 +23,7 @@
     * none
 
 }}
+<!-- block_dashboard/queryparams -->
 <fieldset id="dashboardsettings-panel-queryparams" class="dashboardsettings-panel off">
 <legend>{{strqueryparams}}</legend>
 <table class="dashboard-setup">
@@ -47,7 +48,7 @@
         </td>
 
         <td align="right" width="25%">
-        <b>{{strsqlparamvalues}}</b>
+        <b>{{strsqlparamvalues}}<br/>{{strsqlparamdefault}}</b>
         </td>
     </tr>
 
@@ -70,10 +71,12 @@
     </td>
 
     <td align="right" width="25%">
-        <textarea name="{{valueskey}}" rows="5" cols="30">{{valueskeyvalue}}</textarea>
+        <textarea name="{{valueskey}}" rows="5" cols="30">{{valueskeyvalue}}</textarea><br/>
+        <input type="text" size="20" name="{{defaultkey}}" value="{{defaultkeyvalue}}" />
     </td>
     </tr>
 {{/params}}
 
 </table>
 </fieldset>
+<!-- /block_dashboard/queryparams -->

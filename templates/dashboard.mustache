@@ -23,51 +23,63 @@
     * none
 
 }}
+<!-- block_dashboard/dashboard -->
 <div class="dashboard-panel">
 
-{{{dhtmlxcalendarstyle}}}
+    {{{dhtmlxcalendarstyle}}}
 
-{{#errormsg}}
-   {{{errormsg}}}
-{{/errormsg}}
+    {{#errormsg}}
+       {{{errormsg}}}
+    {{/errormsg}}
+    {{^errormsg}}
+        {{{warningmsg}}}
+    {{/errormsg}}
 
-{{^errormsg}}
-{{{warningmsg}}}
+    {{#description}}
+    <div class="block-dashboard-description">{{{description}}}</div>
+    {{/description}}
 
-{{{debug}}}
+    {{{debug}}}
 
-{{{filterandparams}}}
+    {{{filterandparams}}}
 
-{{{data}}}
+    {{^errormsg}}
+    {{{data}}}
+    {{/errormsg}}
 
-{{{summators}}}
+    {{{summators}}}
 
-{{#graph}}
-<div class="dashboard-graph-box">
-  {{{graph}}}
+    {{#graph}}
+    <div class="dashboard-graph-box">
+      {{{graph}}}
+    </div>
+    {{/graph}}
+
+    {{{controlbuttons}}}
+
+    {{#query}}
+    <div class="dashboard-query-box">
+        <pre>{{{query}}}</pre>
+    </div>
+    {{/query}}
+
+    {{#filterqueries}}
+    <div class="dashboard-filter-query-box">
+        <pre>{{{filterqueries}}}</pre>
+    </div>
+    {{/filterqueries}}
+
+    {{#benches}}
+    <div class="dashboard-benches-box">
+    <table width="100%" class="dashboard-benches">
+    {{#benchrows}}
+        <tr>
+            <td class="param">{{name}}</td>
+            <td class="value">{{value}} sec</td>
+        </tr>
+    {{/benchrows}}
+    </table>
+    </div>
+    {{/benches}}
 </div>
-{{/graph}}
-
-{{{controlbuttons}}}
-
-{{#query}}
-<div class="dashboard-query-box">
-    <pre>{{{query}}}</pre>
-</div>
-{{/query}}
-
-{{#benches}}
-<div class="dashboard-benches-box">
-<table width="100%" class="dashboard-benches">
-{{#benchrows}}
-    <tr>
-        <td class="param">{{name}}</td>
-        <td class="value">{{value}} sec</td>
-    </tr>
-{{/benchrows}}
-</table>
-</div>
-{{/benches}}
-
-{{/errormsg}}
-</div>
+<!-- /block_dashboard/dashboard -->

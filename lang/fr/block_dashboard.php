@@ -58,6 +58,7 @@ $string['configdisplay'] = 'Eléments d\'affichage&nbsp;';
 $string['configenablehorizsums'] = 'Activer les totaux horizontaux';
 $string['configenablevertsums'] = 'Activer les totaux verticaux';
 $string['configeventmapping'] = 'Mapping de données pour les événements';
+$string['configdescription'] = 'Description';
 $string['configfileformat'] = 'Type de fichier de sortie&nbsp;';
 $string['configfileheaders'] = 'En-têtes du fichier&nbsp;';
 $string['configfilelocation'] = 'Emplacement du fichier (dans moodledata) ';
@@ -171,8 +172,6 @@ $string['dofilter'] = 'Filtrer';
 $string['donut'] = 'Donut';
 $string['dropconfig'] = 'Copier la configuration';
 $string['editingnoexecute'] = ' Le tableau de bord ne peut pas exécuter de requêtes en mode édition.';
-$string['emulatecommunity'] = 'Emuler la version communautaire';
-$string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire. Certaines fonctionnalités ne seront plus disponibles.';
 $string['enabled'] = ' activé ';
 $string['eventdesc'] = 'Série des descriptions d\'événement&nbsp;';
 $string['eventend'] = 'Série des fins de plage&nbsp;';
@@ -210,10 +209,6 @@ $string['invalidorobsoletequery'] = 'Requête obsolete ou invalide.';
 $string['line'] = 'Lignes';
 $string['linear'] = 'Linéaire';
 $string['listvalue'] = 'Liste';
-$string['licenseprovider'] = 'Fournisseur version Pro';
-$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
-$string['licensekey'] = 'Clef de license pro';
-$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['log'] = 'Logarithmique';
 $string['maptypehybrid'] = 'Vue combinée';
 $string['maptyperoadmap'] = 'Carte routière';
@@ -238,7 +233,6 @@ $string['paramasvar'] = 'une variable';
 $string['paramassql'] = 'une clause where';
 $string['paramascol'] = 'une colonne de sortie';
 $string['pie'] = 'Camenberts';
-$string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Tableau de bord';
 $string['publishinblock'] = 'Dans l\'espace du bloc';
 $string['publishinpage'] = 'Dans une page séparée';
@@ -254,6 +248,7 @@ $string['semicolon'] = 'Point-virgule';
 $string['setup'] = 'Configuration';
 $string['sqlinserts'] = 'Instructions SQL INSERT';
 $string['sqlparamlabel'] = 'Libellé';
+$string['sqlparamdefault'] = 'Valeur par défaut';
 $string['sqlparamtype'] = 'Type';
 $string['sqlparamvalues'] = 'Valeurs';
 $string['sqlparamvar'] = 'Champ SQL';
@@ -704,13 +699,6 @@ $string['configfilelocationadmin_help'] = '
 
 $string['confighorodatefiles_help'] = 'Si actif, chaque fichier généré sera complété par un horodatage';
 
-$string['plugindist_desc'] = '<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
-correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugn existe et est distribuée
-sous certaines conditions, afin de soutenir l\'effort de développement, amélioration, documentation et suivi des versions.</p>
-<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
-<ul><li><a href="http://service.activeprolearn.com/local/shop/front/view.php?id=1">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>';
-
 $string['configqueryrotate_help'] = '
 # Pivotement des données
 
@@ -740,3 +728,5 @@ Vous pouvez coloriser les résultats dans une colonne de résultat :
   - dans la zone de texte de gauche, en entrant une expression évaluante qui remplace la valeur de sortie par %% (f.e. %% == 0).
   - dans la zone de droite, le code couleur HTML de la colorisation (couleur de fond).
 ';
+
+include(__DIR__.'/pro_additional_strings.php');
