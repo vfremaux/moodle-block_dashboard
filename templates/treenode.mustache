@@ -1,0 +1,34 @@
+
+<!-- block_dashboard/treenode -->
+
+{{#firstlevel}}
+<li class="row-head">
+    <div>
+        {{#str}}node, block_dashboard{{/str}}
+    </div>
+    <div class="row-data">
+        {{#outputs}}
+        <div class="row-datum-head">
+            {{outputlabel}}
+        </div>
+        {{/outputs}}
+    </div>
+</li>
+{{/firstlevel}}
+
+<ul class="dashboard-tree{{level}}">
+    {{#nodes}}
+    <li class="row-content {{rowclass}}">
+        <div class="nodename">
+            {{{nodecontent}}}
+        </div>
+        <div class="row-data">
+            {{#data}}
+            <div class="row-datum">{{datum}}</div>
+            {{/data}}
+        </div>
+    </li>
+    {{{children}}}
+    {{/nodes}}
+</ul>
+<!-- /block_dashboard/treenode -->

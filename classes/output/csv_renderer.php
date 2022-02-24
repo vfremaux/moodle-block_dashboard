@@ -23,6 +23,8 @@
  */
 namespace block_dashboard\output;
 
+use StdClass;
+
 defined('MOODLE_INTERNAL') || die();
 
 class csv_renderer extends \plugin_renderer_base {
@@ -198,11 +200,11 @@ class csv_renderer extends \plugin_renderer_base {
      * An HTML raster for a matrix cross table
      * printing raster uses a recursive cell drilldown over dynamic matrix dimension
      */
-    function cross_table_csv(&$theblock, &$m, &$hcols) {
+    public function cross_table_csv($theblock, $m, $hcols) {
 
         $str = '';
 
-        $str .= $this->table_header_csv($theblock, $hcols);
+        $this->table_header_csv($str, $theblock, $hcols);
         // Print flipped array.
         $path = array();
 
@@ -210,7 +212,7 @@ class csv_renderer extends \plugin_renderer_base {
         $theblock->subsums->subs = array();
         $theblock->subsums->all = array();
 
-        $this->table_explore_rec_csv($theblock, $path, $hcols, $m);
+        $this->table_explore_rec_csv($theblock, $path, $hcols, $m, $str);
 
         return $str;
     }
@@ -218,7 +220,7 @@ class csv_renderer extends \plugin_renderer_base {
     /**
      * Recursive worker for CSV table writing
      */
-    function table_explore_rec_csv(&$theblock, &$pathstack, &$hcols, &$t) {
+    public function table_explore_rec_csv($theblock, &$pathstack, $hcols, $t, &$str) {
         global $CFG;
 
         $config = get_config('block_dashboard');
@@ -236,7 +238,7 @@ class csv_renderer extends \plugin_renderer_base {
 
             $level++;
             if ($level < $keydeepness) {
-                $this->table_explore_rec_csv($theblock, $pathstack, $hcols, $v, $return);
+                $this->table_explore_rec_csv($theblock, $pathstack, $hcols, $v, $str);
             } else {
                 $r = ($r + 1) % 2;
                 $c = 0;
@@ -308,14 +310,12 @@ class csv_renderer extends \plugin_renderer_base {
             $level--;
             array_pop($pathstack);
         }
-
-        return $str;
     }
 
     /**
      * prints the first line as column titles
      */
-    function dashboard_print_table_header_csv(&$str, &$theblock, &$hcols) {
+    public function table_header_csv(&$str, &$theblock, &$hcols) {
         global $CFG;
 
         $config = get_config('block_dashboard');
