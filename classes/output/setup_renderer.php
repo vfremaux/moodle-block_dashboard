@@ -126,7 +126,7 @@ class setup_renderer extends \plugin_renderer_base {
             $tab = new StdClass;
             list($tab->tabkey, $tab->tabname, $visible) = $tabarr;
             $tab->tabclass = ($tab->tabkey == 'querydesc') ? 'active ' : '';
-            $tab->tabclass .= ($visible) ? 'on' : 'off';
+            $tab->tabclass .= ($visible) ? 'on here' : 'off';
             $tab->tabname = str_replace(' ', '&nbsp;', $tab->tabname);
             $template->tabs[] = $tab;
         }
@@ -385,7 +385,6 @@ class setup_renderer extends \plugin_renderer_base {
         if (isset($theblock->config) && isset($theblock->config->splitsumsonsort)) {
             $template->splitsumsonsort = $theblock->config->splitsumsonsort;
         }
-
 
         $template->strconfigoutputfieldslabels = get_string('configoutputfieldslabels', 'block_dashboard');
 
@@ -879,7 +878,6 @@ class setup_renderer extends \plugin_renderer_base {
 
         return $this->render_from_template('block_dashboard/fileoutputparams', $template);
     }
-
 
     /**
      *
