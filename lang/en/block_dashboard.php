@@ -32,6 +32,8 @@ $string['dashboard:export'] = 'Export data (web service)';
 // Privacy.
 $string['privacy:metadata'] = 'The Dashboard block does not store any personal data about any user.';
 
+$string['cachedef_aggregate'] = 'Query aggregates cache';
+
 $string['backtocourse'] = 'Back to course';
 $string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';

@@ -148,8 +148,8 @@ if ($results) {
         eval($matrixst.";");
     }
 
-    debug_trace("Final Matrix", TRACE_DEBUG);
-    debug_trace($m, TRACE_DEBUG);
+    debug_trace("Final Matrix", TRACE_DATA);
+    debug_trace($m, TRACE_DATA);
     $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
     $str = $csvrenderer->cross_table_csv($theblock, $m, $hcols);
 

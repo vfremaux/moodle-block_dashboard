@@ -29,6 +29,8 @@ $string['dashboard:configure'] = 'Peut configurer le tableau de bord';
 $string['dashboard:systempathaccess'] = 'Peut générer des fichiers dans tout le système de fichiers';
 $string['dashboard:export'] = 'Exporter les données (web service)';
 
+$string['cachedef_aggregate'] = 'Cache d\'agrégats de requête';
+
 $string['backtocourse'] = 'Revenir au cours';
 $string['backtoview'] = 'Revenir au résultat de requête';
 $string['bar'] = 'Barres';
