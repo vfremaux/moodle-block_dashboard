@@ -33,7 +33,7 @@ $plugin->component = 'block_dashboard'; // Full name of the plugin (used for dia
 $plugin->release = '3.9.0 (build 2022012100)';
 $plugin->maturity = MATURITY_RC;
 $plugin->dependencies = array('local_vflibs' => '2016081100');
-$plugin->supports = [38,39];
+$plugin->supports = [39,311];
 
 // Non moodle attributes.
 $plugin->codeincrement = '3.9.0006';
