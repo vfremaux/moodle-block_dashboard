@@ -223,6 +223,9 @@ $string['day'] = 'Day';
 $string['dofilter'] = 'Filter';
 $string['donut'] = 'Donut';
 $string['dropconfig'] = 'Copy here the configuration string';
+$string['plugindist'] = 'Plugin distribution';
+$string['emulatecommunity'] = 'Emulate community version';
+$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['editingnoexecute'] = ' You are in editing mode, the dashboard cannot execute queries';
 $string['enabled'] = ' enabled';
 $string['eventdesc'] = 'Event desc';
@@ -262,6 +265,10 @@ $string['invalidorobsoletequery'] = 'Invalid or obsolete query.';
 $string['line'] = 'Lines';
 $string['linear'] = 'Linear';
 $string['listvalue'] = 'Value List';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['log'] = 'Logarithmic';
 $string['maptypehybrid'] = 'Hybrid view';
 $string['maptyperoadmap'] = 'Road map';
@@ -272,6 +279,7 @@ $string['monday'] = 'Monday';
 $string['month'] = 'Month';
 $string['newdashboard'] = 'New dashboard';
 $string['nodata'] = 'No data available';
+$string['node'] = 'Data Node';
 $string['nofiles'] = 'No files';
 $string['noquerystored'] = 'No query stored';
 $string['norefresh'] = 'No refresh';
@@ -773,6 +781,13 @@ into an expansion of the results columns, remapping the pivot column data to for
 
 ';
 
+$string['plugindist_desc'] = '<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<ul><li><a href="http://service.activeprolearn.com/local/shop/front/view.php?id=1">ActiveProLearn SAS</a></li>
+<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>';
+
 $string['configserieslabels_help'] = '
 # Y series labels
 
@@ -790,5 +805,3 @@ You may choose to colorize results (textual) in one output column using value fi
 $string['configparent_help'] = '
 Give the alias of the query output field that designates the hierarchic binding. Often named "parent".
 ';
-
-include(__DIR__.'/pro_additional_strings.php');
