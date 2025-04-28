@@ -29,6 +29,8 @@ $string['dashboard:configure'] = 'Peut configurer le tableau de bord';
 $string['dashboard:systempathaccess'] = 'Peut générer des fichiers dans tout le système de fichiers';
 $string['dashboard:export'] = 'Exporter les données (web service)';
 
+$string['cachedef_aggregate'] = 'Cache d\'agrégats de requête';
+
 $string['backtocourse'] = 'Revenir au cours';
 $string['backtoview'] = 'Revenir au résultat de requête';
 $string['bar'] = 'Barres';
@@ -218,7 +220,6 @@ $string['mins'] = 'minute(s)';
 $string['monday'] = 'Lundi';
 $string['month'] = 'Mois';
 $string['newdashboard'] = 'Nouveau tableau de bord';
-$string['node'] = 'Noeud';
 $string['nodata'] = 'Aucune donnée disponible.';
 $string['nofiles'] = 'Pas de fichiers';
 $string['noquerystored'] = 'Pas de requête enregistrée';
@@ -571,10 +572,6 @@ $string['configtabletype_help'] = '
     <li><b>Table hiérachique</b> : si les données extraites présentent un principe hiérachique (id,parent)
 il est possible de les afficher dans une représentation arborescente.</li>
 </ul>
-';
-
-$string['configparent_help'] = '
-Désigner ici l\'alias de champ de la requête qui porte l\'information de hiérarchie. Souvent, on le nomme "parent".
 ';
 
 $string['confighierarchic_help'] = '

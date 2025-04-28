@@ -58,7 +58,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             include_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
             $pageid = optional_param('page', 0, PARAM_INT); // Flexipage page number.
             if (!$pageid) {
-                $flexpage = \format\page\course_page::get_current_page($COURSE->id);
+                $flexpage = \format_page\course_page::get_current_page($COURSE->id);
             } else {
                 $flexpage = new StdClass;
                 $flexpage->id = $pageid;
@@ -863,7 +863,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
             include_once($CFG->dirroot.'/course/format/page/classes/page.class.php');
             $pageid = optional_param('page', false, PARAM_INT);
             $template->ispageformatpage = !empty($pageid);
-            if ($page = \format\page\course_page::get_current_page($COURSE->id)) {
+            if ($page = \format_page\course_page::get_current_page($COURSE->id)) {
                 $template->pageid = $page->id;
             }
         }

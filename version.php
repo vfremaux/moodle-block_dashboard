@@ -18,7 +18,6 @@
  * Version details.
  *
  * @package    block_dashboard
- * @category   blocks
  * @copyright  2012 onwards Valery Fremaux (http://www.mylearningfactory.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
@@ -27,13 +26,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018092600;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2019051100;        // Requires this Moodle version.
+$plugin->version   = 2025011400;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2022041900;        // Requires this Moodle version.
 $plugin->component = 'block_dashboard'; // Full name of the plugin (used for diagnostics).
-$plugin->release = '3.7.0 (build 2018092600)';
+$plugin->release = '4.5.0 (build 2022012100)';
 $plugin->maturity = MATURITY_RC;
 $plugin->dependencies = array('local_vflibs' => '2016081100');
+$plugin->supports = [401, 405];
 
 // Non moodle attributes.
-$plugin->codeincrement = '3.7.0006';
+$plugin->codeincrement = '4.5.0006';
 $plugin->privacy = 'dualrelease';
