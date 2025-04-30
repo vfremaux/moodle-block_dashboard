@@ -32,6 +32,8 @@ $string['dashboard:export'] = 'Export data (web service)';
 // Privacy.
 $string['privacy:metadata'] = 'The Dashboard block does not store any personal data about any user.';
 
+$string['cachedef_aggregate'] = 'Query aggregates cache';
+
 $string['backtocourse'] = 'Back to course';
 $string['backtoview'] = 'Back to block view';
 $string['bar'] = 'Bars';
@@ -169,7 +171,9 @@ $string['configymin'] = 'Y axis min';
 $string['configyseries'] = 'Data series';
 $string['configyseriesformats'] = 'Data series formatting';
 $string['configzoom'] = 'Zoom';
-$string['confiygmin'] = 'Q min';
+$string['configqmin'] = 'Q min';
+$string['configmapprovider'] = 'Map provider';
+$string['configmapprovider_desc'] = 'OpenLayer is a free map system. Google Maps needs a paied key for displaying maps.';
 $string['crontraceon'] = 'Dashboard cron trace';
 $string['crontraceon_desc'] = 'If enable, generates a special <dataroot>/dashboards.log file for tracing croned executions.';
 $string['csv'] = 'CSV records';
@@ -221,9 +225,6 @@ $string['day'] = 'Day';
 $string['dofilter'] = 'Filter';
 $string['donut'] = 'Donut';
 $string['dropconfig'] = 'Copy here the configuration string';
-$string['plugindist'] = 'Plugin distribution';
-$string['emulatecommunity'] = 'Emulate community version';
-$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['editingnoexecute'] = ' You are in editing mode, the dashboard cannot execute queries';
 $string['enabled'] = ' enabled';
 $string['eventdesc'] = 'Event desc';
@@ -263,10 +264,6 @@ $string['invalidorobsoletequery'] = 'Invalid or obsolete query.';
 $string['line'] = 'Lines';
 $string['linear'] = 'Linear';
 $string['listvalue'] = 'Value List';
-$string['licenseprovider'] = 'Pro License provider';
-$string['licenseprovider_desc'] = 'Input here your provider key';
-$string['licensekey'] = 'Pro license key';
-$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['log'] = 'Logarithmic';
 $string['maptypehybrid'] = 'Hybrid view';
 $string['maptyperoadmap'] = 'Road map';
@@ -778,13 +775,6 @@ into an expansion of the results columns, remapping the pivot column data to for
 
 ';
 
-$string['plugindist_desc'] = '<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<ul><li><a href="http://service.activeprolearn.com/local/shop/front/view.php?id=1">ActiveProLearn SAS</a></li>
-<li><a href="http://www.edunao.com">Edunao SAS</a></li></ul>';
-
 $string['configserieslabels_help'] = '
 # Y series labels
 
@@ -798,3 +788,9 @@ You may choose to colorize results (textual) in one output column using value fi
   - in the left side text area enter an evaluation expression replacing value by %% (f.e. %% == 0).
   - in the right side text area, enter the html colour code.
 ';
+
+$string['configparent_help'] = '
+Give the alias of the query output field that designates the hierarchic binding. Often named "parent".
+';
+
+include(__DIR__.'/pro_additional_strings.php');

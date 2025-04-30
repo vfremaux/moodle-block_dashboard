@@ -27,9 +27,13 @@ defined('MOODLE_INTERNAL') || die();
  * implementation path where to fetch resources.
  * @param string $feature a feature key to be tested.
  */
-function block_dashboard_supports_feature($feature) {
+function block_dashboard_supports_feature($feature = null, $getsupported = false) {
     global $CFG;
     static $supports;
+
+    if (!during_initial_install()) {
+        $config = get_config('block_dashboard');
+    }
 
     if (!isset($supports)) {
         $supports = array(
@@ -46,6 +50,10 @@ function block_dashboard_supports_feature($feature) {
         );
     }
 
+    if ($getsupported) {
+        return $supports;
+    }
+
     // Check existance of the 'pro' dir in plugin.
     if (is_dir(__DIR__.'/pro')) {
         if ($feature == 'emulate/community') {
@@ -58,6 +66,11 @@ function block_dashboard_supports_feature($feature) {
         }
     } else {
         $versionkey = 'community';
+    }
+
+    if (empty($feature)) {
+        // Just return version.
+        return $versionkey;
     }
 
     list($feat, $subfeat) = explode('/', $feature);
@@ -199,7 +212,7 @@ function dashboard_table_explore_rec(&$theblock, &$str, &$pathstack, &$hcols, &$
         if ($level < $keydeepness) {
             dashboard_table_explore_rec($theblock, $str, $pathstack, $hcols, $v, $vkeys, $hlabel, $keydeepness, $subsums);
         } else {
-            $pre = "<tr class=\"row r{$r}\" >";
+            $pre = "<tr class=\"dashboard-row r{$r}\" >";
             $r = ($r + 1) % 2;
             $c = 0;
             foreach ($pathstack as $pathelm) {

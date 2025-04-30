@@ -82,7 +82,8 @@ if (!empty($sort)) {
 
 $filteredsql = $theblock->protect($theblock->filteredsql);
 
-$results = $theblock->fetch_dashboard_data($filteredsql, '', '', true); // get all data
+$results = [];
+$theblock->fetch_dashboard_data($filteredsql, $results, '', true); // get all data
 
 if ($results) {
     // Output csv file.
@@ -96,7 +97,6 @@ if ($results) {
         // This is a tabular table.
         /*
          * in a tabular table, data can be placed :
-         * - in first columns in order of vertical keys
          * - in first columns in order of vertical keys
          * the results are grabbed sequentially and spread into the matrix 
          */
@@ -141,12 +141,19 @@ if ($results) {
                 $outvalues[] = str_replace('"', '\\"', $datum);
             }
         }
-        $matrixst .= ' = "'.implode(' ',$outvalues).'"';
+        $matrixst .= ' = "'.implode(' ', $outvalues).'"';
 
-        // Make the matrix in memory.
+        // Add a matrix cell in php memory.
+		if (function_exists('debug_trace')) {
+	        debug_trace($matrixst, TRACE_DEBUG);
+	    }
         eval($matrixst.";");
     }
 
+	if (function_exists('debug_trace')) {
+	    debug_trace("Final Matrix", TRACE_DATA);
+	    debug_trace($m, TRACE_DATA);
+	}
     $csvrenderer = $PAGE->get_renderer('block_dashboard', 'csv');
     $str = $csvrenderer->cross_table_csv($theblock, $m, $hcols);
 

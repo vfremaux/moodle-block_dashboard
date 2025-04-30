@@ -103,7 +103,7 @@ function extra_db_set_config($configkey, $value) {
 /**
  * connects to ERP database on a new postgre connection
  */
-function extra_db_connect($return = false, &$error) {
+function extra_db_connect($return = false, &$error = null) {
     global $extradbcnx;
 
     $extra_dbport = extra_db_get_config('extra_db_port');
@@ -146,9 +146,12 @@ function extra_db_close() {
 }
 
 /**
- *
+ * @param string $sql
+ * @param bool $renew
+ * @param bool $return
+ * @param stringref &$error
  */
-function extra_db_query($sql, $renew = false, $return = false, &$error) {
+function extra_db_query($sql, $renew = false, $return = false, &$error = null) {
     global $extradbcnx;
     static $querycache;
 

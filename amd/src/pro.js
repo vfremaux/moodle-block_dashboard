@@ -13,27 +13,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-// jshint undef:false, unused:false, scripturl:true
+// jshint unused: true, undef:true
 
-/**
- * Javascript controller for pro services.
- *
- * @module     block_dashboard/pro
- * @package    block_dashboard
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
-    var blkdashboardpro = {
+    var blockdashboardpro = {
+
+        component: 'block_dashboard',
+        shortcomponent: 'block_dashboard',
+        componentpath: 'blocks/dashboard',
 
         init: function() {
 
-            $('#id_s_block_dashboard_licensekey').bind('change', this.check_product_key);
-            $('#id_s_block_dashboard_licensekey').trigger('change');
-            log.debug('AMD Pro js initialized for use_stats');
+            var licensekeyid = '#id_s_' + blockdashboardpro.component + '_licensekey';
+            $(licensekeyid).bind('change', this.check_product_key);
+            $(licensekeyid).trigger('change');
+            log.debug('AMD Pro js initialized for ' + blockdashboardpro.component + ' system');
         },
 
         check_product_key: function() {
+
+            var licensekeyid = '#id_s_' + blockdashboardpro.component + '_licensekey';
 
             var that = $(this);
 
@@ -41,35 +41,41 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             var payload = productkey.substr(0, 14);
             var crc = productkey.substr(14, 2);
 
-            var calculated = blkdashboardpro.checksum(payload);
+            var calculated = blockdashboardpro.checksum(payload);
 
-            var validicon = ' <img src="' + cfg.wwwroot + '/pix/i/valid.png' + '">';
-            var cautionicon = ' <img src="' + cfg.wwwroot + '/pix/i/warning.png' + '">';
-            var invalidicon = ' <img src="' + cfg.wwwroot + '/pix/i/invalid.png' + '">';
-            var waiticon = ' <img src="' + cfg.wwwroot + '/pix/i/ajaxloader.gif' + '">';
+            var validicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/valid.svg' + '">';
+            var cautionicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/warning.svg' + '">';
+            var invalidicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/invalid.svg' + '">';
+            var waiticon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/loading.svg' + '">';
+            var found;
 
             if (crc === calculated) {
-                var url = cfg.wwwroot + '/blocks/dashboard/pro/ajax/services.php?';
+                var url = cfg.wwwroot + '/' + blockdashboardpro.componentpath + '/pro/ajax/services.php?';
                 url += 'what=license';
                 url += '&service=check';
                 url += '&customerkey=' + that.val();
-                url += '&provider=' + $('#id_s_block_dashboard_licenseprovider').val();
+                url += '&provider=' + $('#id_s_' + blockdashboardpro.component + '_licenseprovider').val();
 
-                $('#id_s_block_dashboard_licensekey + img').remove();
-                $('#id_s_block_dashboard_licensekey').after(waiticon);
+                $(licensekeyid + ' + img').remove();
+                $(licensekeyid).after(waiticon);
 
                 $.get(url, function(data) {
-                    if (data.match(/SET OK/)) {
-                        $('#id_s_block_dashboard_licensekey + img').remove();
-                        $('#id_s_block_dashboard_licensekey').after(validicon);
+                    if (data.match(/(SET|CHECK) OK/)) {
+                        if (found = data.match(/-\d+.*$/)) {
+                            $(licensekeyid + ' + img').remove();
+                            $(licensekeyid).after(cautionicon);
+                        } else {
+                            $(licensekeyid + ' + img').remove();
+                            $(licensekeyid).after(validicon);
+                        }
                     } else {
-                        $('#id_s_block_dashboard_licensekey + img').remove();
-                        $('#id_s_block_dashboard_licensekey').after(invalidicon);
+                        $(licensekeyid + ' + img').remove();
+                        $(licensekeyid).after(invalidicon);
                     }
                 }, 'html');
             } else {
-                $('#id_s_block_dashboard_licensekey + img').remove();
-                $('#id_s_block_dashboard_licensekey').after(cautionicon);
+                $(licensekeyid + ' + img').remove();
+                $(licensekeyid).after(cautionicon);
             }
         },
 
@@ -95,5 +101,5 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
         }
     };
 
-    return blkdashboardpro;
+    return blockdashboardpro;
 });
