@@ -877,7 +877,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
         $template->blockid = $theblock->instance->id;
         $template->courseid = $COURSE->id;
 
-        $template->inblocklayout = @$theblock->config->inblocklayout;
+        $template->inblocklayout = $theblock->config->inblocklayout ?? false;
         $template->blockidparam = optional_param('blockid', 0, PARAM_INT);
 
         if ($COURSE->format == 'page') {
@@ -958,7 +958,7 @@ class block_dashboard_renderer extends plugin_renderer_base {
                 $arrayform = ($filtertpl->multiple) ? '[]' : '';
 
                 if (!is_array(@$theblock->filtervalues[$radical])) {
-                    $unslashedvalue = stripslashes(@$theblock->filtervalues[$radical]);
+                    $unslashedvalue = stripslashes($theblock->filtervalues[$radical] ?? '');
                 } else {
                     $unslashedvalue = $theblock->filtervalues[$radical];
                 }

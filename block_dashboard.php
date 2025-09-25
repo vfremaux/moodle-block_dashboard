@@ -1100,10 +1100,10 @@ class block_dashboard extends block_base {
         $outputfilterdefaults = explode(';', @$this->config->filterdefaults);
         dashboard_normalize($outputfilters, $outputfilterdefaults); // Normalizes defaults to keys.
         $this->filterfields->defaults = array_combine($outputfilters, $outputfilterdefaults);
-        $outputfilteroptions = explode(';', @$this->config->filteroptions);
+        $outputfilteroptions = explode(';', $this->config->filteroptions ?? '');
         dashboard_normalize($outputfilters, $outputfilteroptions); // Normalizes options to keys.
         $this->filterfields->options = array_combine($outputfilters, $outputfilteroptions);
-        $outputfilterqueries = explode(';', @$this->config->filterqueries);
+        $outputfilterqueries = explode(';', $this->config->filterqueries ?? '');
         dashboard_normalize($outputfilters, $outputfilterqueries); // Normalizes options to keys.
         $this->filterfields->queries = array_combine($outputfilters, $outputfilterqueries);
 
@@ -1121,9 +1121,9 @@ class block_dashboard extends block_base {
         $this->filterfields->filtercanonicalfield = $filterfields;
 
         // Tabular params.
-        $vkeys = explode(";", @$this->config->verticalkeys);
-        $vformats = explode(";", @$this->config->verticalformats);
-        $vlabels = explode(";", @$this->config->verticallabels);
+        $vkeys = explode(";", $this->config->verticalkeys ?? '');
+        $vformats = explode(";", $this->config->verticalformats ?? '');
+        $vlabels = explode(";", $this->config->verticallabels ?? '');
         dashboard_normalize($vkeys, $vformats); // Normalizes formats to keys.
         dashboard_normalize($vkeys, $vlabels); // Normalizes labels to keys.
         $this->vertkeys = new StdClass;
@@ -1132,24 +1132,24 @@ class block_dashboard extends block_base {
 
         // Treeview params.
         $parentserie = @$this->config->parentserie;
-        $treeoutputfields = explode(';', @$this->config->treeoutput);
-        $treeoutputformats = explode(';', @$this->config->treeoutputformats);
+        $treeoutputfields = explode(';', $this->config->treeoutput ?? '');
+        $treeoutputformats = explode(';', $this->config->treeoutputformats ?? '');
         dashboard_normalize($treeoutputfields, $treeoutputformats); // Normailzes labels to keys.
         $this->treeoutput = array_combine($treeoutputfields, $treeoutputformats);
 
         // Summators.
-        $numsums = explode(';', @$this->config->numsums);
-        $numsumlabels = explode(';', @$this->config->numsumlabels);
-        $numsumformats = explode(';', @$this->config->numsumformats);
+        $numsums = explode(';', $this->config->numsums ?? '');
+        $numsumlabels = explode(';', $this->config->numsumlabels ?? '');
+        $numsumformats = explode(';', $this->config->numsumformats ?? '');
         dashboard_normalize($numsums, $numsumlabels); // Normailzes labels to keys.
         dashboard_normalize($numsums, $numsumformats); // Normailzes labels to keys.
         $this->outputnumsums = array_combine($numsums, $numsumlabels);
         $this->numsumsf = array_combine($numsums, $numsumformats);
 
         // Graph params.
-        $yseries = explode(';', @$this->config->yseries);
-        $yseriesformats = explode(';', @$this->config->yseriesformats);
-        $yserieslabels = explode(';', @$this->config->serieslabels);
+        $yseries = explode(';', $this->config->yseries ?? '');
+        $yseriesformats = explode(';', $this->config->yseriesformats ?? '');
+        $yserieslabels = explode(';', $this->config->serieslabels ?? '');
         dashboard_normalize($yseries, $yseriesformats); // Normalizes formats to keys.
         dashboard_normalize($yseries, $yserieslabels); // Normalizes labels to keys.
         $this->yseries = array_combine($yseries, $yserieslabels);
@@ -1169,11 +1169,11 @@ class block_dashboard extends block_base {
             if (!empty($this->config->$varkey)) {
                 $uparam = new StdClass;
                 $uparam->key = $this->config->$varkey;
-                $uparam->paramas = @$this->config->$paramaskey;
+                $uparam->paramas = $this->config->$paramaskey ?? false;
                 $uparam->label = $this->config->$labelkey;
                 $uparam->type = $this->config->$typekey;
                 $uparam->values = $this->config->$valueskey;
-                $uparam->default = @$this->config->$defaultkey;
+                $uparam->default = $this->config->$defaultkey ?? false;
                 $uparam->ashaving = dashboard_guess_is_alias($this, $uparam->key);
                 $this->params[$uparam->key] = $uparam;
             }
@@ -1221,7 +1221,7 @@ class block_dashboard extends block_base {
                 case ('choice'):
                 case ('select'):
                 case ('date'):
-                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), $param->default ?? '', PARAM_TEXT);
                     $paramvalue = trim($paramvalue); // In case of...
                     if ($param->type == 'date') {
                         $this->params[$sqlkey]->originalvalue = $paramvalue;
@@ -1249,7 +1249,7 @@ class block_dashboard extends block_base {
                     break;
 
                 case ('text'):
-                    $paramvalue = optional_param(core_text::strtolower($key), @$param->default, PARAM_TEXT);
+                    $paramvalue = optional_param(core_text::strtolower($key), $param->default ?? '', PARAM_TEXT);
                     $this->params[$sqlkey]->value = $paramvalue;
                     if ($paramvalue) {
                         if ($param->paramas == 'sql') {
@@ -1272,7 +1272,7 @@ class block_dashboard extends block_base {
 
                 case ('range'):
                 case ('daterange'):
-                    $valuefrom = optional_param(core_text::strtolower($key).'_from', @$param->default, PARAM_TEXT);
+                    $valuefrom = optional_param(core_text::strtolower($key).'_from', $param->default ?? '', PARAM_TEXT);
                     $valueto = optional_param(core_text::strtolower($key).'_to', '', PARAM_TEXT);
                     $this->params[$sqlkey]->originalvaluefrom = $valuefrom;
                     $this->params[$sqlkey]->originalvalueto = $valueto;
